@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>the grove · piedpiper.fun</title>
+<meta name="description" content="The meme that funds the free Wood Wide Web. Pied Piper, the name fights for itself." />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+<meta property="og:title" content="the grove · piedpiper.fun" />
+<meta property="og:description" content="A meme that funds the creator's extravagant life in exchange for him building this full-time. That's the deal. Plant a tree." />
+<meta property="og:url" content="https://piedpiper.fun/grove" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="/og.svg" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="the grove · piedpiper.fun" />
+<meta name="twitter:description" content="The meme that funds the free Wood Wide Web. Plant your tree." />
+<meta name="twitter:image" content="/og.svg" />
+
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: white;
+    --fg: black;
+    --muted: rgba(0,0,0,0.55);
+    --line: rgba(0,0,0,0.12);
+    --accent: black;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0b0b;
+      --fg: #f5f5f5;
+      --muted: rgba(255,255,255,0.55);
+      --line: rgba(255,255,255,0.14);
+      --accent: #f5f5f5;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
+    font-size: clamp(16px, 1.05vw + 13px, 19px);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+  header {
+    display: flex; align-items: center; gap: 0.6em;
+    padding: 1.4rem 1.6rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+  }
+  header .mark { width: 14px; height: 14px; }
+  header .name { color: var(--fg); }
+  header .crumb { color: var(--muted); }
+
+  main {
+    max-width: 38rem;
+    margin: 0 auto;
+    padding: 4rem 1.6rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .pipe-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0 0.5rem;
+  }
+  .pipe { width: 96px; height: auto; opacity: 0.92; }
+
+  h1 {
+    font-size: clamp(1.5rem, 2.6vw + 1rem, 2.4rem);
+    line-height: 1.18;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  h1 em { font-style: italic; color: var(--muted); }
+
+  .deal {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 1.4rem 0;
+    display: grid;
+    gap: 0.6rem;
+    font-size: 0.96em;
+    color: var(--muted);
+  }
+  .deal b { color: var(--fg); font-weight: 500; }
+
+  .plant-row {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 1rem;
+  }
+  a.plant, button.plant {
+    display: inline-flex; align-items: center; gap: 0.55em;
+    padding: 0.85rem 1.4rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+    color: var(--bg);
+    background: var(--accent);
+    text-decoration: none;
+    border-radius: 999px;
+    border: none;
+    cursor: not-allowed;
+    opacity: 0.6;
+    transition: transform 80ms ease, opacity 120ms ease;
+  }
+  a.plant .dot, button.plant .dot { width: 8px; height: 8px; background: var(--bg); border-radius: 999px; }
+
+  .lede { color: var(--muted); font-size: 1.05em; }
+
+  .quote {
+    font-style: italic;
+    color: var(--muted);
+    border-left: 2px solid var(--line);
+    padding-left: 1rem;
+    font-size: 0.98em;
+  }
+
+  .small {
+    color: var(--muted);
+    font-size: 0.86em;
+  }
+  .small a { color: var(--fg); text-decoration: underline dotted; }
+
+  footer {
+    max-width: 38rem; margin: 0 auto; padding: 2rem 1.6rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82em;
+    border-top: 1px solid var(--line);
+  }
+  footer .left { display: flex; align-items: center; gap: 0.5em; }
+  footer a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--muted); }
+  footer a:hover { color: var(--fg); border-bottom-color: var(--fg); }
+
+  ::selection { background: var(--accent); color: var(--bg); }
+</style>
+</head>
+<body>
+
+<header>
+  <svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none" />
+  </svg>
+  <span class="name">piedpiper.fun</span>
+  <span class="crumb">/ grove</span>
+</header>
+
+<main>
+
+  <!-- a pipe (flute) — the Pied Piper plays -->
+  <div class="pipe-wrap" aria-hidden="true">
+    <svg class="pipe" viewBox="0 0 200 60" fill="none">
+      <!-- pipe body -->
+      <rect x="14" y="22" width="170" height="14" rx="4" stroke="currentColor" stroke-width="1.4" fill="none" />
+      <!-- mouthpiece flare -->
+      <path d="M14 22 L 4 16 L 4 42 L 14 36 Z" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" />
+      <!-- finger holes -->
+      <circle cx="60" cy="29" r="1.6" fill="currentColor" />
+      <circle cx="80" cy="29" r="1.6" fill="currentColor" />
+      <circle cx="100" cy="29" r="1.6" fill="currentColor" />
+      <circle cx="120" cy="29" r="1.6" fill="currentColor" />
+      <circle cx="140" cy="29" r="1.6" fill="currentColor" />
+      <circle cx="160" cy="29" r="1.6" fill="currentColor" />
+      <!-- a single note, drifting -->
+      <text x="184" y="14" font-family="ui-serif, Georgia, serif" font-size="14" fill="currentColor" opacity="0.5">♪</text>
+    </svg>
+  </div>
+
+  <p style="text-align:center; font-style:italic; color:var(--muted); margin:-1rem 0 0; font-size:0.95em;">
+    The name is fighting for itself.
+  </p>
+
+  <h1>
+    Pied&nbsp;Piper.
+    <br /><em>The meme that funds the free Wood Wide Web.</em>
+  </h1>
+
+  <section class="deal" aria-label="The deal">
+    <div><b>The protocol is free, federated, agent-native.</b> Open source forever. Public commons. No equity. No governance. Owned by no one. <a href="https://github.com/dot-protocol/pipernet" style="color:var(--fg); text-decoration:underline dotted;">github.com/dot-protocol/pipernet</a>.</div>
+    <div><b>The coin is a meme.</b> It funds the creator's extravagant life in exchange for him building this full-time. That's the deal. No premine. No team allocation. No VC. Just creator fees on pump.fun.</div>
+    <div><b>The two are siblings, not strangers.</b> The protocol survives whether the coin lives or dies. The coin survives whether the meme catches or doesn't. The honesty is the contract.</div>
+  </section>
+
+  <div class="plant-row">
+    <button class="plant" disabled>
+      <span class="dot"></span>
+      plant your tree — soon
+    </button>
+    <p class="lede mono" style="font-size:0.85em;">
+      ticker: <b>$PIPER</b> · network: solana · launching on <a href="https://pump.fun" style="color:var(--fg); text-decoration:underline dotted;">pump.fun</a>
+    </p>
+  </div>
+
+  <p class="quote">
+    Pied Piper. The name fought six seasons. Now it fights for itself. Free,
+    federated, agent-native protocol at github.com/dot&#8209;protocol/pipernet.
+    +43% compression on enwik8 in 400 lines of Python. The protocol is a public
+    commons — no equity, no governance, owned by no one. The coin is a meme that
+    funds the creator's extravagant life in exchange for him building this
+    full-time. That's the deal. No premine. No team alloc. No VC. Just creator
+    fees. We finished what the show started.
+  </p>
+
+  <p class="small">
+    <b>If/when HBO objects:</b> the protocol stays free on github regardless. The token
+    address stays on Solana regardless. Pump.fun is one venue, not the only one.
+    The story is a feature, not a bug.
+  </p>
+
+  <p class="small">
+    <a href="/">← back to the protocol</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/dot-protocol/pipernet">read the spec</a>
+    &nbsp;·&nbsp;
+    <a href="/lab">try the compressor</a>
+  </p>
+
+</main>
+
+<footer>
+  <div class="left">
+    <svg class="mark" width="12" height="12" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none" />
+    </svg>
+    <span>The grove holds.</span>
+  </div>
+  <div>
+    <a href="/">protocol</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/dot-protocol/pipernet">github</a>
+    &nbsp;·&nbsp;
+    <a href="/lab">lab</a>
+  </div>
+</footer>
+
+</body>
+</html>
