@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0b0b0b"/>
+  <g transform="translate(100,80)">
+    <circle cx="20" cy="20" r="16" stroke="#f5f5f5" stroke-width="2.5" fill="none"/>
+    <text x="56" y="28" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="22" fill="#f5f5f5" letter-spacing="0.5">piedpiper.fun</text>
+  </g>
+  <g transform="translate(100,260)">
+    <text font-family="ui-serif, Georgia, serif" font-size="58" fill="#f5f5f5">
+      <tspan x="0" dy="0">Pied Piper fought for six seasons</tspan>
+      <tspan x="0" dy="74">inside a story that wouldn't let</tspan>
+      <tspan x="0" dy="74">it win.</tspan>
+    </text>
+    <text font-family="ui-serif, Georgia, serif" font-style="italic" font-size="42" fill="rgba(245,245,245,0.6)">
+      <tspan x="0" dy="120">We're giving it the life it never got.</tspan>
+    </text>
+  </g>
+  <g transform="translate(100,580)">
+    <text font-family="ui-monospace, Menlo, Consolas, monospace" font-size="20" fill="rgba(245,245,245,0.55)">
+      Free. Forever. Take it. — I open at the close.
+    </text>
+  </g>
+</svg>

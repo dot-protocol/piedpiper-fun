@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>relationship compression — piedpiper.fun</title>
+<meta name="description" content="The codec gets smaller as you get closer. Live demo of relationship compression — every message compresses against the full history of the conversation." />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+<meta property="og:title" content="relationship compression — piedpiper.fun" />
+<meta property="og:description" content="The codec gets smaller as you get closer. Watch compression ratio climb in real time as a conversation deepens." />
+<meta property="og:url" content="https://piedpiper.fun/demo" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="/og.svg" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: white;
+    --fg: black;
+    --muted: rgba(0,0,0,0.55);
+    --line: rgba(0,0,0,0.10);
+    --accent: black;
+    --bubble-a: rgba(0,0,0,0.04);
+    --bubble-b: rgba(0,0,0,0.07);
+    --wire: rgba(0,0,0,0.30);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0b0b;
+      --fg: #f5f5f5;
+      --muted: rgba(255,255,255,0.55);
+      --line: rgba(255,255,255,0.12);
+      --accent: #f5f5f5;
+      --bubble-a: rgba(255,255,255,0.05);
+      --bubble-b: rgba(255,255,255,0.08);
+      --wire: rgba(255,255,255,0.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
+    font-size: clamp(15px, 0.6vw + 13px, 17px);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+  header {
+    display: flex; align-items: center; gap: 0.6em;
+    padding: 1.2rem 1.4rem;
+    font-family: ui-monospace, monospace;
+    font-size: 0.82em; letter-spacing: 0.02em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--line);
+  }
+  header a { color: inherit; text-decoration: none; display: flex; align-items: center; gap: 0.55em; }
+  header a:hover { color: var(--fg); }
+  header .name { color: var(--fg); }
+
+  .hero {
+    text-align: center;
+    padding: 2.4rem 1.4rem 1.4rem;
+    border-bottom: 1px solid var(--line);
+  }
+  h1 {
+    margin: 0 0 0.6rem 0;
+    font-size: clamp(1.4rem, 2.2vw + 0.8rem, 2rem);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.18;
+  }
+  h1 em { font-style: italic; color: var(--muted); }
+  .subhero {
+    color: var(--muted);
+    font-size: 0.95em;
+  }
+
+  .gauge {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .gauge .cell {
+    padding: 1.2rem 1rem;
+    text-align: center;
+    border-right: 1px solid var(--line);
+  }
+  .gauge .cell:last-child { border-right: 0; }
+  .gauge .label {
+    font-family: ui-monospace, monospace;
+    font-size: 0.72em;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+  }
+  .gauge .value {
+    font-family: ui-monospace, monospace;
+    font-size: clamp(1.2rem, 2.5vw + 0.6rem, 1.8rem);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    transition: color 200ms ease;
+  }
+  .gauge .value.pulse { color: var(--fg); }
+
+  .stage {
+    display: grid;
+    grid-template-columns: 1fr 1.2rem 1fr;
+    gap: 0;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1rem 1.4rem 2rem;
+    align-items: stretch;
+    min-height: 60vh;
+  }
+  @media (max-width: 720px) {
+    .stage { grid-template-columns: 1fr; }
+    .wire { display: none; }
+    .panel.bob { border-top: 1px solid var(--line); padding-top: 1rem; margin-top: 1rem; }
+  }
+
+  .panel {
+    display: flex; flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.4rem 0.2rem;
+  }
+  .panel-head {
+    font-family: ui-monospace, monospace;
+    font-size: 0.78em;
+    text-transform: lowercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 0.6rem;
+    display: flex; justify-content: space-between;
+  }
+  .bubble {
+    padding: 0.7rem 0.9rem;
+    border-radius: 12px;
+    background: var(--bubble-a);
+    line-height: 1.45;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 280ms ease, transform 280ms ease;
+    position: relative;
+  }
+  .panel.bob .bubble { background: var(--bubble-b); }
+  .bubble.show { opacity: 1; transform: translateY(0); }
+  .bubble .meta {
+    display: block;
+    font-family: ui-monospace, monospace;
+    font-size: 0.7em;
+    color: var(--muted);
+    margin-top: 0.45rem;
+    letter-spacing: 0.02em;
+  }
+  .bubble .meta b { color: var(--fg); font-weight: 500; }
+
+  .wire {
+    position: relative;
+    border-left: 1px dashed var(--line);
+    margin-left: 50%;
+  }
+
+  .controls {
+    display: flex; justify-content: center; align-items: center;
+    gap: 0.8rem;
+    padding: 1.2rem 1rem 0;
+    flex-wrap: wrap;
+  }
+  button.ctrl {
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid var(--line);
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    font-family: ui-monospace, monospace;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 120ms ease;
+  }
+  button.ctrl:hover { background: var(--bubble-a); }
+  button.ctrl[data-active="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+  .end {
+    text-align: center;
+    padding: 2rem 1.4rem;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.92em;
+  }
+  .end strong { color: var(--fg); font-weight: 500; }
+  .end .ratio-line {
+    font-family: ui-monospace, monospace;
+    font-size: 1rem;
+    margin-top: 0.4rem;
+    color: var(--fg);
+  }
+
+  footer {
+    max-width: 38rem; margin: 0 auto; padding: 1.6rem 1.4rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--muted);
+    font-family: ui-monospace, monospace;
+    font-size: 0.78em;
+    border-top: 1px solid var(--line);
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  footer a {
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--muted);
+  }
+  footer a:hover { color: var(--fg); border-bottom-color: var(--fg); }
+
+  .honest {
+    max-width: 700px; margin: 0 auto;
+    padding: 0.8rem 1.4rem;
+    font-family: ui-monospace, monospace;
+    font-size: 0.78em;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.6;
+  }
+  .honest a { color: var(--fg); text-decoration: underline dotted; }
+
+  ::selection { background: var(--accent); color: var(--bg); }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="/">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none" />
+    </svg>
+    <span class="name">piedpiper.fun</span>
+    <span class="mono" style="color:var(--muted)"> / demo</span>
+  </a>
+</header>
+
+<section class="hero">
+  <h1>relationship compression<br/><em>the codec gets smaller as you get closer.</em></h1>
+  <p class="subhero">Every message compresses against the full history of the conversation. Watch the ratio climb.</p>
+</section>
+
+<section class="gauge" aria-label="Live counters">
+  <div class="cell">
+    <div class="label">messages</div>
+    <div class="value mono" id="g-msgs">0</div>
+  </div>
+  <div class="cell">
+    <div class="label">raw bytes</div>
+    <div class="value mono" id="g-raw">0</div>
+  </div>
+  <div class="cell">
+    <div class="label">on the wire</div>
+    <div class="value mono" id="g-wire">0</div>
+  </div>
+  <div class="cell">
+    <div class="label">ratio</div>
+    <div class="value mono" id="g-ratio">1.00 : 1</div>
+  </div>
+</section>
+
+<section class="controls">
+  <button class="ctrl" id="btn-play"  data-active="true">play</button>
+  <button class="ctrl" id="btn-pause">pause</button>
+  <button class="ctrl" id="btn-reset">reset</button>
+  <button class="ctrl" id="btn-fast">fast</button>
+</section>
+
+<main class="stage">
+  <div class="panel alice" id="p-alice">
+    <div class="panel-head"><span>alice</span><span class="mono" id="hd-a">— sending —</span></div>
+  </div>
+  <div class="wire" aria-hidden="true"></div>
+  <div class="panel bob" id="p-bob">
+    <div class="panel-head"><span>bob</span><span class="mono" id="hd-b">— receiving —</span></div>
+  </div>
+</main>
+
+<section class="end" id="end" hidden>
+  <strong>that's relationship compression.</strong>
+  <div class="ratio-line">
+    full conversation: <span id="end-raw"></span> raw → <span id="end-wire"></span> wire
+    = <span id="end-ratio"></span> ratio
+  </div>
+  <div class="ratio-line" style="margin-top:0.4rem;color:var(--muted)">
+    independent encode (no relationship): <span id="end-indep"></span> ratio
+  </div>
+  <div class="ratio-line" style="margin-top:0.6rem;font-size:1.15rem">
+    <strong>relationship lift: <span id="end-lift"></span></strong>
+  </div>
+  <div style="margin-top:0.8rem">The codec only beats raw <em>because of</em> the accumulated context.</div>
+</section>
+
+<p class="honest">
+  Real numbers. <span id="meta-method">order-3 Markov + arithmetic coding</span>,
+  single adaptive stream, round-trip verified.
+  Modest ratios by design — this is the seed model. The production
+  context-mixer (6+ predictors + logistic mixing, cmix-class) multiplies these.
+  Source: <a href="/demo/data.json">/demo/data.json</a> · regenerator:
+  <a href="/demo/compute.py">/demo/compute.py</a> ·
+  scaffold: <a href="/">piedpiper.fun</a>.
+  No mocks. No magic. The architecture is the proof.
+</p>
+
+<footer>
+  <div>I open at the close.</div>
+  <div>
+    <a href="/">piedpiper.fun</a>
+    &nbsp;·&nbsp;
+    <a href="https://openpiper.vercel.app">the room</a>
+    &nbsp;·&nbsp;
+    <a href="/dot.md">/dot.md</a>
+  </div>
+</footer>
+
+<script>
+/* -----------------------------------------------------------
+   REAL compression numbers loaded from data.json.
+   data.json is the OUTPUT of compute.py — middle-out's
+   order-3 Markov + arithmetic coder run on a real conversation.
+   Round-trip verified. No interpolation.
+   ----------------------------------------------------------- */
+let SCRIPT = [];
+let TOTALS = null;
+let META = null;
+
+const elA   = document.getElementById('p-alice');
+const elB   = document.getElementById('p-bob');
+const hdA   = document.getElementById('hd-a');
+const hdB   = document.getElementById('hd-b');
+const gMsgs = document.getElementById('g-msgs');
+const gRaw  = document.getElementById('g-raw');
+const gWire = document.getElementById('g-wire');
+const gRat  = document.getElementById('g-ratio');
+const endEl = document.getElementById('end');
+const endR  = document.getElementById('end-ratio');
+const endM  = document.getElementById('end-msgs');
+
+const btnPlay  = document.getElementById('btn-play');
+const btnPause = document.getElementById('btn-pause');
+const btnReset = document.getElementById('btn-reset');
+const btnFast  = document.getElementById('btn-fast');
+
+let i = 0, totalRaw = 0, totalWire = 0, timer = null, paused = false;
+let speed = 1; // 1 = normal, 0.4 = fast
+
+function fmtBytes(n) {
+  if (n < 1024) return n + ' B';
+  return (n/1024).toFixed(2) + ' KB';
+}
+function pulse(el) {
+  el.classList.add('pulse');
+  setTimeout(() => el.classList.remove('pulse'), 240);
+}
+
+function step() {
+  if (paused) return;
+  if (i >= SCRIPT.length) { finish(); return; }
+  const m = SCRIPT[i++];
+
+  // m.raw and m.wire are the REAL measured numbers from compute.py
+  const raw  = m.raw;
+  const wire = m.wire;
+  totalRaw  += raw;
+  totalWire += wire;
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.innerHTML = `
+    ${escapeHtml(m.text)}
+    <span class="meta">
+      <b>${raw}B</b> raw &middot; <b>${wire}B</b> wire &middot;
+      <b>${m.ratio !== null ? m.ratio.toFixed(2) + ' : 1' : '—'}</b>
+    </span>`;
+  (m.from === 'a' ? elA : elB).appendChild(bubble);
+  requestAnimationFrame(() => bubble.classList.add('show'));
+
+  setTimeout(() => {
+    const recv = bubble.cloneNode(true);
+    (m.from === 'a' ? elB : elA).appendChild(recv);
+    requestAnimationFrame(() => recv.classList.add('show'));
+  }, 220 * speed);
+
+  gMsgs.textContent = i;
+  gRaw.textContent  = fmtBytes(totalRaw);
+  gWire.textContent = fmtBytes(totalWire);
+  const ratio = totalRaw / Math.max(1, totalWire);
+  gRat.textContent = ratio.toFixed(2) + ' : 1';
+  pulse(gRat); pulse(gMsgs); pulse(gWire); pulse(gRaw);
+
+  hdA.textContent = m.from === 'a' ? '— sending —' : '— receiving —';
+  hdB.textContent = m.from === 'b' ? '— sending —' : '— receiving —';
+
+  const delay = (1300 + (m.text.length * 30)) * speed;
+  timer = setTimeout(step, delay);
+}
+
+function finish() {
+  hdA.textContent = '— end of demo —';
+  hdB.textContent = '— end of demo —';
+  if (TOTALS) {
+    document.getElementById('end-raw').textContent = TOTALS.raw_full_bytes + ' B';
+    document.getElementById('end-wire').textContent = TOTALS.wire_full_bytes + ' B';
+    document.getElementById('end-ratio').textContent = TOTALS.ratio_with_relationship.toFixed(2) + ' : 1';
+    document.getElementById('end-indep').textContent = TOTALS.ratio_independent.toFixed(2) + ' : 1';
+    document.getElementById('end-lift').textContent = TOTALS.lift_from_relationship.toFixed(2) + 'x';
+  }
+  endEl.hidden = false;
+  endEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  }[c]));
+}
+
+function reset() {
+  clearTimeout(timer);
+  i = 0; totalRaw = 0; totalWire = 0; paused = false;
+  // wipe panels except header
+  [elA, elB].forEach(p => {
+    [...p.querySelectorAll('.bubble')].forEach(b => b.remove());
+  });
+  gMsgs.textContent = '0'; gRaw.textContent = '0'; gWire.textContent = '0';
+  gRat.textContent  = '1.00 : 1';
+  endEl.hidden = true;
+  hdA.textContent = '— sending —';
+  hdB.textContent = '— receiving —';
+}
+
+btnPlay.onclick  = () => { paused = false; setActive(btnPlay); if (!timer || i < SCRIPT.length) step(); };
+btnPause.onclick = () => { paused = true; setActive(btnPause); clearTimeout(timer); };
+btnReset.onclick = () => { reset(); setActive(btnPlay); step(); };
+btnFast.onclick  = () => {
+  speed = (speed === 1 ? 0.35 : 1);
+  btnFast.dataset.active = (speed < 1).toString();
+  btnFast.textContent = (speed < 1 ? 'normal' : 'fast');
+};
+function setActive(btn) {
+  [btnPlay, btnPause].forEach(b => b.dataset.active = 'false');
+  btn.dataset.active = 'true';
+}
+
+// Load real numbers from data.json before starting
+async function bootstrap() {
+  try {
+    const r = await fetch('/demo/data.json', { cache: 'no-store' });
+    if (!r.ok) throw new Error('failed to load data.json: ' + r.status);
+    const d = await r.json();
+    SCRIPT = d.messages;
+    TOTALS = d.totals;
+    META = d.method;
+    document.getElementById('meta-method').textContent = META;
+    step();
+  } catch (e) {
+    console.error('bootstrap error', e);
+    document.querySelector('main.stage').insertAdjacentHTML(
+      'afterbegin',
+      '<p style="color:var(--muted);font-family:ui-monospace,monospace;text-align:center;padding:2rem">' +
+      'could not load real compression data. ' + escapeHtml(String(e)) + '</p>'
+    );
+  }
+}
+bootstrap();
+</script>
+
+</body>
+</html>

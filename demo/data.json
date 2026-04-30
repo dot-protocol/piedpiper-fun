@@ -1,0 +1,163 @@
+{
+  "method": "middle-out v0 baseline \u2014 order-3 Markov model + arithmetic coding (single stream)",
+  "library": "python 3.14.3",
+  "honest": true,
+  "round_trip_verified": true,
+  "messages": [
+    {
+      "i": 0,
+      "from": "a",
+      "text": "hi",
+      "raw": 6,
+      "wire": 8,
+      "alone": 7,
+      "ratio": 0.75,
+      "ratio_alone": 0.286
+    },
+    {
+      "i": 1,
+      "from": "b",
+      "text": "hey \u2014 long day?",
+      "raw": 21,
+      "wire": 21,
+      "alone": 22,
+      "ratio": 1.0,
+      "ratio_alone": 0.773
+    },
+    {
+      "i": 2,
+      "from": "a",
+      "text": "the meeting ran over again. same thing as last week.",
+      "raw": 56,
+      "wire": 47,
+      "alone": 51,
+      "ratio": 1.191,
+      "ratio_alone": 1.02
+    },
+    {
+      "i": 3,
+      "from": "b",
+      "text": "with the same person who never finishes a sentence?",
+      "raw": 55,
+      "wire": 41,
+      "alone": 50,
+      "ratio": 1.341,
+      "ratio_alone": 1.02
+    },
+    {
+      "i": 4,
+      "from": "a",
+      "text": "yeah. and they brought the deck up again.",
+      "raw": 45,
+      "wire": 33,
+      "alone": 43,
+      "ratio": 1.364,
+      "ratio_alone": 0.953
+    },
+    {
+      "i": 5,
+      "from": "b",
+      "text": "the one from october?",
+      "raw": 25,
+      "wire": 18,
+      "alone": 25,
+      "ratio": 1.389,
+      "ratio_alone": 0.84
+    },
+    {
+      "i": 6,
+      "from": "a",
+      "text": "that one. third time. nothing has changed in it.",
+      "raw": 52,
+      "wire": 34,
+      "alone": 48,
+      "ratio": 1.529,
+      "ratio_alone": 1.0
+    },
+    {
+      "i": 7,
+      "from": "b",
+      "text": "are you saying the thing tomorrow?",
+      "raw": 38,
+      "wire": 26,
+      "alone": 37,
+      "ratio": 1.462,
+      "ratio_alone": 0.919
+    },
+    {
+      "i": 8,
+      "from": "a",
+      "text": "yeah. like we said.",
+      "raw": 23,
+      "wire": 15,
+      "alone": 23,
+      "ratio": 1.533,
+      "ratio_alone": 0.826
+    },
+    {
+      "i": 9,
+      "from": "b",
+      "text": "good.",
+      "raw": 9,
+      "wire": 7,
+      "alone": 10,
+      "ratio": 1.286,
+      "ratio_alone": 0.5
+    },
+    {
+      "i": 10,
+      "from": "a",
+      "text": "thanks for last night btw.",
+      "raw": 30,
+      "wire": 20,
+      "alone": 30,
+      "ratio": 1.5,
+      "ratio_alone": 0.867
+    },
+    {
+      "i": 11,
+      "from": "b",
+      "text": "of course. always.",
+      "raw": 22,
+      "wire": 16,
+      "alone": 22,
+      "ratio": 1.375,
+      "ratio_alone": 0.818
+    },
+    {
+      "i": 12,
+      "from": "a",
+      "text": "ok. talk after?",
+      "raw": 19,
+      "wire": 13,
+      "alone": 20,
+      "ratio": 1.462,
+      "ratio_alone": 0.75
+    },
+    {
+      "i": 13,
+      "from": "b",
+      "text": "yeah.",
+      "raw": 9,
+      "wire": 7,
+      "alone": 10,
+      "ratio": 1.286,
+      "ratio_alone": 0.5
+    }
+  ],
+  "totals": {
+    "messages": 14,
+    "raw_full_bytes": 424,
+    "wire_full_bytes": 310,
+    "ratio_with_relationship": 1.368,
+    "wire_independent_bytes": 398,
+    "ratio_independent": 0.889,
+    "lift_from_relationship": 1.538
+  },
+  "notes": [
+    "Single arithmetic stream \u2014 Markov model learns from every prior byte.",
+    "Marginal wire cost per message \u2248 (encoded[0..i]) \u2212 (encoded[0..i-1]).",
+    "Order-3 Markov is the seed model; production uses 6+ predictors with logistic mixing.",
+    "Numbers shown are modest by design. The CURVE is the architectural truth."
+  ]
+}

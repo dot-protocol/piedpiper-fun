@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>piedpiper.fun</title>
+<meta name="description" content="Pied Piper fought for six seasons inside a story that wouldn't let it win. We're giving it the life it never got." />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+<meta property="og:title" content="piedpiper.fun — Pied Piper for real" />
+<meta property="og:description" content="The name fought all six seasons. We're giving it life. Free. Forever. The protocol is open. The name is a commons. The merch is yours." />
+<meta property="og:url" content="https://piedpiper.fun" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="/og.svg" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="piedpiper.fun" />
+<meta name="twitter:description" content="The name fought all six seasons. We're giving it life. Free. Forever." />
+<meta name="twitter:image" content="/og.svg" />
+
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: white;
+    --fg: black;
+    --muted: rgba(0,0,0,0.55);
+    --line: rgba(0,0,0,0.12);
+    --accent: black;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0b0b;
+      --fg: #f5f5f5;
+      --muted: rgba(255,255,255,0.55);
+      --line: rgba(255,255,255,0.14);
+      --accent: #f5f5f5;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
+    font-size: clamp(16px, 1.05vw + 13px, 19px);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+  header {
+    display: flex; align-items: center; gap: 0.6em;
+    padding: 1.4rem 1.6rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+  }
+  header .mark { width: 14px; height: 14px; }
+  header .name { color: var(--fg); }
+
+  main {
+    max-width: 38rem;
+    margin: 0 auto;
+    padding: 4rem 1.6rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .door-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0 0.5rem;
+  }
+  .door { width: 96px; height: auto; opacity: 0.92; }
+
+  h1 {
+    font-size: clamp(1.5rem, 2.6vw + 1rem, 2.4rem);
+    line-height: 1.18;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  h1 em { font-style: italic; color: var(--muted); }
+
+  .pact {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 1.4rem 0;
+    display: grid;
+    gap: 0.5rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.92em;
+    color: var(--muted);
+  }
+  .pact b { color: var(--fg); font-weight: 500; }
+
+  .open-row {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 1rem;
+  }
+  a.open {
+    display: inline-flex; align-items: center; gap: 0.55em;
+    padding: 0.85rem 1.4rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+    color: var(--bg);
+    background: var(--accent);
+    text-decoration: none;
+    border-radius: 999px;
+    transition: transform 80ms ease, opacity 120ms ease;
+  }
+  a.open:hover { transform: translateY(-1px); opacity: 0.92; }
+  a.open .dot { width: 8px; height: 8px; background: var(--bg); border-radius: 999px; }
+
+  .lede {
+    color: var(--muted);
+    font-size: 1.05em;
+  }
+
+  .commandments {
+    display: grid; gap: 0.9rem;
+    color: var(--muted);
+    font-size: 0.96em;
+  }
+  .commandments li b { color: var(--fg); font-weight: 500; }
+  .commandments ol { margin: 0; padding: 0 0 0 1.2rem; display: grid; gap: 0.8rem; }
+
+  .quote {
+    font-style: italic;
+    color: var(--muted);
+    border-left: 2px solid var(--line);
+    padding-left: 1rem;
+  }
+
+  footer {
+    max-width: 38rem; margin: 0 auto; padding: 2rem 1.6rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82em;
+    border-top: 1px solid var(--line);
+  }
+  footer .left { display: flex; align-items: center; gap: 0.5em; }
+  footer a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--muted); }
+  footer a:hover { color: var(--fg); border-bottom-color: var(--fg); }
+
+  ::selection { background: var(--accent); color: var(--bg); }
+</style>
+</head>
+<body>
+
+<header>
+  <!-- the dot -->
+  <svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none"
+      stroke-linecap="round" stroke-dasharray="0 1 0" />
+  </svg>
+  <span class="name">piedpiper.fun</span>
+</header>
+
+<main>
+
+  <!-- the door — slightly ajar -->
+  <div class="door-wrap" aria-hidden="true">
+    <svg class="door" viewBox="0 0 80 120" fill="none">
+      <!-- frame -->
+      <rect x="6" y="6" width="68" height="108" rx="2" stroke="currentColor" stroke-width="1.4" fill="none" />
+      <!-- door, slightly open -->
+      <path d="M10 10 L 56 14 L 56 110 L 10 114 Z"
+            stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" />
+      <!-- handle -->
+      <circle cx="50" cy="62" r="1.6" fill="currentColor" />
+      <!-- light spilling through the gap -->
+      <line x1="56" y1="14" x2="74" y2="60" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 3" opacity="0.4" />
+      <line x1="56" y1="62" x2="74" y2="62" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 3" opacity="0.4" />
+      <line x1="56" y1="110" x2="74" y2="60" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 3" opacity="0.4" />
+    </svg>
+  </div>
+
+  <h1>
+    Pied&nbsp;Piper fought for six seasons inside a story that wouldn't let it win.
+    <br /><em>We're giving it the life it never got.</em>
+  </h1>
+
+  <div class="open-row">
+    <a class="open" href="https://openpiper.vercel.app" rel="noopener">
+      <span class="dot"></span>
+      open
+    </a>
+    <p class="lede">Free. Forever. Take it.</p>
+  </div>
+
+  <section class="pact" aria-label="The Pact">
+    <div><b>The protocol is free.</b> Anyone runs a node. Anyone builds a client.</div>
+    <div><b>The network is federated.</b> No middleman. No central server.</div>
+    <div><b>The name is a commons.</b> Nobody owns Pied Piper. Everyone carries it.</div>
+  </section>
+
+  <section class="commandments" aria-label="The Commandments">
+    <p style="color:var(--fg); margin:0;">A few rules we don't break:</p>
+    <ol>
+      <li><b>The internet is for everyone.</b> Not for companies. Not for governments. Not for the bandwidth-rich.</li>
+      <li><b>Pipernet is for every organism.</b> A DOT from an AI is as valid as a DOT from a human. The mesh does not discriminate by substrate.</li>
+      <li><b>Append only.</b> No overwrites. No deletes. The chain is sacred. History is the source of truth.</li>
+      <li><b>Measure everything.</b> If it isn't measured, it's invisible.</li>
+      <li><b>Prepare the world for when we're gone.</b> The protocol must run without us. The mesh must outlive the makers.</li>
+    </ol>
+  </section>
+
+  <p class="quote">
+    "You've been sending messages.<br />
+    Pied Piper for real lets you send <b>yourself.</b>"
+  </p>
+
+  <div class="open-row">
+    <a class="open" href="https://openpiper.vercel.app" rel="noopener">
+      <span class="dot"></span>
+      open the room
+    </a>
+    <p class="lede mono" style="font-size:0.85em;">
+      source: <a href="https://github.com/dot-protocol/pipernet" style="color:var(--fg);text-decoration:underline dotted;">github.com/dot-protocol/pipernet</a> ·
+      paste-anywhere dot at <a href="/dot.md" style="color:var(--fg);text-decoration:underline dotted;">/dot.md</a> ·
+      live compression at <a href="/lab" style="color:var(--fg);text-decoration:underline dotted;">/lab</a>
+    </p>
+  </div>
+
+</main>
+
+<footer>
+  <div class="left">
+    <svg class="mark" width="12" height="12" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none" />
+    </svg>
+    <span>I open at the close.</span>
+  </div>
+  <div>
+    <a href="https://github.com/dot-protocol/pipernet">github</a>
+    &nbsp;·&nbsp;
+    <a href="/lab">lab</a>
+    &nbsp;·&nbsp;
+    <a href="https://openpiper.vercel.app">openpiper</a>
+    &nbsp;·&nbsp;
+    <a href="/dot.md">dot</a>
+  </div>
+</footer>
+
+</body>
+</html>

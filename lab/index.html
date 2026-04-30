@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>lab — piedpiper.fun</title>
+<meta name="description" content="Live compression — paste text, get the real ratio. Track B v0.3 (order-3 Markov + multi-window match, multiplicative mix). Round-trip byte-exact verified." />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+<meta property="og:title" content="piedpiper.fun / lab — live compression" />
+<meta property="og:description" content="Paste text. Get the real compression ratio. Track B v0.3, byte-exact round-trip, no mocks." />
+<meta property="og:url" content="https://piedpiper.fun/lab" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="/og.svg" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: white;
+    --fg: black;
+    --muted: rgba(0,0,0,0.55);
+    --line: rgba(0,0,0,0.10);
+    --accent: black;
+    --bubble-a: rgba(0,0,0,0.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0b0b;
+      --fg: #f5f5f5;
+      --muted: rgba(255,255,255,0.55);
+      --line: rgba(255,255,255,0.12);
+      --accent: #f5f5f5;
+      --bubble-a: rgba(255,255,255,0.05);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
+    font-size: clamp(15px, 0.6vw + 13px, 17px);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+  header {
+    display: flex; align-items: center; gap: 0.6em;
+    padding: 1.2rem 1.4rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--muted);
+    font-family: ui-monospace, monospace;
+    font-size: 0.82em;
+    letter-spacing: 0.02em;
+  }
+  header a { color: inherit; text-decoration: none; display: flex; align-items: center; gap: 0.55em; }
+  header a:hover { color: var(--fg); }
+
+  main {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 2.4rem 1.4rem 4rem;
+    display: flex; flex-direction: column; gap: 1.6rem;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(1.4rem, 2.2vw + 0.8rem, 2rem);
+    line-height: 1.2;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  h1 em { font-style: italic; color: var(--muted); }
+
+  .lede { color: var(--muted); margin: 0; }
+
+  textarea {
+    width: 100%;
+    min-height: 12rem;
+    padding: 1rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: ui-monospace, monospace;
+    font-size: 0.95em;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+  }
+  textarea:focus { border-color: var(--fg); }
+
+  .row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+
+  button.go {
+    background: var(--accent);
+    color: var(--bg);
+    border: 0;
+    padding: 0.7rem 1.4rem;
+    border-radius: 999px;
+    font-family: ui-monospace, monospace;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: opacity 120ms ease;
+  }
+  button.go:hover { opacity: 0.9; }
+  button.go:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .meta {
+    color: var(--muted);
+    font-family: ui-monospace, monospace;
+    font-size: 0.82em;
+  }
+
+  .results {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .results .cell {
+    padding: 1rem;
+    border-right: 1px solid var(--line);
+    text-align: center;
+  }
+  .results .cell:last-child { border-right: 0; }
+  .results .label {
+    font-family: ui-monospace, monospace;
+    font-size: 0.7em;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+  }
+  .results .value {
+    font-family: ui-monospace, monospace;
+    font-size: clamp(1.05rem, 1.6vw + 0.4rem, 1.4rem);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 540px) {
+    .results { grid-template-columns: repeat(2, 1fr); }
+    .results .cell:nth-child(2) { border-right: 0; }
+    .results .cell { border-bottom: 1px solid var(--line); }
+    .results .cell:nth-child(3), .results .cell:nth-child(4) { border-bottom: 0; }
+  }
+
+  .verdict {
+    padding: 1rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bubble-a);
+    font-family: ui-monospace, monospace;
+    font-size: 0.85em;
+    color: var(--muted);
+  }
+  .verdict.ok { color: var(--fg); }
+  .verdict b { color: var(--fg); }
+
+  .honest {
+    color: var(--muted);
+    font-size: 0.92em;
+    line-height: 1.6;
+    border-top: 1px solid var(--line);
+    padding-top: 1.4rem;
+  }
+  .honest a {
+    color: var(--fg);
+    text-decoration: underline dotted;
+  }
+
+  .err {
+    padding: 1rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--fg);
+    font-family: ui-monospace, monospace;
+    font-size: 0.85em;
+  }
+
+  footer {
+    max-width: 44rem; margin: 0 auto; padding: 1.6rem 1.4rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--muted);
+    font-family: ui-monospace, monospace;
+    font-size: 0.78em;
+    border-top: 1px solid var(--line);
+    flex-wrap: wrap; gap: 0.6rem;
+  }
+  footer a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--muted); }
+  footer a:hover { color: var(--fg); border-bottom-color: var(--fg); }
+
+  ::selection { background: var(--accent); color: var(--bg); }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="/">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none" />
+    </svg>
+    <span style="color:var(--fg)">piedpiper.fun</span>
+    <span style="color:var(--muted)">/ lab</span>
+  </a>
+</header>
+
+<main>
+  <h1>compress something. <em>real numbers.</em></h1>
+  <p class="lede">
+    Paste text. Press compress. The same engine that lives in
+    <a href="https://github.com/mevBlaze/pipernet" style="color:inherit;text-decoration:underline dotted">github.com/mevBlaze/pipernet</a>
+    runs your bytes server-side, gives you the real ratio, and verifies the round-trip is byte-exact.
+  </p>
+
+  <textarea id="t" placeholder="paste text here — try a Wikipedia article, a code file, a chat log, anything..."></textarea>
+
+  <div class="row">
+    <button class="go" id="go">compress</button>
+    <span class="meta" id="status">cap is 64 KB per request · server-side, takes a few seconds</span>
+  </div>
+
+  <div class="results" id="results" hidden>
+    <div class="cell"><div class="label">raw bytes</div><div class="value" id="r-raw">—</div></div>
+    <div class="cell"><div class="label">on the wire</div><div class="value" id="r-wire">—</div></div>
+    <div class="cell"><div class="label">ratio</div><div class="value" id="r-ratio">—</div></div>
+    <div class="cell"><div class="label">bits / byte</div><div class="value" id="r-bpb">—</div></div>
+  </div>
+
+  <div class="verdict" id="verdict" hidden></div>
+
+  <p class="honest">
+    <b style="color:var(--fg)">What this is.</b> Track B v0.3 — order-3 Markov + four match-window
+    predictors mixed multiplicatively, single adaptive arithmetic-coded
+    stream, byte-exact round-trip. Pure Python; no LZ, no Huffman, no
+    codebook. On 250 KB of enwik8 it produces +43.71% lift over the
+    order-3 Markov baseline (3.01% behind gzip). On your text it produces
+    whatever the text actually compresses to. Honest both ways.
+    <br /><br />
+    <b style="color:var(--fg)">What this isn't.</b> Not SOTA. cmix v21 holds the
+    Hutter Prize at 14.6 MB on full enwik8; we are far behind in absolute
+    terms. The architectural ground we're on (corpus-wide retrieval-
+    augmented context mixing) is empty space in the 20-year sediment record
+    of Hutter submissions — that's where the work is.
+    <br /><br />
+    <b style="color:var(--fg)">Source.</b> Same code in your browser is
+    <a href="https://github.com/mevBlaze/pipernet/blob/main/compression/track-b/mixer_multi.py">compression/track-b/mixer_multi.py</a>.
+    Reproduce locally with <code>python3 compression/track-b/bench.py 250000</code>.
+  </p>
+</main>
+
+<footer>
+  <span>I open at the close.</span>
+  <span>
+    <a href="/">piedpiper.fun</a> · <a href="https://openpiper.vercel.app">the room</a> · <a href="https://github.com/mevBlaze/pipernet">repo</a>
+  </span>
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+const t = $('t'), go = $('go'), status = $('status');
+const results = $('results'), verdict = $('verdict');
+
+function fmtBytes(n) { return n.toLocaleString() + ' B'; }
+
+go.addEventListener('click', async () => {
+  const text = t.value;
+  if (!text) { status.textContent = 'paste something first'; return; }
+  if (new TextEncoder().encode(text).length > 64*1024) {
+    status.textContent = 'too big — cap is 64 KB per request'; return;
+  }
+  go.disabled = true;
+  status.textContent = 'compressing on the server (a few seconds)…';
+  results.hidden = true; verdict.hidden = true;
+  const t0 = performance.now();
+  try {
+    const r = await fetch('/api/compress', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ text })
+    });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || ('HTTP ' + r.status));
+    const t1 = performance.now();
+
+    $('r-raw').textContent = fmtBytes(j.raw_bytes);
+    $('r-wire').textContent = fmtBytes(j.wire_bytes);
+    $('r-ratio').textContent = j.ratio.toFixed(2) + ' : 1';
+    $('r-bpb').textContent = j.bpb.toFixed(2);
+    results.hidden = false;
+
+    const lift = j.ratio > 1 ? '+' + ((j.ratio-1)*100).toFixed(1) + '% smaller' : ((j.ratio-1)*100).toFixed(1) + '% larger';
+    const rt = j.round_trip_ok ? 'round-trip byte-exact ✓' : 'round-trip FAILED ✗';
+    verdict.classList.toggle('ok', j.round_trip_ok);
+    verdict.innerHTML = `<b>${j.encoder}</b> · windows ${JSON.stringify(j.windows)} · ${lift} than uncompressed · ${rt} · server-encoded in ${j.encode_ms} ms · round-trip total ${(t1-t0)|0} ms`;
+    verdict.hidden = false;
+    status.textContent = '';
+  } catch (e) {
+    verdict.classList.remove('ok');
+    verdict.innerHTML = '<span>error: ' + (e.message || e) + '</span>';
+    verdict.hidden = false;
+  } finally {
+    go.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>
