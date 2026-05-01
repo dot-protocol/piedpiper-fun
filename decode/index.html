@@ -1,8 +1,25 @@
 <!doctype html>
+<!-- ═══════════════════════════════════════════════════════════════════
+  POSTHOG KEY — grep: phc_PLACEHOLDER_REPLACE_ME
+  Blaze: swap the placeholder string below with your real project key.
+  Run: bash tools/swap-posthog-key.sh phc_your_real_key_here
+  ═══════════════════════════════════════════════════════════════════ -->
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<!-- PostHog analytics + heatmaps + session replay -->
+<script>
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId captureTraceFeedback captureTraceMetric".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init('phc_PLACEHOLDER_REPLACE_ME', {
+    api_host: 'https://us.i.posthog.com',
+    person_profiles: 'identified_only',
+    capture_pageview: true,
+    capture_pageleave: true,
+    autocapture: true,
+    session_recording: { maskAllInputs: false, maskInputOptions: { password: true } }
+  });
+</script>
 <title>decode · piedpiper.fun</title>
 <meta name="description" content="Drop any microdot or .dot.png here. Reads, decodes, and verifies the identity payload entirely in your browser. No upload." />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -23,7 +40,11 @@
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js" crossorigin="anonymous"></script>
 
 <style>
-  /* ─── CSS Variables (matches piedpiper.fun exactly) ─────────────────────── */
+  /* ─── CSS Variables + THEME SYSTEM ──────────────────────────────────────────
+     Default: auto (follows prefers-color-scheme).
+     Explicit themes override via [data-theme] on <body>.
+     Picker in footer persists choice to localStorage('piedpiper-theme').
+  ─────────────────────────────────────────────────────────────────────────── */
   :root {
     color-scheme: light dark;
     --bg: white;
@@ -45,6 +66,43 @@
       --invalid: #f85149;
     }
   }
+  [data-theme="light"] {
+    --bg: #ffffff; --fg: #000000;
+    --muted: rgba(0,0,0,0.55); --line: rgba(0,0,0,0.12); --accent: #000000;
+    --verified: #1a7f37; --invalid: #c0392b;
+  }
+  [data-theme="dark"] {
+    --bg: #0b0b0b; --fg: #f5f5f5;
+    --muted: rgba(255,255,255,0.55); --line: rgba(255,255,255,0.14); --accent: #f5f5f5;
+    --verified: #3fb950; --invalid: #f85149;
+  }
+  [data-theme="sepia"] {
+    --bg: #f4ecd8; --fg: #3a2f1d;
+    --muted: rgba(58,47,29,0.55); --line: rgba(58,47,29,0.18); --accent: #3a2f1d;
+    --verified: #2e7d32; --invalid: #b71c1c;
+  }
+  [data-theme="terminal"] {
+    --bg: #000000; --fg: #00ff41;
+    --muted: rgba(0,255,65,0.55); --line: rgba(0,255,65,0.22); --accent: #00ff41;
+    --verified: #00ff41; --invalid: #ff4444;
+  }
+  [data-theme="mandala"] {
+    --bg: #fdf6e3; --fg: #073642;
+    --muted: rgba(7,54,66,0.55); --line: rgba(7,54,66,0.15); --accent: #cb4b16;
+    --verified: #268bd2; --invalid: #dc322f;
+  }
+  .theme-picker-wrap {
+    display: flex; align-items: center; gap: 0.4em;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82em; color: var(--muted);
+  }
+  .theme-picker-wrap select {
+    background: transparent; border: none; border-bottom: 1px dotted var(--muted);
+    color: var(--muted); font-family: inherit; font-size: inherit;
+    cursor: pointer; padding: 0 0.2em; outline: none; appearance: none;
+    -webkit-appearance: none;
+  }
+  .theme-picker-wrap select:hover { color: var(--fg); border-bottom-color: var(--fg); }
 
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
@@ -480,7 +538,7 @@
     </svg>
     <span>The dot speaks for itself.</span>
   </div>
-  <div>
+  <div style="display:flex; align-items:center; gap:1em; flex-wrap:wrap; justify-content:flex-end;">
     <a href="/">protocol</a>
     &nbsp;·&nbsp;
     <a href="https://github.com/dot-protocol/pipernet">github</a>
@@ -488,6 +546,18 @@
     <a href="/lab">lab</a>
     &nbsp;·&nbsp;
     <a href="/decode">decode any dot</a>
+    &nbsp;·&nbsp;
+    <span class="theme-picker-wrap">
+      <span>theme:</span>
+      <select id="theme-select" onchange="applyTheme(this.value)" title="switch theme" aria-label="colour theme">
+        <option value="auto">auto</option>
+        <option value="light">light</option>
+        <option value="dark">dark</option>
+        <option value="sepia">sepia</option>
+        <option value="terminal">terminal</option>
+        <option value="mandala">mandala</option>
+      </select>
+    </span>
   </div>
 </footer>
 
@@ -843,6 +913,72 @@ document.body.addEventListener('drop', e => {
     processFile(file);
   }
 });
+
+// ── POSTHOG CUSTOM EVENTS — DECODE ──────────────────────────────────────────
+// dot_dropped: file dropped or selected
+function _trackDotDropped(file) {
+  try { window.posthog && posthog.capture('dot_dropped', { file_size: file.size, file_type: file.type }); } catch(e) {}
+}
+// Patch drop zone and file input to fire dot_dropped
+dropZone.addEventListener('drop', e => {
+  const f = e.dataTransfer.files && e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) _trackDotDropped(f);
+}, true);
+fileInput.addEventListener('change', e => {
+  const f = e.target.files && e.target.files[0];
+  if (f) _trackDotDropped(f);
+}, true);
+
+// Patch handleQrText to fire outcome events
+var _origHandleQrText = handleQrText;
+handleQrText = async function(rawText) {
+  var result = await _origHandleQrText.apply(this, arguments);
+  return result;
+};
+
+// Patch showDossier to fire decode_success / decode_invalid_sig
+var _origShowDossier = showDossier;
+showDossier = function(payload, verified) {
+  if (verified) {
+    try { window.posthog && posthog.capture('decode_success', { tier: payload.tier || 'unknown' }); } catch(e) {}
+  } else {
+    try { window.posthog && posthog.capture('decode_invalid_sig', { tier: payload.tier || 'unknown' }); } catch(e) {}
+  }
+  return _origShowDossier.apply(this, arguments);
+};
+
+// Patch showNoQr to fire decode_no_qr
+var _origShowNoQr = showNoQr;
+showNoQr = function() {
+  try { window.posthog && posthog.capture('decode_no_qr'); } catch(e) {}
+  return _origShowNoQr.apply(this, arguments);
+};
+
+// Patch copyPubkey to fire pubkey_copied
+var _origCopyPubkey = copyPubkey;
+copyPubkey = async function() {
+  try { window.posthog && posthog.capture('pubkey_copied'); } catch(e) {}
+  return _origCopyPubkey.apply(this, arguments);
+};
+</script>
+
+<script>
+// ── THEME SYSTEM ──────────────────────────────────────────────────────────────
+function applyTheme(key) {
+  if (key === 'auto') {
+    document.body.removeAttribute('data-theme');
+  } else {
+    document.body.setAttribute('data-theme', key);
+  }
+  try { localStorage.setItem('piedpiper-theme', key); } catch(e) {}
+  var sel = document.getElementById('theme-select');
+  if (sel && sel.value !== key) sel.value = key;
+}
+(function() {
+  var saved = 'auto';
+  try { saved = localStorage.getItem('piedpiper-theme') || 'auto'; } catch(e) {}
+  applyTheme(saved);
+})();
 </script>
 
 </body>

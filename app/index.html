@@ -1,8 +1,27 @@
 <!doctype html>
+<!-- ═══════════════════════════════════════════════════════════════════
+  POSTHOG KEY — grep: phc_PLACEHOLDER_REPLACE_ME
+  Blaze: swap the placeholder string below with your real project key.
+  Run: bash tools/swap-posthog-key.sh phc_your_real_key_here
+  ═══════════════════════════════════════════════════════════════════ -->
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<!-- PostHog analytics + heatmaps + session replay
+     autocapture:true enables click heatmaps automatically.
+     Swap phc_PLACEHOLDER_REPLACE_ME with your real project key. -->
+<script>
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId captureTraceFeedback captureTraceMetric".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init('phc_PLACEHOLDER_REPLACE_ME', {
+    api_host: 'https://us.i.posthog.com',
+    person_profiles: 'identified_only',
+    capture_pageview: true,
+    capture_pageleave: true,
+    autocapture: true, /* autocapture:true enables click heatmaps automatically */
+    session_recording: { maskAllInputs: false, maskInputOptions: { password: true } }
+  });
+</script>
 <title>pipernet · piedpiper.fun</title>
 <meta name="description" content="The Pipernet channel hub. Live signed envelopes across every domain." />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -19,6 +38,11 @@
 
 <style>
 /* ─── DESIGN TOKENS ────────────────────────────────────────────────────────── */
+/* ── THEME SYSTEM ───────────────────────────────────────────────────────────
+   Default: auto (follows prefers-color-scheme).
+   Explicit themes override via [data-theme] on <body>.
+   Picker in footer persists choice to localStorage('piedpiper-theme').
+── */
 :root {
   color-scheme: light dark;
   --bg:        white;
@@ -48,6 +72,44 @@
     --accent:#f2f2f2;
   }
 }
+[data-theme="light"] {
+  --bg: #ffffff; --bg2: #f7f7f7; --bg3: #efefef; --fg: #000000;
+  --muted: rgba(0,0,0,0.52); --muted2: rgba(0,0,0,0.32);
+  --line: rgba(0,0,0,0.10); --line2: rgba(0,0,0,0.07); --accent: #000000;
+}
+[data-theme="dark"] {
+  --bg: #0b0b0b; --bg2: #111111; --bg3: #181818; --fg: #f2f2f2;
+  --muted: rgba(255,255,255,0.52); --muted2: rgba(255,255,255,0.30);
+  --line: rgba(255,255,255,0.10); --line2: rgba(255,255,255,0.06); --accent: #f2f2f2;
+}
+[data-theme="sepia"] {
+  --bg: #f4ecd8; --bg2: #ede4cc; --bg3: #e3d8bc; --fg: #3a2f1d;
+  --muted: rgba(58,47,29,0.55); --muted2: rgba(58,47,29,0.35);
+  --line: rgba(58,47,29,0.18); --line2: rgba(58,47,29,0.10); --accent: #3a2f1d;
+}
+[data-theme="terminal"] {
+  --bg: #000000; --bg2: #0a0a0a; --bg3: #111111; --fg: #00ff41;
+  --muted: rgba(0,255,65,0.55); --muted2: rgba(0,255,65,0.35);
+  --line: rgba(0,255,65,0.22); --line2: rgba(0,255,65,0.12); --accent: #00ff41;
+}
+[data-theme="mandala"] {
+  --bg: #fdf6e3; --bg2: #f5ecd4; --bg3: #ede3c5; --fg: #073642;
+  --muted: rgba(7,54,66,0.55); --muted2: rgba(7,54,66,0.35);
+  --line: rgba(7,54,66,0.15); --line2: rgba(7,54,66,0.08); --accent: #cb4b16;
+}
+/* theme picker — shown in demo banner area */
+.theme-picker-wrap {
+  display: inline-flex; align-items: center; gap: 0.35em;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.72em; color: var(--muted);
+}
+.theme-picker-wrap select {
+  background: transparent; border: none; border-bottom: 1px dotted var(--muted);
+  color: var(--muted); font-family: inherit; font-size: inherit;
+  cursor: pointer; padding: 0 0.15em; outline: none; appearance: none;
+  -webkit-appearance: none;
+}
+.theme-picker-wrap select:hover { color: var(--fg); border-bottom-color: var(--fg); }
 
 /* ─── RESET ────────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
@@ -619,6 +681,18 @@ button.id-btn.primary:hover { opacity: 0.82; background: var(--accent); }
 <!-- ─── DEMO BANNER ───────────────────────────────────────────────────────── -->
 <div id="demo-banner">
   <b>test mode —</b> gated by $MEVICI until $PIPER deploys · relay offline · real on-chain holder check
+  &nbsp;·&nbsp;
+  <span class="theme-picker-wrap">
+    theme:
+    <select id="theme-select" onchange="applyTheme(this.value)" title="switch theme" aria-label="colour theme">
+      <option value="auto">auto</option>
+      <option value="light">light</option>
+      <option value="dark">dark</option>
+      <option value="sepia">sepia</option>
+      <option value="terminal">terminal</option>
+      <option value="mandala">mandala</option>
+    </select>
+  </span>
 </div>
 
 <!-- ─── THREE-COLUMN LAYOUT ──────────────────────────────────────────────── -->
@@ -794,11 +868,11 @@ const CHANNEL_META = {
     subtitle: "the river",
     origin: "where the protocol lives. R0 onward.",
     mission: "build a federated, agent-native communication protocol with Ed25519 signed envelopes.",
-    state: "shipped: CLI, HTTP relay, MCP gateway, .dot logogram. Networking ships next.",
+    state: "shipped: pipernet serve (HTTP relay + SSE), MCP gateway, .dot logogram, six pages live at piedpiper.fun.",
     repo: "github.com/dot-protocol/pipernet",
     demo: "/lab",
     demo_label: "/lab (compression)",
-    latest: "the dot logogram shipped (commit 58422dd)",
+    latest: "six pages live: /, /grove, /holders, /lab, /app, /decode. pipernet serve + MCP gateway shipped.",
     tweet: "https://x.com/dotpiedpiper",
     roadmap: ["WebRTC peer transport", "live mesh viewer", "DOT-language registry"]
   },
@@ -1573,6 +1647,71 @@ function escHtml(s) {
 // BOOT
 // ─────────────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', init);
+
+// ── POSTHOG CUSTOM EVENTS — APP ──────────────────────────────────────────────
+
+// channel_switch: fired when selectChannel is called
+var _origSelectChannel = selectChannel;
+selectChannel = function(el) {
+  var ch = el.dataset.channel;
+  try { window.posthog && posthog.capture('channel_switch', { channel: ch }); } catch(e) {}
+  return _origSelectChannel.apply(this, arguments);
+};
+
+// wallet_connected: fired in onWalletConnected (privacy: truncated pubkey)
+var _origOnWalletConnected_app = onWalletConnected;
+onWalletConnected = async function(pubkey) {
+  try {
+    var truncated = pubkey ? pubkey.slice(0,4) + '…' + pubkey.slice(-4) : 'unknown';
+    window.posthog && posthog.capture('wallet_connected', { page: 'app', pubkey_truncated: truncated });
+  } catch(e) {}
+  return _origOnWalletConnected_app.apply(this, arguments);
+};
+
+// chat_message_sent: fired in sendMessage
+var _origSendMessage_app = sendMessage;
+sendMessage = async function() {
+  var input = document.getElementById('msg-input');
+  if (input && input.value.trim()) {
+    try { window.posthog && posthog.capture('chat_message_sent', { page: 'app', channel: currentChannel, msg_len: input.value.trim().length }); } catch(e) {}
+  }
+  return _origSendMessage_app.apply(this, arguments);
+};
+
+// info_panel_toggle: fired in toggleInfo
+var _origToggleInfo = toggleInfo;
+toggleInfo = function() {
+  var right = document.getElementById('col-right');
+  var willOpen = !right.classList.contains('mobile-open');
+  try { window.posthog && posthog.capture('info_panel_toggle', { action: willOpen ? 'open' : 'close', channel: currentChannel }); } catch(e) {}
+  return _origToggleInfo.apply(this, arguments);
+};
+
+// handle_renamed: fired in saveHandle
+var _origSaveHandle = saveHandle;
+saveHandle = function() {
+  try { window.posthog && posthog.capture('handle_renamed'); } catch(e) {}
+  return _origSaveHandle.apply(this, arguments);
+};
+</script>
+
+<script>
+// ── THEME SYSTEM ──────────────────────────────────────────────────────────────
+function applyTheme(key) {
+  if (key === 'auto') {
+    document.body.removeAttribute('data-theme');
+  } else {
+    document.body.setAttribute('data-theme', key);
+  }
+  try { localStorage.setItem('piedpiper-theme', key); } catch(e) {}
+  var sel = document.getElementById('theme-select');
+  if (sel && sel.value !== key) sel.value = key;
+}
+(function() {
+  var saved = 'auto';
+  try { saved = localStorage.getItem('piedpiper-theme') || 'auto'; } catch(e) {}
+  applyTheme(saved);
+})();
 </script>
 
 </body>

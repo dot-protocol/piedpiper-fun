@@ -1,8 +1,27 @@
 <!doctype html>
+<!-- ═══════════════════════════════════════════════════════════════════
+  POSTHOG KEY — grep: phc_PLACEHOLDER_REPLACE_ME
+  Blaze: swap the placeholder string below with your real project key.
+  Run: bash tools/swap-posthog-key.sh phc_your_real_key_here
+  ═══════════════════════════════════════════════════════════════════ -->
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<!-- PostHog analytics + heatmaps + session replay
+     autocapture:true enables click heatmaps automatically.
+     Swap phc_PLACEHOLDER_REPLACE_ME with your real project key. -->
+<script>
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId captureTraceFeedback captureTraceMetric".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init('phc_PLACEHOLDER_REPLACE_ME', {
+    api_host: 'https://us.i.posthog.com',
+    person_profiles: 'identified_only',
+    capture_pageview: true,
+    capture_pageleave: true,
+    autocapture: true, /* autocapture:true enables click heatmaps automatically */
+    session_recording: { maskAllInputs: false, maskInputOptions: { password: true } }
+  });
+</script>
 <title>holders · piedpiper.fun</title>
 <meta name="description" content="Pied Piper holder chat. Realtime signed messages. Token-holder gated." />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -18,6 +37,11 @@
 <meta name="twitter:image" content="/og.png" />
 
 <style>
+  /* ── THEME SYSTEM ───────────────────────────────────────────────────────────
+     Default: auto (follows prefers-color-scheme).
+     Explicit themes override via [data-theme] on <body>.
+     Picker in footer persists choice to localStorage('piedpiper-theme').
+  ── */
   :root {
     color-scheme: light dark;
     --bg: white;
@@ -35,6 +59,38 @@
       --accent: #f5f5f5;
     }
   }
+  [data-theme="light"] {
+    --bg: #ffffff; --fg: #000000;
+    --muted: rgba(0,0,0,0.55); --line: rgba(0,0,0,0.12); --accent: #000000;
+  }
+  [data-theme="dark"] {
+    --bg: #0b0b0b; --fg: #f5f5f5;
+    --muted: rgba(255,255,255,0.55); --line: rgba(255,255,255,0.14); --accent: #f5f5f5;
+  }
+  [data-theme="sepia"] {
+    --bg: #f4ecd8; --fg: #3a2f1d;
+    --muted: rgba(58,47,29,0.55); --line: rgba(58,47,29,0.18); --accent: #3a2f1d;
+  }
+  [data-theme="terminal"] {
+    --bg: #000000; --fg: #00ff41;
+    --muted: rgba(0,255,65,0.55); --line: rgba(0,255,65,0.22); --accent: #00ff41;
+  }
+  [data-theme="mandala"] {
+    --bg: #fdf6e3; --fg: #073642;
+    --muted: rgba(7,54,66,0.55); --line: rgba(7,54,66,0.15); --accent: #cb4b16;
+  }
+  .theme-picker-wrap {
+    display: flex; align-items: center; gap: 0.4em;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82em; color: var(--muted);
+  }
+  .theme-picker-wrap select {
+    background: transparent; border: none; border-bottom: 1px dotted var(--muted);
+    color: var(--muted); font-family: inherit; font-size: inherit;
+    cursor: pointer; padding: 0 0.2em; outline: none; appearance: none;
+    -webkit-appearance: none;
+  }
+  .theme-picker-wrap select:hover { color: var(--fg); border-bottom-color: var(--fg); }
 
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
@@ -463,7 +519,7 @@
     </svg>
     <span>Signed. Verified. Append-only.</span>
   </div>
-  <div>
+  <div style="display:flex; align-items:center; gap:1em; flex-wrap:wrap; justify-content:flex-end;">
     <a href="/grove">grove</a>
     &nbsp;·&nbsp;
     <a href="/">protocol</a>
@@ -471,6 +527,18 @@
     <a href="/lab">lab</a>
     &nbsp;·&nbsp;
     <a href="/decode">decode any dot</a>
+    &nbsp;·&nbsp;
+    <span class="theme-picker-wrap">
+      <span>theme:</span>
+      <select id="theme-select" onchange="applyTheme(this.value)" title="switch theme" aria-label="colour theme">
+        <option value="auto">auto</option>
+        <option value="light">light</option>
+        <option value="dark">dark</option>
+        <option value="sepia">sepia</option>
+        <option value="terminal">terminal</option>
+        <option value="mandala">mandala</option>
+      </select>
+    </span>
   </div>
 </footer>
 
@@ -898,6 +966,71 @@ function escHtml(s) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+
+// ── POSTHOG CUSTOM EVENTS — HOLDERS ─────────────────────────────────────────
+// Instrument wallet connect button
+(function() {
+  var connectBtn = document.getElementById('connect-btn');
+  if (connectBtn) {
+    connectBtn.addEventListener('click', function() {
+      try { window.posthog && posthog.capture('wallet_connect_click', { page: 'holders' }); } catch(e) {}
+    });
+  }
+})();
+
+// Patch onWalletConnected to fire wallet_connected event (privacy: truncated pubkey)
+var _origOnWalletConnected = onWalletConnected;
+onWalletConnected = async function(pubkey) {
+  try {
+    var truncated = pubkey ? pubkey.slice(0,4) + '…' + pubkey.slice(-4) : 'unknown';
+    window.posthog && posthog.capture('wallet_connected', { page: 'holders', pubkey_truncated: truncated });
+  } catch(e) {}
+  return _origOnWalletConnected.apply(this, arguments);
+};
+
+// Patch isHolder to fire holder check pass/fail
+var _origIsHolder = isHolder;
+isHolder = async function(pubkey) {
+  var result = await _origIsHolder.apply(this, arguments);
+  try {
+    var truncated = pubkey ? pubkey.slice(0,4) + '…' + pubkey.slice(-4) : 'unknown';
+    if (result) {
+      window.posthog && posthog.capture('holder_check_pass', { pubkey_truncated: truncated });
+    } else {
+      window.posthog && posthog.capture('holder_check_fail', { pubkey_truncated: truncated });
+    }
+  } catch(e) {}
+  return result;
+};
+
+// Patch sendMessage to fire chat_message_sent
+var _origSendMessage = sendMessage;
+sendMessage = async function() {
+  var input = document.getElementById('msg-input');
+  if (input && input.value.trim()) {
+    try { window.posthog && posthog.capture('chat_message_sent', { page: 'holders', msg_len: input.value.trim().length }); } catch(e) {}
+  }
+  return _origSendMessage.apply(this, arguments);
+};
+</script>
+
+<script>
+// ── THEME SYSTEM ──────────────────────────────────────────────────────────────
+function applyTheme(key) {
+  if (key === 'auto') {
+    document.body.removeAttribute('data-theme');
+  } else {
+    document.body.setAttribute('data-theme', key);
+  }
+  try { localStorage.setItem('piedpiper-theme', key); } catch(e) {}
+  var sel = document.getElementById('theme-select');
+  if (sel && sel.value !== key) sel.value = key;
+}
+(function() {
+  var saved = 'auto';
+  try { saved = localStorage.getItem('piedpiper-theme') || 'auto'; } catch(e) {}
+  applyTheme(saved);
+})();
 </script>
 
 </body>
