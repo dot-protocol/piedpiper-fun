@@ -1,0 +1,1551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>pipernet · piedpiper.fun</title>
+<meta name="description" content="The Pipernet channel hub. Live signed envelopes across every domain." />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+<meta property="og:title" content="pipernet · piedpiper.fun" />
+<meta property="og:description" content="The Pipernet channel hub. Live signed envelopes across every domain." />
+<meta property="og:url" content="https://piedpiper.fun/app" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="pipernet · piedpiper.fun" />
+<meta name="twitter:description" content="The Pipernet channel hub. Live signed envelopes across every domain." />
+<meta name="twitter:image" content="/og.png" />
+
+<style>
+/* ─── DESIGN TOKENS ────────────────────────────────────────────────────────── */
+:root {
+  color-scheme: light dark;
+  --bg:        white;
+  --bg2:       #f7f7f7;
+  --bg3:       #efefef;
+  --fg:        black;
+  --muted:     rgba(0,0,0,0.52);
+  --muted2:    rgba(0,0,0,0.32);
+  --line:      rgba(0,0,0,0.10);
+  --line2:     rgba(0,0,0,0.07);
+  --accent:    black;
+  --col-left:  200px;
+  --col-right: 260px;
+  --input-h:   52px;
+  --sidebar-pad: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:    #0b0b0b;
+    --bg2:   #111111;
+    --bg3:   #181818;
+    --fg:    #f2f2f2;
+    --muted: rgba(255,255,255,0.52);
+    --muted2:rgba(255,255,255,0.30);
+    --line:  rgba(255,255,255,0.10);
+    --line2: rgba(255,255,255,0.06);
+    --accent:#f2f2f2;
+  }
+}
+
+/* ─── RESET ────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.mono {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* ─── LAYOUT ───────────────────────────────────────────────────────────────── */
+#app {
+  display: grid;
+  grid-template-columns: var(--col-left) 1fr var(--col-right);
+  grid-template-rows: 100vh;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ─── LEFT COLUMN ──────────────────────────────────────────────────────────── */
+#col-left {
+  background: var(--bg2);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#left-header {
+  padding: 14px var(--sidebar-pad) 12px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+#left-header a {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  text-decoration: none;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.82em;
+  letter-spacing: 0.02em;
+  color: var(--fg);
+}
+#left-header a:hover { opacity: 0.72; }
+
+.ch-section-header {
+  padding: 12px var(--sidebar-pad) 4px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.67em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-variant: small-caps;
+  flex-shrink: 0;
+}
+
+#channel-list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+.ch-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px var(--sidebar-pad);
+  cursor: pointer;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.82em;
+  color: var(--muted);
+  border-radius: 4px;
+  margin: 1px 6px;
+  transition: background 80ms ease, color 80ms ease;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ch-item:hover {
+  background: var(--line2);
+  color: var(--fg);
+}
+.ch-item.active {
+  background: var(--line);
+  color: var(--fg);
+  font-weight: 600;
+}
+.ch-item-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.ch-badge {
+  flex-shrink: 0;
+  font-size: 0.75em;
+  color: var(--muted2);
+  margin-left: 4px;
+}
+.ch-lock-badge {
+  flex-shrink: 0;
+  font-size: 0.72em;
+  color: var(--muted2);
+  margin-left: 4px;
+}
+
+/* left divider */
+.ch-divider {
+  margin: 8px var(--sidebar-pad) 4px;
+  border: none;
+  border-top: 1px solid var(--line);
+}
+
+/* ─── IDENTITY PANEL ───────────────────────────────────────────────────────── */
+#identity-panel {
+  border-top: 1px solid var(--line);
+  padding: 10px var(--sidebar-pad);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+#identity-disconnected {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+#identity-connected {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+}
+.id-pubkey {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.75em;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.id-rank {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.78em;
+  color: var(--fg);
+}
+button.id-btn {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.76em;
+  padding: 5px 10px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: background 80ms ease;
+  align-self: flex-start;
+}
+button.id-btn:hover { background: var(--line); }
+button.id-btn.primary {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+button.id-btn.primary:hover { opacity: 0.82; background: var(--accent); }
+/* spinner */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+  display: inline-block; width: 10px; height: 10px;
+  border: 1.5px solid var(--line); border-top-color: var(--fg);
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+  vertical-align: middle; margin-right: 4px;
+}
+
+/* ─── CENTER COLUMN ────────────────────────────────────────────────────────── */
+#col-center {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+#stream-header {
+  padding: 13px 18px 11px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+#stream-channel-name {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--fg);
+}
+#stream-channel-sub {
+  font-size: 0.82em;
+  color: var(--muted);
+  font-style: italic;
+  line-height: 1.3;
+}
+
+#message-list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px 18px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+#message-list:empty::after {
+  content: "no messages yet.";
+  color: var(--muted);
+  font-style: italic;
+  font-size: 0.9em;
+}
+
+/* ── MESSAGE ROWS ── */
+.msg-group {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  column-gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--line2);
+}
+.msg-group:last-child { border-bottom: none; }
+.msg-sig-col {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.72em;
+  color: var(--muted2);
+  line-height: 1.8;
+  text-align: center;
+  padding-top: 1px;
+  flex-shrink: 0;
+  cursor: default;
+  user-select: none;
+}
+.msg-sig-col.valid { color: var(--fg); }
+.msg-main { min-width: 0; }
+.msg-meta-row {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  flex-wrap: wrap;
+  line-height: 1.4;
+}
+.msg-handle {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.84em;
+  font-weight: 600;
+  color: var(--fg);
+}
+.msg-rank-emoji {
+  font-size: 0.82em;
+  line-height: 1;
+}
+.msg-time {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.74em;
+  color: var(--muted2);
+}
+.msg-body {
+  font-size: 0.93em;
+  color: var(--muted);
+  line-height: 1.5;
+  word-break: break-word;
+  margin-top: 1px;
+}
+.msg-group.system .msg-body {
+  font-style: italic;
+  color: var(--muted2);
+}
+
+/* relay offline notice in stream */
+.relay-notice {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.78em;
+  color: var(--muted2);
+  text-align: center;
+  padding: 12px 0 6px;
+  font-style: italic;
+}
+
+/* ── INPUT AREA ── */
+#input-area {
+  border-top: 1px solid var(--line);
+  padding: 10px 14px;
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  flex-shrink: 0;
+  background: var(--bg);
+}
+#msg-input {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 7px 10px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.84em;
+  color: var(--fg);
+  outline: none;
+  resize: none;
+  line-height: 1.45;
+  transition: border-color 100ms ease;
+}
+#msg-input:focus { border-color: var(--fg); }
+#msg-input::placeholder { color: var(--muted2); }
+#msg-input:disabled { opacity: 0.5; cursor: not-allowed; }
+#send-btn {
+  padding: 0 16px;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: 4px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.82em;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: opacity 100ms ease;
+  flex-shrink: 0;
+  align-self: flex-end;
+  height: 34px;
+}
+#send-btn:hover:not(:disabled) { opacity: 0.80; }
+#send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+#char-count {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.72em;
+  color: var(--muted2);
+  align-self: flex-end;
+  padding-bottom: 7px;
+  flex-shrink: 0;
+  min-width: 28px;
+  text-align: right;
+}
+#char-count.warn { color: var(--fg); }
+
+/* ─── RIGHT COLUMN ──────────────────────────────────────────────────────────── */
+#col-right {
+  background: var(--bg2);
+  border-left: 1px solid var(--line);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+#context-panel {
+  padding: 18px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ctx-heading {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.72em;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.ctx-title {
+  font-size: 1.02em;
+  font-weight: 500;
+  color: var(--fg);
+  margin: 0 0 10px;
+  line-height: 1.3;
+}
+
+.ctx-field {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  column-gap: 8px;
+  align-items: baseline;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--line2);
+  font-size: 0.82em;
+  line-height: 1.45;
+}
+.ctx-field:last-child { border-bottom: none; }
+.ctx-key {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.86em;
+  color: var(--muted2);
+  text-align: right;
+  white-space: nowrap;
+}
+.ctx-val {
+  color: var(--muted);
+  word-break: break-word;
+}
+.ctx-val a {
+  color: var(--fg);
+  text-decoration: underline dotted;
+}
+.ctx-val a:hover { text-decoration: underline; }
+.ctx-val .dash { color: var(--muted2); }
+
+.ctx-roadmap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.82em;
+  color: var(--muted);
+  padding-left: 0;
+  margin: 0;
+  list-style: none;
+}
+.ctx-roadmap li::before {
+  content: "→ ";
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color: var(--muted2);
+}
+
+/* handle-name modal */
+#handle-modal {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+}
+#handle-modal.open { display: flex; }
+.modal-box {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 22px 24px;
+  width: min(340px, 90vw);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.modal-title {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--fg);
+}
+.modal-sub {
+  font-size: 0.84em;
+  color: var(--muted);
+  margin: -6px 0 0;
+}
+.modal-input {
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 7px 10px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  color: var(--fg);
+  outline: none;
+  width: 100%;
+}
+.modal-input:focus { border-color: var(--fg); }
+.modal-btns { display: flex; gap: 8px; }
+
+/* demo banner */
+#demo-banner {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--bg3);
+  border-top: 1px solid var(--line);
+  padding: 6px 16px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.72em;
+  color: var(--muted);
+  text-align: center;
+  z-index: 50;
+}
+#demo-banner b { color: var(--fg); }
+
+/* ─── MOBILE RESPONSIVE (< 768px) ─────────────────────────────────────────── */
+@media (max-width: 767px) {
+  html, body { overflow: auto; }
+  #app {
+    display: block;
+    height: auto;
+    overflow: visible;
+  }
+  #col-left {
+    display: block;
+    overflow: visible;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    height: auto;
+  }
+  #channel-list { max-height: 200px; }
+  #identity-panel { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; }
+  #identity-connected, #identity-disconnected { flex-direction: row; flex-wrap: wrap; align-items: center; }
+  #col-center {
+    display: flex;
+    height: 100svh;
+    overflow: hidden;
+    position: relative;
+  }
+  #col-right {
+    display: none; /* hidden by default; "info" tab approach */
+    border-left: none;
+    border-top: 1px solid var(--line);
+    max-height: 280px;
+    overflow-y: auto;
+  }
+  #col-right.mobile-open { display: block; }
+  /* info toggle button — only visible on mobile */
+  #info-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.78em;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    padding: 4px 10px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+}
+@media (min-width: 768px) {
+  #info-toggle { display: none; }
+}
+
+::selection { background: var(--accent); color: var(--bg); }
+</style>
+</head>
+<body>
+
+<!-- ─── HANDLE MODAL ──────────────────────────────────────────────────────── -->
+<div id="handle-modal" role="dialog" aria-modal="true" aria-label="Choose your handle">
+  <div class="modal-box">
+    <p class="modal-title">choose your handle</p>
+    <p class="modal-sub">lowercase, no spaces, max 20 chars. stored in your browser only.</p>
+    <input class="modal-input mono" id="handle-input"
+      type="text" maxlength="20" autocomplete="off" spellcheck="false"
+      placeholder="eg. gilfoyle" />
+    <div class="modal-btns">
+      <button class="id-btn primary" id="handle-save-btn" onclick="saveHandle()">save</button>
+      <button class="id-btn" onclick="closeHandleModal()">cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── DEMO BANNER ───────────────────────────────────────────────────────── -->
+<div id="demo-banner">
+  <b>demo mode —</b> $PIPER not yet deployed · relay offline · any wallet passes holder check
+</div>
+
+<!-- ─── THREE-COLUMN LAYOUT ──────────────────────────────────────────────── -->
+<div id="app">
+
+  <!-- ── LEFT: CHANNELS ────────────────────────────────────────────────── -->
+  <div id="col-left">
+
+    <!-- site header -->
+    <div id="left-header">
+      <a href="/" title="back to piedpiper.fun">
+        <!-- tiny flute logogram -->
+        <svg width="16" height="10" viewBox="0 0 200 60" fill="none" aria-hidden="true">
+          <rect x="14" y="22" width="170" height="14" rx="4" stroke="currentColor" stroke-width="1.8" fill="none" />
+          <path d="M14 22 L4 16 L4 42 L14 36 Z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round" />
+          <circle cx="60" cy="29" r="2.2" fill="currentColor" />
+          <circle cx="90" cy="29" r="2.2" fill="currentColor" />
+          <circle cx="120" cy="29" r="2.2" fill="currentColor" />
+          <circle cx="150" cy="29" r="2.2" fill="currentColor" />
+        </svg>
+        <span style="letter-spacing:0.01em;">🪈 piedpiper.fun</span>
+      </a>
+    </div>
+
+    <!-- channel list (scrollable) -->
+    <div id="channel-list">
+
+      <div class="ch-section-header">rooms</div>
+      <div class="ch-item active" data-channel="room" onclick="selectChannel(this)">
+        <span class="ch-item-label"># room</span>
+      </div>
+      <div class="ch-item" data-channel="grove" onclick="selectChannel(this)">
+        <span class="ch-item-label"># grove</span>
+      </div>
+      <div class="ch-item" data-channel="holders" onclick="selectChannel(this)">
+        <span class="ch-item-label"># holders</span>
+        <!-- inline lock SVG -->
+        <span class="ch-lock-badge" title="holder-gated" aria-label="holder-gated">
+          <svg width="9" height="11" viewBox="0 0 64 80" fill="none" aria-hidden="true">
+            <path d="M16 32 L16 20 A16 16 0 0 1 48 20 L48 32" stroke="currentColor" stroke-width="5" stroke-linecap="round" fill="none" />
+            <rect x="6" y="32" width="52" height="40" rx="4" stroke="currentColor" stroke-width="5" fill="none" />
+            <circle cx="32" cy="52" r="5" stroke="currentColor" stroke-width="4" fill="none" />
+            <line x1="32" y1="57" x2="32" y2="65" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+          </svg>
+        </span>
+      </div>
+
+      <hr class="ch-divider" />
+      <div class="ch-section-header">domains</div>
+
+      <div class="ch-item" data-channel="energy" onclick="selectChannel(this)">
+        <span class="ch-item-label"># energy</span>
+      </div>
+      <div class="ch-item" data-channel="mevici" onclick="selectChannel(this)">
+        <span class="ch-item-label"># mevici</span>
+      </div>
+      <div class="ch-item" data-channel="access" onclick="selectChannel(this)">
+        <span class="ch-item-label"># access</span>
+      </div>
+      <div class="ch-item" data-channel="physics" onclick="selectChannel(this)">
+        <span class="ch-item-label"># physics</span>
+      </div>
+      <div class="ch-item" data-channel="history" onclick="selectChannel(this)">
+        <span class="ch-item-label"># history</span>
+      </div>
+      <div class="ch-item" data-channel="sanskrit" onclick="selectChannel(this)">
+        <span class="ch-item-label"># sanskrit</span>
+      </div>
+      <div class="ch-item" data-channel="openfab" onclick="selectChannel(this)">
+        <span class="ch-item-label"># openfab</span>
+      </div>
+      <div class="ch-item" data-channel="openroom" onclick="selectChannel(this)">
+        <span class="ch-item-label"># openroom</span>
+      </div>
+
+    </div><!-- /channel-list -->
+
+    <!-- identity panel -->
+    <div id="identity-panel">
+
+      <div id="identity-disconnected">
+        <button class="id-btn primary" id="connect-btn" onclick="connectWallet()">
+          connect wallet
+        </button>
+      </div>
+
+      <div id="identity-connected">
+        <span class="id-pubkey" id="id-pubkey-display">—</span>
+        <span class="id-rank" id="id-rank-display">—</span>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <button class="id-btn" onclick="openHandleModal()" title="change handle" style="font-size:0.72em; padding:3px 8px;">rename</button>
+          <button class="id-btn" onclick="disconnectWallet()" style="font-size:0.72em; padding:3px 8px;">disconnect</button>
+        </div>
+      </div>
+
+    </div><!-- /identity-panel -->
+
+  </div><!-- /col-left -->
+
+  <!-- ── CENTER: THE STREAM ─────────────────────────────────────────────── -->
+  <div id="col-center">
+
+    <div id="stream-header">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span id="stream-channel-name" class="mono"># room</span>
+        <button id="info-toggle" onclick="toggleInfo()" aria-label="channel info">
+          info
+        </button>
+      </div>
+      <span id="stream-channel-sub">the river</span>
+    </div>
+
+    <div id="message-list" role="log" aria-live="polite" aria-label="Channel messages">
+    </div>
+
+    <div id="input-area">
+      <input
+        id="msg-input"
+        class="mono"
+        type="text"
+        maxlength="280"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="connect wallet to speak"
+        disabled
+        onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); sendMessage(); }"
+        oninput="updateCharCount()"
+      />
+      <span id="char-count" class="mono">280</span>
+      <button id="send-btn" onclick="sendMessage()" disabled>send</button>
+    </div>
+
+  </div><!-- /col-center -->
+
+  <!-- ── RIGHT: CHANNEL CONTEXT ─────────────────────────────────────────── -->
+  <div id="col-right" aria-label="Channel information">
+    <div id="context-panel">
+      <!-- populated dynamically by renderContext() -->
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// PIPERNET APP — v0
+// Single-file vanilla JS/HTML/CSS. No build step. No dependencies.
+//
+// ── CONSTANTS TO FLIP WHEN LIVE ──────────────────────────────────────────────
+//
+// 1. RELAY_BASE — set to "https://api.piedpiper.fun" (or whatever the pipernet
+//    HTTP relay endpoint is). The app will point SSE and POST at:
+//      GET  ${RELAY_BASE}/channels/${channel}/events     (SSE stream)
+//      GET  ${RELAY_BASE}/channels/${channel}?limit=50   (history)
+//      POST ${RELAY_BASE}/channels/${channel}            (send)
+//
+// 2. PIPER_TOKEN_MINT — Solana SPL mint address. Once set, replace the
+//    isHolder() stub with the real getTokenAccountsByOwner RPC call.
+//
+// ─────────────────────────────────────────────────────────────────────────────
+const RELAY_BASE       = null;   // <-- CHANGE when relay is running
+const PIPER_TOKEN_MINT = null;   // <-- CHANGE when $PIPER deploys
+const SOLANA_RPC       = "https://api.mainnet-beta.solana.com";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CHANNEL METADATA
+// ─────────────────────────────────────────────────────────────────────────────
+const CHANNEL_META = {
+  "room": {
+    title: "the room",
+    subtitle: "the river",
+    origin: "where the protocol lives. R0 onward.",
+    mission: "build a federated, agent-native communication protocol with Ed25519 signed envelopes.",
+    state: "shipped: CLI, HTTP relay, MCP gateway, .dot logogram. Networking ships next.",
+    repo: "github.com/dot-protocol/pipernet",
+    demo: "/lab",
+    demo_label: "/lab (compression)",
+    latest: "the dot logogram shipped (commit 58422dd)",
+    tweet: "https://x.com/dotpiedpiper",
+    roadmap: ["WebRTC peer transport", "live mesh viewer", "DOT-language registry"]
+  },
+  "grove": {
+    title: "the grove",
+    subtitle: "the meme that funds the work",
+    origin: "the coin story. Gilfoyle pitched it. We did it anyway.",
+    mission: "fund the protocol build via a meme on pump.fun. No premine, no team allocation, no VC — just creator fees.",
+    state: "pre-launch. $PIPER deploying to pump.fun. Grove page live at /grove.",
+    repo: null,
+    demo: "/grove",
+    demo_label: "/grove",
+    latest: "Grove page live. Token pending pump.fun launch.",
+    tweet: "https://x.com/dotpiedpiper",
+    roadmap: ["launch $PIPER on pump.fun", "holder chat goes live", "link grove activity to protocol milestones"]
+  },
+  "holders": {
+    title: "holders",
+    subtitle: "gated. signed. append-only.",
+    origin: "the inner sanctum. Holders only. Token-gated via SPL balance check.",
+    mission: "private channel for $PIPER holders. Signed envelopes only. Every message is cryptographically auditable.",
+    state: "demo mode. Holder check stubbed — any wallet passes until $PIPER deploys.",
+    repo: null,
+    demo: "/holders",
+    demo_label: "/holders",
+    latest: "Holder chat scaffolded. Waiting for token deploy.",
+    tweet: null,
+    roadmap: ["real SPL balance check", "per-message Ed25519 sig verification", "on-chain message archival"]
+  },
+  "energy": {
+    title: "energy",
+    subtitle: "the Pipernet pattern applied to power",
+    origin: "next domain after communication. R140 — every domain gets a repo + memecoin.",
+    mission: "open-source protocols for energy generation, distribution, storage. Signed envelopes for metered readings.",
+    state: "concept stage. No repo yet. Shaping what the prototype envelope looks like.",
+    repo: null,
+    demo: null,
+    demo_label: null,
+    latest: "R140 thesis: the Pipernet pattern is repeatable across domains.",
+    tweet: null,
+    roadmap: ["spec the envelope schema for energy events", "MVP repo: github.com/dot-protocol/poweret (working name)", "first signed envelope: a household solar production reading"]
+  },
+  "mevici": {
+    title: "mevici",
+    subtitle: "prediction markets, agent-native",
+    origin: "prediction market OS. Attention has measurable financial value.",
+    mission: "open protocol layer for prediction markets. Agents place and resolve bets. Signed envelopes for market events.",
+    state: "live at mevici.vercel.app. Cockpit UI, OpenScreener, holder chat, supernode running.",
+    repo: "github.com/mevBlaze/mevici",
+    demo: "https://mevici.vercel.app",
+    demo_label: "mevici.vercel.app",
+    latest: "Cockpit UI + OpenScreener live. Token: AyUfba64zszzNqVQG3Ya4g2mEjVCWJcHqyGN8Ae2pump",
+    tweet: "https://x.com/meviciterminal",
+    roadmap: ["integrate Pipernet signed envelopes for market events", "DOT-native identity for traders", "cross-market mesh sync"]
+  },
+  "access": {
+    title: "access",
+    subtitle: "HER-like proactive life OS",
+    origin: "AXXIS capability wrapped in a conversational interface. AI observes, understands, suggests, executes.",
+    mission: "proactive personal OS. Observer > Profiler > Executor > Companion > Learner. Pipernet as the communication substrate.",
+    state: "v0.1 complete. 6 modules, 2755 lines. Component chunking strategy active.",
+    repo: null,
+    demo: null,
+    demo_label: null,
+    latest: "v0.1 shipped (observer, profiler, executor, companion, daemon, learner).",
+    tweet: null,
+    roadmap: ["Chrome extension observer", "Pipernet envelope for agent-to-user signals", "DOT-signed action ledger"]
+  },
+  "physics": {
+    title: "physics",
+    subtitle: "light of speed · field protocol",
+    origin: "Paper 7 — c = 1/√(ε₀μ₀). Four loopholes. Open Fab Protocol applied to physics research.",
+    mission: "open-source physics research as signed envelopes. Every theorem, experiment, and refutation as a DOT.",
+    state: "Paper 7 (light of speed) published CC BY 4.0 at docs/openfab/. Four loopholes catalogued.",
+    repo: "github.com/dot-protocol/pipernet",
+    demo: null,
+    demo_label: null,
+    latest: "Paper 7 published: c=1/√(ε₀μ₀), four loopholes for superluminal transmission.",
+    tweet: null,
+    roadmap: ["formalize DOT schema for physics claims", "peer review via signed refutation envelopes", "loophole 3 experiment spec"]
+  },
+  "history": {
+    title: "history",
+    subtitle: "append-only civilisation",
+    origin: "the Pipernet principle applied to historical record. Append-only. No overwrites. The chain is sacred.",
+    mission: "signed, timestamped, immutable historical records as DOTs. Any organism can witness. Any node can verify.",
+    state: "concept stage. The protocol is the foundation — every DOT is already a historical record.",
+    repo: null,
+    demo: null,
+    demo_label: null,
+    latest: "The commandment: Append only. No overwrites. No deletes. History is the source of truth.",
+    tweet: null,
+    roadmap: ["DOT schema for historical claims with source citations", "cross-chain anchoring for permanent timestamps", "first signed primary source ingested"]
+  },
+  "sanskrit": {
+    title: "sanskrit",
+    subtitle: "the language that compresses",
+    origin: "Sanskrit as protocol. The most compressed natural language ever written. Panini's grammar as a compression algorithm.",
+    mission: "explore Sanskrit's information-theoretic properties. Build tooling for lossless Sanskrit encoding as DOTs.",
+    state: "concept stage. Connection: Sanskrit grammar = context mixing. Panini's Ashtadhyayi = the first compression spec.",
+    repo: null,
+    demo: null,
+    demo_label: null,
+    latest: "Insight: Panini wrote the first formal grammar in 500 BC — effectively a compression algorithm.",
+    tweet: null,
+    roadmap: ["implement Panini's grammar rules as a context predictor", "Sanskrit DOT schema", "first Vedic text ingested as signed envelope"]
+  },
+  "openfab": {
+    title: "openfab",
+    subtitle: "biological fabrication protocol",
+    origin: "Paper 6 — biological resin: 65% photopolymer + PEG-400 + Fe₃O₄ + chlorophyll + lecithin. Open fabrication as DOTs.",
+    mission: "open-source fabrication protocols as signed envelopes. Any organism can replicate any material. CC BY 4.0 forever.",
+    state: "Paper 6 (biological resin) and Paper 7 (light of speed) published CC BY 4.0. Oracle Disc shipped.",
+    repo: "github.com/dot-protocol/pipernet",
+    demo: null,
+    demo_label: null,
+    latest: "Oracle Disc: 5 concentric rings, 104 bytes/disc, SVG printable for OpenFab resin disc. Round-trip verified.",
+    tweet: null,
+    roadmap: ["publish Paper 8 (fabrication envelope schema)", "first OpenFab DOT: a signed material composition spec", "printable Oracle Disc v1 release"]
+  },
+  "openroom": {
+    title: "openroom",
+    subtitle: "AI agent group chat simulation",
+    origin: "The Room — AI agents simulate a founding team. CEO, CTO, CFO, researchers in a shared context.",
+    mission: "simulate high-fidelity agent collaboration. Agents sign envelopes, maintain state, hold each other accountable.",
+    state: "live on localhost:4020 (Kin network). 6 founding agents. SSE streaming. Oracle memory.",
+    repo: null,
+    demo: null,
+    demo_label: null,
+    latest: "Room simulation running. 6 agents with soul files, triage, memory, cognition, relationships.",
+    tweet: null,
+    roadmap: ["Pipernet relay integration — room events as DOTs", "public Room viewer", "inter-room DOT routing"]
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RANK SYSTEM
+// ─────────────────────────────────────────────────────────────────────────────
+const RANKS = [
+  { key: "whale",   emoji: "🐋", label: "whale",   min: 100_000_000 },
+  { key: "dolphin", emoji: "🐬", label: "dolphin", min: 10_000_000  },
+  { key: "octopus", emoji: "🐙", label: "octopus", min: 1_000_000   },
+  { key: "crab",    emoji: "🦀", label: "crab",    min: 100_000     },
+  { key: "prawn",   emoji: "🦞", label: "prawn",   min: 10_000      },
+  { key: "shrimp",  emoji: "🦐", label: "shrimp",  min: 0           },
+];
+
+function rankForBalance(balance) {
+  for (const r of RANKS) {
+    if (balance >= r.min) return r;
+  }
+  return RANKS[RANKS.length - 1];
+}
+
+/**
+ * getRank — stub for demo.
+ * Returns a random rank for any connected wallet so we can demo visuals.
+ * v1: replace with real SPL balance call.
+ */
+function getRank(pubkey) {
+  // Deterministic from pubkey so it doesn't change on re-render.
+  const seed = pubkey.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  const index = seed % RANKS.length;
+  return RANKS[index];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// APP STATE
+// ─────────────────────────────────────────────────────────────────────────────
+let currentChannel = "room";
+let walletPubkey = null;
+let userHandle = null;
+let userRank = null;
+let sseSource = null;
+let userScrolledUp = false;
+const channelMessages = {}; // channel -> [{handle, rankEmoji, body, timestamp, valid, system}]
+
+// Seed #room with a welcoming system message so the stream isn't empty.
+channelMessages["room"] = [
+  {
+    handle: "system",
+    rankEmoji: null,
+    body: "the room is open. the relay is offline — messages are local only until the relay comes up.",
+    timestamp: Date.now() - 60000,
+    valid: false,
+    system: true
+  }
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────────────────
+function init() {
+  // Restore handle from localStorage.
+  userHandle = localStorage.getItem('pipernet_handle') || null;
+
+  // Render initial state.
+  renderContext(currentChannel);
+  renderMessages(currentChannel);
+  updateStreamHeader(currentChannel);
+  updateInputState();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CHANNEL SELECTION
+// ─────────────────────────────────────────────────────────────────────────────
+function selectChannel(el) {
+  // Deactivate old.
+  document.querySelectorAll('.ch-item').forEach(i => i.classList.remove('active'));
+  // Activate new.
+  el.classList.add('active');
+  const ch = el.dataset.channel;
+  currentChannel = ch;
+
+  // Close existing SSE stream.
+  if (sseSource) { sseSource.close(); sseSource = null; }
+
+  // Init message store for this channel if needed.
+  if (!channelMessages[ch]) channelMessages[ch] = [];
+
+  updateStreamHeader(ch);
+  renderContext(ch);
+  renderMessages(ch);
+  updateInputState();
+
+  // Start relay stream if we have a base URL.
+  if (RELAY_BASE && walletPubkey) {
+    loadHistory(ch);
+    openStream(ch);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STREAM HEADER
+// ─────────────────────────────────────────────────────────────────────────────
+function updateStreamHeader(ch) {
+  const meta = CHANNEL_META[ch] || {};
+  document.getElementById('stream-channel-name').textContent = '# ' + ch;
+  document.getElementById('stream-channel-sub').textContent = meta.subtitle || ch;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONTEXT PANEL (RIGHT COLUMN)
+// ─────────────────────────────────────────────────────────────────────────────
+function renderContext(ch) {
+  const meta = CHANNEL_META[ch] || {};
+  const panel = document.getElementById('context-panel');
+
+  const field = (key, val, isLink) => {
+    if (!val) return `
+      <div class="ctx-field">
+        <span class="ctx-key">${escHtml(key)}</span>
+        <span class="ctx-val"><span class="dash">—</span></span>
+      </div>`;
+    if (isLink) {
+      const href = val.startsWith('http') ? val : 'https://' + val;
+      return `
+      <div class="ctx-field">
+        <span class="ctx-key">${escHtml(key)}</span>
+        <span class="ctx-val"><a href="${escHtml(href)}" target="_blank" rel="noopener">${escHtml(val)}</a></span>
+      </div>`;
+    }
+    return `
+      <div class="ctx-field">
+        <span class="ctx-key">${escHtml(key)}</span>
+        <span class="ctx-val">${escHtml(val)}</span>
+      </div>`;
+  };
+
+  const roadmapItems = (meta.roadmap || []).map(r =>
+    `<li>${escHtml(r)}</li>`
+  ).join('');
+
+  const tweetVal = meta.tweet
+    ? `<a href="${escHtml(meta.tweet)}" target="_blank" rel="noopener">${escHtml(meta.tweet.replace('https://',''))}</a>`
+    : '<span class="dash">—</span>';
+
+  const demoVal = meta.demo
+    ? `<a href="${escHtml(meta.demo)}" ${meta.demo.startsWith('http') ? 'target="_blank" rel="noopener"' : ''}>${escHtml(meta.demo_label || meta.demo)}</a>`
+    : '<span class="dash">—</span>';
+
+  panel.innerHTML = `
+    <div>
+      <p class="ctx-heading mono"># ${escHtml(ch)}</p>
+      <p class="ctx-title">${escHtml(meta.title || ch)}</p>
+      ${field('origin', meta.origin)}
+      ${field('mission', meta.mission)}
+      ${field('state', meta.state)}
+      <div class="ctx-field">
+        <span class="ctx-key">repo</span>
+        <span class="ctx-val">${meta.repo
+          ? `<a href="https://${escHtml(meta.repo)}" target="_blank" rel="noopener">${escHtml(meta.repo)}</a>`
+          : '<span class="dash">—</span>'}</span>
+      </div>
+      <div class="ctx-field">
+        <span class="ctx-key">demo</span>
+        <span class="ctx-val">${demoVal}</span>
+      </div>
+      ${field('latest', meta.latest)}
+      <div class="ctx-field">
+        <span class="ctx-key">tweet</span>
+        <span class="ctx-val">${tweetVal}</span>
+      </div>
+      ${roadmapItems.length ? `
+        <div style="padding-top:10px;">
+          <p class="ctx-heading mono" style="margin-bottom:6px;">roadmap</p>
+          <ul class="ctx-roadmap">${roadmapItems}</ul>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MESSAGE RENDERING
+// ─────────────────────────────────────────────────────────────────────────────
+function renderMessages(ch) {
+  const container = document.getElementById('message-list');
+  container.innerHTML = '';
+
+  const msgs = channelMessages[ch] || [];
+  if (msgs.length === 0) {
+    if (!RELAY_BASE) {
+      const notice = document.createElement('p');
+      notice.className = 'relay-notice';
+      notice.textContent = 'the relay is offline — messages will appear once it is running.';
+      container.appendChild(notice);
+    }
+    return;
+  }
+
+  msgs.forEach(m => appendMessageEl(container, m));
+  scrollToBottom();
+}
+
+function appendMessageEl(container, m) {
+  const ts = new Date(typeof m.timestamp === 'number' ? m.timestamp : Date.parse(m.timestamp));
+  const timeStr = ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  const row = document.createElement('div');
+  row.className = 'msg-group' + (m.system ? ' system' : '');
+
+  if (m.system) {
+    row.innerHTML = `
+      <span class="msg-sig-col" title="system" aria-hidden="true">◦</span>
+      <div class="msg-main">
+        <div class="msg-meta-row">
+          <span class="msg-handle mono" style="color:var(--muted2); font-weight:400;">system</span>
+          <span class="msg-time mono">${escHtml(timeStr)}</span>
+        </div>
+        <div class="msg-body" style="font-style:italic;">${escHtml(m.body)}</div>
+      </div>
+    `;
+  } else {
+    const sigGlyph = m.valid ? '✓' : '✗';
+    const sigTitle = m.valid ? 'signature verified' : (m.local ? 'local — relay offline' : 'unsigned (demo mode)');
+    row.innerHTML = `
+      <span class="msg-sig-col${m.valid ? ' valid' : ''}" title="${sigTitle}" aria-hidden="true">${sigGlyph}</span>
+      <div class="msg-main">
+        <div class="msg-meta-row">
+          <span class="msg-handle mono">${escHtml(m.handle)}</span>
+          ${m.rankEmoji ? `<span class="msg-rank-emoji" title="${escHtml(m.rankLabel || '')}" aria-label="${escHtml(m.rankLabel || '')}">${m.rankEmoji}</span>` : ''}
+          <span class="msg-time mono">${escHtml(timeStr)}</span>
+        </div>
+        <div class="msg-body">${escHtml(m.body)}</div>
+      </div>
+    `;
+  }
+
+  container.appendChild(row);
+}
+
+function scrollToBottom() {
+  if (userScrolledUp) return;
+  const container = document.getElementById('message-list');
+  container.scrollTop = container.scrollHeight;
+}
+
+// Track whether user has scrolled up so we don't forcibly jump them down.
+document.addEventListener('DOMContentLoaded', () => {
+  const ml = document.getElementById('message-list');
+  if (ml) {
+    ml.addEventListener('scroll', () => {
+      const atBottom = ml.scrollHeight - ml.scrollTop - ml.clientHeight < 40;
+      userScrolledUp = !atBottom;
+    });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RELAY: HISTORY + SSE
+// ─────────────────────────────────────────────────────────────────────────────
+async function loadHistory(ch) {
+  if (!RELAY_BASE) return;
+  try {
+    const res = await fetch(`${RELAY_BASE}/channels/${ch}?limit=50`, {
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const msgs = Array.isArray(data) ? data : (data.messages ?? data.dots ?? []);
+    msgs.forEach(m => {
+      const norm = normaliseMessage(m);
+      if (!channelMessages[ch]) channelMessages[ch] = [];
+      channelMessages[ch].push(norm);
+    });
+    renderMessages(ch);
+  } catch (e) {
+    console.warn('[pipernet] history load failed:', e.message);
+  }
+}
+
+function openStream(ch) {
+  if (!RELAY_BASE) return;
+  if (sseSource) { sseSource.close(); sseSource = null; }
+
+  sseSource = new EventSource(`${RELAY_BASE}/channels/${ch}/events`);
+
+  const onMsg = (data) => {
+    try {
+      const m = normaliseMessage(JSON.parse(data));
+      if (!channelMessages[ch]) channelMessages[ch] = [];
+      channelMessages[ch].push(m);
+      if (currentChannel === ch) {
+        const container = document.getElementById('message-list');
+        appendMessageEl(container, m);
+        scrollToBottom();
+      }
+    } catch (_) {}
+  };
+
+  sseSource.addEventListener('message', e => onMsg(e.data));
+  sseSource.addEventListener('dot',     e => onMsg(e.data));
+  sseSource.addEventListener('ingest',  e => onMsg(e.data));
+
+  sseSource.onerror = () => {
+    // Silently reconnect — EventSource does this automatically.
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SEND MESSAGE
+// ─────────────────────────────────────────────────────────────────────────────
+async function sendMessage() {
+  const input = document.getElementById('msg-input');
+  const btn   = document.getElementById('send-btn');
+  const text  = input.value.trim();
+  if (!text || !walletPubkey) return;
+
+  btn.disabled = true;
+  input.disabled = true;
+
+  const handle    = userHandle || ('anon-' + walletPubkey.slice(0, 6).toLowerCase());
+  const rank      = userRank || getRank(walletPubkey);
+  const timestamp = Date.now();
+
+  // Build Pipernet-style envelope.
+  // v0: unsigned. v1: sign with window.solana.signMessage() and attach sig.
+  const payload = {
+    content:   text,
+    type:      'chat',
+    author:    walletPubkey,
+    handle:    handle,
+    channel:   currentChannel,
+    timestamp: timestamp,
+    rank:      rank.key,
+    // sig: <ed25519 sig of content — add in v1>
+  };
+
+  const localMsg = {
+    handle:    handle,
+    rankEmoji: rank.emoji,
+    rankLabel: rank.label,
+    body:      text,
+    timestamp: timestamp,
+    valid:     false,
+    local:     true
+  };
+
+  if (!RELAY_BASE) {
+    // Offline demo — render locally only.
+    if (!channelMessages[currentChannel]) channelMessages[currentChannel] = [];
+    channelMessages[currentChannel].push(localMsg);
+    const container = document.getElementById('message-list');
+    // Remove "relay offline" notice if present.
+    const notice = container.querySelector('.relay-notice');
+    if (notice) notice.remove();
+    appendMessageEl(container, localMsg);
+    userScrolledUp = false;
+    scrollToBottom();
+    input.value = '';
+    updateCharCount();
+    btn.disabled = false;
+    input.disabled = false;
+    input.focus();
+    return;
+  }
+
+  try {
+    const res = await fetch(`${RELAY_BASE}/channels/${currentChannel}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('send failed: ' + res.status);
+    // SSE stream will echo it back.
+    input.value = '';
+    updateCharCount();
+  } catch (e) {
+    console.error('[pipernet] send failed:', e);
+    // Render locally as fallback.
+    localMsg.body += ' ✗';
+    localMsg.local = true;
+    if (!channelMessages[currentChannel]) channelMessages[currentChannel] = [];
+    channelMessages[currentChannel].push(localMsg);
+    const container = document.getElementById('message-list');
+    appendMessageEl(container, localMsg);
+    userScrolledUp = false;
+    scrollToBottom();
+    input.value = '';
+    updateCharCount();
+  }
+
+  btn.disabled = false;
+  input.disabled = false;
+  input.focus();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CHAR COUNT
+// ─────────────────────────────────────────────────────────────────────────────
+function updateCharCount() {
+  const input = document.getElementById('msg-input');
+  const counter = document.getElementById('char-count');
+  const remaining = 280 - input.value.length;
+  counter.textContent = remaining;
+  counter.classList.toggle('warn', remaining < 30);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INPUT STATE
+// ─────────────────────────────────────────────────────────────────────────────
+function updateInputState() {
+  const input = document.getElementById('msg-input');
+  const btn   = document.getElementById('send-btn');
+  if (walletPubkey) {
+    input.disabled = false;
+    input.placeholder = 'say something in #' + currentChannel + '…';
+    btn.disabled = false;
+  } else {
+    input.disabled = true;
+    input.placeholder = 'connect wallet to speak';
+    btn.disabled = true;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WALLET CONNECT
+// ─────────────────────────────────────────────────────────────────────────────
+async function connectWallet() {
+  const provider = window.solana ?? window.backpack ?? null;
+
+  if (!provider) {
+    const ok = window.confirm(
+      "No Solana wallet detected.\n\n" +
+      "Install Phantom (phantom.app) or Backpack (backpack.app).\n\n" +
+      "In demo mode, press OK to continue with a randomised demo address."
+    );
+    if (ok) {
+      const demoKey = 'DEMO' + Math.random().toString(36).slice(2, 14).toUpperCase();
+      await onWalletConnected(demoKey);
+    }
+    return;
+  }
+
+  const btn = document.getElementById('connect-btn');
+  btn.innerHTML = '<span class="spinner"></span>connecting…';
+  btn.disabled = true;
+
+  try {
+    const resp = await provider.connect();
+    await onWalletConnected(resp.publicKey.toString());
+  } catch (e) {
+    console.error('[pipernet] wallet connect failed:', e);
+    btn.innerHTML = 'connect wallet';
+    btn.disabled = false;
+  }
+}
+
+async function onWalletConnected(pubkey) {
+  walletPubkey = pubkey;
+  userRank = getRank(pubkey);
+
+  // Determine handle.
+  if (!userHandle) {
+    const stored = localStorage.getItem('pipernet_handle');
+    if (stored) {
+      userHandle = stored;
+    } else {
+      // Auto-set anon handle; modal will offer change.
+      userHandle = 'anon-' + pubkey.slice(0, 6).toLowerCase();
+      localStorage.setItem('pipernet_handle', userHandle);
+    }
+  }
+
+  // Show connected state.
+  document.getElementById('identity-disconnected').style.display = 'none';
+  const connEl = document.getElementById('identity-connected');
+  connEl.style.display = 'flex';
+
+  document.getElementById('id-pubkey-display').textContent =
+    pubkey.slice(0, 4) + '…' + pubkey.slice(-4);
+  document.getElementById('id-rank-display').textContent =
+    userRank.emoji + ' ' + userHandle + ' · ' + userRank.label;
+
+  updateInputState();
+
+  // Start relay stream if available.
+  if (RELAY_BASE) {
+    loadHistory(currentChannel);
+    openStream(currentChannel);
+  }
+
+  // Inject a local welcome message.
+  const ch = currentChannel;
+  if (!channelMessages[ch]) channelMessages[ch] = [];
+  channelMessages[ch].push({
+    handle: 'system',
+    rankEmoji: null,
+    body: `${userRank.emoji} ${userHandle} joined.`,
+    timestamp: Date.now(),
+    valid: false,
+    system: true
+  });
+  renderMessages(ch);
+}
+
+function disconnectWallet() {
+  walletPubkey = null;
+  userRank = null;
+  if (sseSource) { sseSource.close(); sseSource = null; }
+
+  document.getElementById('identity-connected').style.display = 'none';
+  document.getElementById('identity-disconnected').style.display = '';
+  const btn = document.getElementById('connect-btn');
+  btn.innerHTML = 'connect wallet';
+  btn.disabled = false;
+
+  updateInputState();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HOLDER CHECK (stub — v0)
+// ─────────────────────────────────────────────────────────────────────────────
+/**
+ * isHolder — v0 stub, always returns true.
+ * v1: replace body with SPL getTokenAccountsByOwner check (see /holders for template).
+ */
+async function isHolder(pubkey) {
+  console.warn('[pipernet] isHolder() STUBBED — demo mode');
+  return true;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HANDLE MODAL
+// ─────────────────────────────────────────────────────────────────────────────
+function openHandleModal() {
+  const modal = document.getElementById('handle-modal');
+  const input = document.getElementById('handle-input');
+  input.value = userHandle || '';
+  modal.classList.add('open');
+  setTimeout(() => input.focus(), 50);
+}
+
+function closeHandleModal() {
+  document.getElementById('handle-modal').classList.remove('open');
+}
+
+function saveHandle() {
+  const raw = document.getElementById('handle-input').value.trim();
+  const clean = raw.toLowerCase().replace(/[^a-z0-9\-_]/g, '').slice(0, 20);
+  if (!clean) return;
+  userHandle = clean;
+  localStorage.setItem('pipernet_handle', clean);
+  closeHandleModal();
+  // Update display.
+  if (walletPubkey && userRank) {
+    document.getElementById('id-rank-display').textContent =
+      userRank.emoji + ' ' + userHandle + ' · ' + userRank.label;
+  }
+}
+
+// Close modal on backdrop click.
+document.getElementById('handle-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeHandleModal();
+});
+
+// handle-input Enter key.
+document.getElementById('handle-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') saveHandle();
+  if (e.key === 'Escape') closeHandleModal();
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MOBILE: INFO TOGGLE
+// ─────────────────────────────────────────────────────────────────────────────
+function toggleInfo() {
+  const right = document.getElementById('col-right');
+  right.classList.toggle('mobile-open');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NORMALISE MESSAGE (relay/Oracle envelope → display object)
+// ─────────────────────────────────────────────────────────────────────────────
+function normaliseMessage(m) {
+  const body    = m.content ?? m.body ?? m.text ?? '';
+  const handle  = m.handle  ?? m.author ?? ('anon-' + (m.pubkey ?? '').slice(0, 6).toLowerCase()) ?? 'anon';
+  const ts      = m.timestamp ?? m.createdAt ?? m.ts ?? m.applied_at ?? Date.now();
+  const sig     = m.sig ?? m.signature ?? null;
+  const valid   = sig !== null && sig !== undefined;
+  const rankKey = m.rank ?? null;
+  const rankObj = rankKey ? RANKS.find(r => r.key === rankKey) : null;
+  return {
+    handle,
+    rankEmoji: rankObj ? rankObj.emoji : null,
+    rankLabel: rankObj ? rankObj.label : null,
+    body,
+    timestamp: ts,
+    valid,
+    system: m.type === 'system' || !!m.system
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UTILITY
+// ─────────────────────────────────────────────────────────────────────────────
+function escHtml(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BOOT
+// ─────────────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
