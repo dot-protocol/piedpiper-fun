@@ -236,6 +236,90 @@
     color: var(--fg);
   }
 
+  /* ── holder identity card ── */
+  .holder-card {
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.85rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-width: 0;
+  }
+  .holder-card-rank {
+    display: flex;
+    align-items: baseline;
+    gap: 0.45em;
+    margin-bottom: 0.55rem;
+  }
+  .holder-card-emoji {
+    font-size: 1.4em;
+    line-height: 1;
+  }
+  .holder-card-label {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.78em;
+    color: var(--muted);
+    text-transform: lowercase;
+  }
+  .holder-card-divider {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 0 0 0.55rem;
+  }
+  .holder-card-balance {
+    font-size: 1.05em;
+    font-weight: 600;
+    font-family: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
+    color: var(--fg);
+  }
+  .holder-card-ticker {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    color: var(--muted);
+    margin-left: 0.3em;
+  }
+  .holder-card-supply {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.78em;
+    color: var(--muted);
+    margin-top: 0.25rem;
+  }
+  .holder-card-usd-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-top: 0.3rem;
+  }
+  .holder-card-usd {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 1em;
+    color: var(--accent);
+  }
+  .holder-card-refresh {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 0.88em;
+    padding: 0;
+    line-height: 1;
+    transition: color 100ms ease, transform 200ms ease;
+    flex-shrink: 0;
+  }
+  .holder-card-refresh:hover { color: var(--fg); }
+  .holder-card-refresh.spinning { animation: spin 0.8s linear infinite; }
+  /* mobile: stack gracefully */
+  @media (max-width: 479px) {
+    .holder-card {
+      font-size: 0.96em;
+    }
+    .holder-card-balance {
+      font-size: 1em;
+    }
+  }
+
   /* ── chat panel ── */
   #chat-panel {
     display: flex;
@@ -449,8 +533,24 @@
 
     <!-- State 3: verified -->
     <div id="state-verified" style="display:none;">
-      <div class="verified-banner">
+      <div class="verified-banner" style="margin-bottom:0.8rem;">
         ✓ welcome to the grove — <span id="wallet-short" class="mono" style="color:var(--muted);"></span>
+      </div>
+      <!-- holder identity card: populated by updateHolderCard() -->
+      <div class="holder-card" id="holder-card" aria-label="Your holder stats">
+        <div class="holder-card-rank">
+          <span class="holder-card-emoji" id="hc-emoji">—</span>
+          <span class="holder-card-label" id="hc-label">—</span>
+        </div>
+        <hr class="holder-card-divider" />
+        <div>
+          <span class="holder-card-balance" id="hc-balance">—</span><span class="holder-card-ticker">$PIPER</span>
+        </div>
+        <div class="holder-card-supply" id="hc-supply">— of supply</div>
+        <div class="holder-card-usd-row">
+          <span class="holder-card-usd" id="hc-usd">—</span>
+          <button class="holder-card-refresh" id="hc-refresh-btn" onclick="refreshHolderCard()" title="refresh balance &amp; price" aria-label="refresh">↻</button>
+        </div>
       </div>
     </div>
 
@@ -662,6 +762,209 @@ async function isHolder(pubkey) {
   }
 }
 
+// ── HOLDER STATS (balance, supply %, USD) ────────────────────────────────────
+
+// In-page price cache — 60s TTL so we don't spam DexScreener.
+let _cachedPrice = null;
+let _cachedPriceTs = 0;
+let _cachedTotalSupply = null; // raw token units (decimals already divided out)
+
+/**
+ * fetchTokenPrice — returns priceUsd (number) or null if unavailable.
+ * Caches for 60 seconds.
+ */
+async function fetchTokenPrice() {
+  const now = Date.now();
+  if (_cachedPrice !== null && (now - _cachedPriceTs) < 60_000) {
+    return _cachedPrice;
+  }
+  try {
+    const res = await fetch(
+      `https://api.dexscreener.com/latest/dex/tokens/${PIPER_TOKEN_MINT}`,
+      { headers: { 'Accept': 'application/json' } }
+    );
+    if (!res.ok) throw new Error('dexscreener ' + res.status);
+    const json = await res.json();
+    const pairs = json.pairs ?? [];
+    if (!pairs.length) return null;
+    // Prefer the pair with highest liquidity.
+    pairs.sort((a, b) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0));
+    const price = parseFloat(pairs[0].priceUsd);
+    if (isNaN(price)) return null;
+    _cachedPrice = price;
+    _cachedPriceTs = now;
+    return price;
+  } catch (e) {
+    console.warn('[pipernet] fetchTokenPrice failed:', e.message);
+    return null;
+  }
+}
+
+/**
+ * fetchTotalSupply — returns total supply (UI amount, decimals already divided)
+ * from Solana RPC. Cached for the page lifetime (supply barely changes).
+ */
+async function fetchTotalSupply() {
+  if (_cachedTotalSupply !== null) return _cachedTotalSupply;
+  try {
+    const body = {
+      jsonrpc: '2.0', id: 2,
+      method: 'getTokenSupply',
+      params: [PIPER_TOKEN_MINT]
+    };
+    const res = await fetch(SOLANA_RPC, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const json = await res.json();
+    const supply = json.result?.value?.uiAmount ?? null;
+    _cachedTotalSupply = supply;
+    return supply;
+  } catch (e) {
+    console.warn('[pipernet] fetchTotalSupply failed:', e.message);
+    return null;
+  }
+}
+
+/**
+ * fetchHolderBalance — returns uiAmount (number) for walletPubkey, or null on error.
+ */
+async function fetchHolderBalance(pubkey) {
+  try {
+    const body = {
+      jsonrpc: '2.0', id: 3,
+      method: 'getTokenAccountsByOwner',
+      params: [
+        pubkey,
+        { mint: PIPER_TOKEN_MINT },
+        { encoding: 'jsonParsed' }
+      ]
+    };
+    const res = await fetch(SOLANA_RPC, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const json = await res.json();
+    const accounts = json.result?.value ?? [];
+    if (!accounts.length) return 0;
+    return accounts[0].account.data.parsed.info.tokenAmount.uiAmount ?? 0;
+  } catch (e) {
+    console.warn('[pipernet] fetchHolderBalance failed:', e.message);
+    return null;
+  }
+}
+
+/**
+ * updateHolderCard — fetches balance, supply, price and renders the card.
+ * Shows "—" placeholders during fetch; never shows partial data.
+ * @param {string} pubkey
+ * @param {boolean} [forceRefresh=false] — bust price cache
+ */
+async function updateHolderCard(pubkey, forceRefresh) {
+  if (forceRefresh) {
+    _cachedPrice = null;
+    _cachedPriceTs = 0;
+  }
+
+  // Show loading state (—) while fetching.
+  document.getElementById('hc-balance').textContent = '—';
+  document.getElementById('hc-supply').textContent = '— of supply';
+  document.getElementById('hc-usd').textContent = '—';
+
+  // Show rank (emoji + label) immediately — we have it from isHolder() already.
+  const rank = rankForBalanceLocal(0); // will update after we have balance
+  // (we'll re-render after balance arrives)
+
+  const refreshBtn = document.getElementById('hc-refresh-btn');
+  if (refreshBtn) refreshBtn.classList.add('spinning');
+
+  // Fetch all three in parallel.
+  const [balance, totalSupply, price] = await Promise.all([
+    fetchHolderBalance(pubkey),
+    fetchTotalSupply(),
+    fetchTokenPrice()
+  ]);
+
+  if (refreshBtn) refreshBtn.classList.remove('spinning');
+
+  if (balance === null) {
+    // Balance fetch failed — keep rank, show error.
+    document.getElementById('hc-balance').textContent = 'unavailable';
+    document.getElementById('hc-supply').textContent = 'balance unavailable';
+    document.getElementById('hc-usd').textContent = price !== null
+      ? 'USD value: TBD (no balance)'
+      : 'USD value: TBD';
+    return;
+  }
+
+  // Rank from real balance.
+  const rankObj = rankForBalanceLocal(balance);
+  document.getElementById('hc-emoji').textContent = rankObj.emoji;
+  document.getElementById('hc-label').textContent = rankObj.label;
+
+  // Balance — thousands separated.
+  document.getElementById('hc-balance').textContent = formatTokenBalance(balance);
+
+  // Supply % — 4 decimal places.
+  if (totalSupply && totalSupply > 0) {
+    const pct = (balance / totalSupply) * 100;
+    document.getElementById('hc-supply').textContent =
+      pct.toFixed(4) + '% of supply';
+  } else {
+    document.getElementById('hc-supply').textContent = 'supply: TBD';
+  }
+
+  // USD value.
+  if (price !== null) {
+    const usd = balance * price;
+    document.getElementById('hc-usd').textContent = '≈ ' + formatUsd(usd);
+  } else {
+    document.getElementById('hc-usd').textContent = 'USD value: TBD';
+  }
+}
+
+function rankForBalanceLocal(balance) {
+  const RANKS_LOCAL = [
+    { key: 'whale',   emoji: '🐋', label: 'whale',   min: 100_000_000 },
+    { key: 'dolphin', emoji: '🐬', label: 'dolphin', min: 10_000_000  },
+    { key: 'octopus', emoji: '🐙', label: 'octopus', min: 1_000_000   },
+    { key: 'crab',    emoji: '🦀', label: 'crab',    min: 100_000     },
+    { key: 'prawn',   emoji: '🦞', label: 'prawn',   min: 10_000      },
+    { key: 'shrimp',  emoji: '🦐', label: 'shrimp',  min: 0           },
+  ];
+  for (const r of RANKS_LOCAL) {
+    if (balance >= r.min) return r;
+  }
+  return RANKS_LOCAL[RANKS_LOCAL.length - 1];
+}
+
+/**
+ * formatTokenBalance — e.g. 12453201 → "12,453,201"
+ */
+function formatTokenBalance(n) {
+  if (typeof n !== 'number') return '—';
+  return Math.floor(n).toLocaleString('en-US');
+}
+
+/**
+ * formatUsd — e.g. 4238.92 → "$4,238.92"
+ */
+function formatUsd(n) {
+  if (typeof n !== 'number' || isNaN(n)) return '—';
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+/**
+ * refreshHolderCard — called by the ↻ button.
+ */
+function refreshHolderCard() {
+  if (walletPubkey) {
+    updateHolderCard(walletPubkey, true);
+  }
+}
+
 // ── WALLET CONNECT ────────────────────────────────────────────────────────────
 
 async function connectWallet() {
@@ -725,6 +1028,8 @@ async function onWalletConnected(pubkey) {
       document.getElementById('wallet-short').textContent = shortPubkey(pubkey);
       showState('verified');
       demoHandle = 'anon-' + pubkey.slice(0, 4).toLowerCase();
+      // Populate the holder identity card asynchronously.
+      updateHolderCard(pubkey);
       revealChat();
     } else {
       // ── State 4: not a holder ──

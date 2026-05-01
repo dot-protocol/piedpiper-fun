@@ -266,6 +266,82 @@ body {
   font-size: 0.78em;
   color: var(--fg);
 }
+/* ── identity card rows ── */
+.id-card-rank-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4em;
+}
+.id-card-emoji {
+  font-size: 1.3em;
+  line-height: 1;
+}
+.id-card-label {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.72em;
+  color: var(--muted);
+  text-transform: lowercase;
+}
+.id-card-divider {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 5px 0;
+}
+.id-card-balance-row {
+  font-size: 0.88em;
+  font-weight: 600;
+  font-family: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
+  color: var(--fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.id-card-ticker {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.8em;
+  color: var(--muted);
+  margin-left: 0.25em;
+}
+.id-card-supply {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.68em;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.id-card-usd-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+}
+.id-card-usd {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.78em;
+  color: var(--accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.id-card-refresh {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.78em;
+  padding: 0;
+  line-height: 1;
+  transition: color 100ms ease, transform 200ms ease;
+  flex-shrink: 0;
+}
+.id-card-refresh:hover { color: var(--fg); }
+@keyframes spin-refresh { to { transform: rotate(360deg); } }
+.id-card-refresh.spinning { animation: spin-refresh 0.8s linear infinite; }
+/* mobile: identity panel stacks compactly */
+@media (max-width: 767px) {
+  .id-card-balance-row { font-size: 0.82em; }
+  .id-card-supply, .id-card-usd { font-size: 0.66em; }
+}
 button.id-btn {
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   font-size: 0.76em;
@@ -781,8 +857,21 @@ button.id-btn.primary:hover { opacity: 0.82; background: var(--accent); }
 
       <div id="identity-connected">
         <span class="id-pubkey" id="id-pubkey-display">—</span>
-        <span class="id-rank" id="id-rank-display">—</span>
-        <div style="display:flex; gap:6px; align-items:center;">
+        <!-- rank + stats card -->
+        <div class="id-card-rank-row">
+          <span class="id-card-emoji" id="id-card-emoji">—</span>
+          <span class="id-card-label" id="id-card-label">—</span>
+        </div>
+        <hr class="id-card-divider" />
+        <div class="id-card-balance-row">
+          <span id="id-card-balance">—</span><span class="id-card-ticker">$PIPER</span>
+        </div>
+        <div class="id-card-supply" id="id-card-supply">— of supply</div>
+        <div class="id-card-usd-row">
+          <span class="id-card-usd" id="id-card-usd">—</span>
+          <button class="id-card-refresh" id="id-card-refresh-btn" onclick="refreshAppHolderCard()" title="refresh" aria-label="refresh balance and price">↻</button>
+        </div>
+        <div style="display:flex; gap:6px; align-items:center; margin-top:4px;">
           <button class="id-btn" onclick="openHandleModal()" title="change handle" style="font-size:0.72em; padding:3px 8px;">rename</button>
           <button class="id-btn" onclick="disconnectWallet()" style="font-size:0.72em; padding:3px 8px;">disconnect</button>
         </div>
@@ -1523,6 +1612,159 @@ function disconnectWallet() {
   btn.disabled = false;
 
   updateInputState();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HOLDER STATS (balance, supply %, USD)
+// ─────────────────────────────────────────────────────────────────────────────
+
+let _appCachedPrice = null;
+let _appCachedPriceTs = 0;
+let _appCachedTotalSupply = null;
+
+async function appFetchTokenPrice() {
+  const now = Date.now();
+  if (_appCachedPrice !== null && (now - _appCachedPriceTs) < 60_000) {
+    return _appCachedPrice;
+  }
+  try {
+    const res = await fetch(
+      `https://api.dexscreener.com/latest/dex/tokens/${PIPER_TOKEN_MINT}`,
+      { headers: { 'Accept': 'application/json' } }
+    );
+    if (!res.ok) throw new Error('dexscreener ' + res.status);
+    const json = await res.json();
+    const pairs = json.pairs ?? [];
+    if (!pairs.length) return null;
+    pairs.sort((a, b) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0));
+    const price = parseFloat(pairs[0].priceUsd);
+    if (isNaN(price)) return null;
+    _appCachedPrice = price;
+    _appCachedPriceTs = now;
+    return price;
+  } catch (e) {
+    console.warn('[pipernet/app] fetchTokenPrice failed:', e.message);
+    return null;
+  }
+}
+
+async function appFetchTotalSupply() {
+  if (_appCachedTotalSupply !== null) return _appCachedTotalSupply;
+  try {
+    const body = {
+      jsonrpc: '2.0', id: 2,
+      method: 'getTokenSupply',
+      params: [PIPER_TOKEN_MINT]
+    };
+    const res = await fetch(SOLANA_RPC, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const json = await res.json();
+    const supply = json.result?.value?.uiAmount ?? null;
+    _appCachedTotalSupply = supply;
+    return supply;
+  } catch (e) {
+    console.warn('[pipernet/app] fetchTotalSupply failed:', e.message);
+    return null;
+  }
+}
+
+async function appFetchHolderBalance(pubkey) {
+  try {
+    const body = {
+      jsonrpc: '2.0', id: 3,
+      method: 'getTokenAccountsByOwner',
+      params: [
+        pubkey,
+        { mint: PIPER_TOKEN_MINT },
+        { encoding: 'jsonParsed' }
+      ]
+    };
+    const res = await fetch(SOLANA_RPC, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const json = await res.json();
+    const accounts = json.result?.value ?? [];
+    if (!accounts.length) return 0;
+    return accounts[0].account.data.parsed.info.tokenAmount.uiAmount ?? 0;
+  } catch (e) {
+    console.warn('[pipernet/app] fetchHolderBalance failed:', e.message);
+    return null;
+  }
+}
+
+function appFormatBalance(n) {
+  if (typeof n !== 'number') return '—';
+  return Math.floor(n).toLocaleString('en-US');
+}
+
+function appFormatUsd(n) {
+  if (typeof n !== 'number' || isNaN(n)) return '—';
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+async function updateAppHolderCard(pubkey, forceRefresh) {
+  if (forceRefresh) {
+    _appCachedPrice = null;
+    _appCachedPriceTs = 0;
+  }
+  // Placeholders while loading.
+  document.getElementById('id-card-balance').textContent = '—';
+  document.getElementById('id-card-supply').textContent = '— of supply';
+  document.getElementById('id-card-usd').textContent = '—';
+
+  const refreshBtn = document.getElementById('id-card-refresh-btn');
+  if (refreshBtn) refreshBtn.classList.add('spinning');
+
+  const [balance, totalSupply, price] = await Promise.all([
+    appFetchHolderBalance(pubkey),
+    appFetchTotalSupply(),
+    appFetchTokenPrice()
+  ]);
+
+  if (refreshBtn) refreshBtn.classList.remove('spinning');
+
+  if (balance === null) {
+    document.getElementById('id-card-balance').textContent = 'unavailable';
+    document.getElementById('id-card-supply').textContent = 'balance unavailable';
+    document.getElementById('id-card-usd').textContent = 'USD value: TBD';
+    return;
+  }
+
+  // Update rank from real balance.
+  const rankObj = rankForBalance(balance);
+  userRank = rankObj;
+  document.getElementById('id-card-emoji').textContent = rankObj.emoji;
+  document.getElementById('id-card-label').textContent = rankObj.label;
+  // Keep the legacy id-rank-display for compat (used elsewhere in the page).
+  const rankDisplay = document.getElementById('id-rank-display');
+  if (rankDisplay) rankDisplay.textContent = rankObj.emoji + ' ' + (userHandle || '') + ' · ' + rankObj.label;
+
+  document.getElementById('id-card-balance').textContent = appFormatBalance(balance);
+
+  if (totalSupply && totalSupply > 0) {
+    const pct = (balance / totalSupply) * 100;
+    document.getElementById('id-card-supply').textContent = pct.toFixed(4) + '% of supply';
+  } else {
+    document.getElementById('id-card-supply').textContent = 'supply: TBD';
+  }
+
+  if (price !== null) {
+    const usd = balance * price;
+    document.getElementById('id-card-usd').textContent = '≈ ' + appFormatUsd(usd);
+  } else {
+    document.getElementById('id-card-usd').textContent = 'USD value: TBD';
+  }
+}
+
+function refreshAppHolderCard() {
+  if (walletPubkey) {
+    updateAppHolderCard(walletPubkey, true);
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
