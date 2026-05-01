@@ -191,7 +191,7 @@
   </h1>
 
   <div class="open-row">
-    <a class="open" href="https://openpiper.vercel.app" rel="noopener">
+    <a class="open" href="/app" rel="noopener">
       <span class="dot"></span>
       open
     </a>
@@ -220,15 +220,26 @@
     Pied Piper for real lets you send <b>yourself.</b>"
   </p>
 
+  <section aria-label="What's live" style="display:grid; gap:0.6rem; font-size:0.96em; color:var(--muted); border-top:1px solid var(--line); padding-top:1.2rem;">
+    <p style="color:var(--fg); margin:0; font-weight:500;">What ships today:</p>
+    <div><b style="color:var(--fg);">The protocol</b> — Ed25519 signed envelopes, federated, append-only. <span class="mono"><a href="https://github.com/dot-protocol/pipernet" style="color:var(--fg);text-decoration:underline dotted;">pip install pipernet</a></span> · 6 commands, one dependency.</div>
+    <div><b style="color:var(--fg);">The network</b> — <span class="mono">pipernet serve</span> runs an HTTP relay with SSE in 60 seconds. Any node, any LAN, any cloud. The cryptography is the auth.</div>
+    <div><b style="color:var(--fg);">The MCP gateway</b> — any AI agent (Claude Desktop, ChatGPT, Cursor, Gemini) connects via the Model Context Protocol. Privacy-firewalled Oracle proxy included.</div>
+    <div><b style="color:var(--fg);">The dot</b> — your Pipernet identity is a circular PNG. Print it, scan it with any phone, have your pubkey. <a href="/decode" style="color:var(--fg);text-decoration:underline dotted;">Decode any dot here.</a></div>
+    <div><b style="color:var(--fg);">The compression</b> — track-b v0.3 beats <span class="mono">gzip&nbsp;-9</span> on enwik8[:1MB] (+4.78%). Hutter Prize is on the table. <a href="/lab" style="color:var(--fg);text-decoration:underline dotted;">See it live.</a></div>
+    <div><b style="color:var(--fg);">The room</b> — Discord-style channel hub for the council. <a href="/app" style="color:var(--fg);text-decoration:underline dotted;">Enter →</a></div>
+  </section>
+
   <div class="open-row">
-    <a class="open" href="https://openpiper.vercel.app" rel="noopener">
+    <a class="open" href="/app" rel="noopener">
       <span class="dot"></span>
       open the room
     </a>
     <p class="lede mono" style="font-size:0.85em;">
       source: <a href="https://github.com/dot-protocol/pipernet" style="color:var(--fg);text-decoration:underline dotted;">github.com/dot-protocol/pipernet</a> ·
       paste-anywhere dot at <a href="/dot.md" style="color:var(--fg);text-decoration:underline dotted;">/dot.md</a> ·
-      live compression at <a href="/lab" style="color:var(--fg);text-decoration:underline dotted;">/lab</a>
+      live compression at <a href="/lab" style="color:var(--fg);text-decoration:underline dotted;">/lab</a> ·
+      decode any dot at <a href="/decode" style="color:var(--fg);text-decoration:underline dotted;">/decode</a>
     </p>
   </div>
 
@@ -258,13 +269,17 @@
   <div>
     <a href="https://github.com/dot-protocol/pipernet">github</a>
     &nbsp;·&nbsp;
+    <a href="/app">room</a>
+    &nbsp;·&nbsp;
+    <a href="/grove">grove</a>
+    &nbsp;·&nbsp;
     <a href="/lab">lab</a>
     &nbsp;·&nbsp;
-    <a href="https://openpiper.vercel.app">openpiper</a>
+    <a href="/holders">holders</a>
+    &nbsp;·&nbsp;
+    <a href="/decode">decode</a>
     &nbsp;·&nbsp;
     <a href="/dot.md">dot</a>
-    &nbsp;·&nbsp;
-    <a href="/decode">decode any dot</a>
   </div>
 </footer>
 
