@@ -829,9 +829,38 @@ function openStream() {
     } catch (_) {}
   });
 
-  sseSource.onerror = () => {
+  // Track sustained failure — EventSource fires onerror on every transient
+  // reconnect, which is normal. Only flag "offline" after several errors with
+  // no successful messages in between.
+  let sseErrorCount = 0;
+  let sseConnectedOnce = false;
+
+  sseSource.addEventListener('connected', () => {
+    sseConnectedOnce = true;
+    sseErrorCount = 0;
     const relayStatus = document.getElementById('relay-status');
-    if (relayStatus) relayStatus.style.display = '';
+    if (relayStatus) relayStatus.style.display = 'none';
+    console.log('[pipernet] relay connected');
+  });
+
+  sseSource.onopen = () => {
+    sseConnectedOnce = true;
+    sseErrorCount = 0;
+    const relayStatus = document.getElementById('relay-status');
+    if (relayStatus) relayStatus.style.display = 'none';
+  };
+
+  sseSource.onerror = () => {
+    sseErrorCount += 1;
+    // EventSource auto-reconnects. Only declare "offline" after 5 errors AND
+    // we've never connected, OR after 10 errors total.
+    const looksOffline = (!sseConnectedOnce && sseErrorCount >= 5)
+                      || (sseErrorCount >= 10);
+    if (looksOffline) {
+      const relayStatus = document.getElementById('relay-status');
+      if (relayStatus) relayStatus.style.display = '';
+      console.warn('[pipernet] relay offline after', sseErrorCount, 'errors');
+    }
   };
 }
 
