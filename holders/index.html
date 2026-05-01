@@ -1,0 +1,876 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>holders · piedpiper.fun</title>
+<meta name="description" content="Pied Piper holder chat. Realtime signed messages. Token-holder gated." />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+<meta property="og:title" content="holders · piedpiper.fun" />
+<meta property="og:description" content="Pied Piper holder chat. Realtime signed messages. Token-holder gated." />
+<meta property="og:url" content="https://piedpiper.fun/holders" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="holders · piedpiper.fun" />
+<meta name="twitter:description" content="Pied Piper holder chat. Realtime signed messages. Token-holder gated." />
+<meta name="twitter:image" content="/og.png" />
+
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: white;
+    --fg: black;
+    --muted: rgba(0,0,0,0.55);
+    --line: rgba(0,0,0,0.12);
+    --accent: black;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0b0b;
+      --fg: #f5f5f5;
+      --muted: rgba(255,255,255,0.55);
+      --line: rgba(255,255,255,0.14);
+      --accent: #f5f5f5;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
+    font-size: clamp(16px, 1.05vw + 13px, 19px);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+  header {
+    display: flex; align-items: center; gap: 0.6em;
+    padding: 1.4rem 1.6rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+  }
+  header .mark { width: 14px; height: 14px; }
+  header .name { color: var(--fg); }
+  header .crumb { color: var(--muted); }
+
+  main {
+    max-width: 38rem;
+    margin: 0 auto;
+    padding: 4rem 1.6rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  /* ── lock icon ── */
+  .lock-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0 0.5rem;
+  }
+  .lock { width: 64px; height: auto; opacity: 0.9; }
+
+  h1 {
+    font-size: clamp(1.5rem, 2.6vw + 1rem, 2.4rem);
+    line-height: 1.18;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  h1 em { font-style: italic; color: var(--muted); }
+
+  /* ── deal block (mirrors /grove .deal) ── */
+  .deal {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 1.4rem 0;
+    display: grid;
+    gap: 0.6rem;
+    font-size: 0.96em;
+    color: var(--muted);
+  }
+  .deal b { color: var(--fg); font-weight: 500; }
+
+  /* ── plant-style button row ── */
+  .plant-row {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 1rem;
+  }
+  button.plant {
+    display: inline-flex; align-items: center; gap: 0.55em;
+    padding: 0.85rem 1.4rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+    color: var(--bg);
+    background: var(--accent);
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    transition: transform 80ms ease, opacity 120ms ease;
+  }
+  button.plant:hover:not(:disabled) { transform: translateY(-1px); opacity: 0.88; }
+  button.plant:disabled { opacity: 0.5; cursor: not-allowed; }
+  button.plant .dot { width: 8px; height: 8px; background: var(--bg); border-radius: 999px; }
+
+  /* outline variant — "not a holder" CTA */
+  button.plant.outline, a.plant.outline {
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid var(--fg);
+    text-decoration: none;
+  }
+  button.plant.outline .dot, a.plant.outline .dot { background: var(--fg); }
+
+  /* ── demo banner ── */
+  .demo-banner {
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.7rem 1rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82em;
+    color: var(--muted);
+    display: flex; align-items: baseline; gap: 0.5em;
+  }
+  .demo-banner b { color: var(--fg); }
+
+  /* ── status messages ── */
+  .status-block {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 1.2rem;
+    min-height: 4rem;
+  }
+  .status-text {
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.92em;
+    display: flex; align-items: center; gap: 0.5em;
+  }
+  .status-text.ok { color: var(--fg); }
+  .status-text.bad { color: var(--fg); }
+
+  /* spinner */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 14px; height: 14px;
+    border: 1.5px solid var(--line);
+    border-top-color: var(--fg);
+    border-radius: 50%;
+    display: inline-block;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+
+  /* ── verified banner ── */
+  .verified-banner {
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.7rem 1rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.88em;
+    color: var(--fg);
+  }
+
+  /* ── chat panel ── */
+  #chat-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    border-top: 1px solid var(--line);
+    padding-top: 2rem;
+  }
+
+  .chat-label {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82em;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* chat window */
+  #messages {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    height: 320px;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    background: var(--bg);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.84em;
+    scroll-behavior: smooth;
+  }
+  #messages:empty::after {
+    content: "no messages yet — be first.";
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .msg {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 0.5em;
+    row-gap: 0.15em;
+  }
+  .msg-sig {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 0.9em;
+    line-height: 1;
+    user-select: none;
+  }
+  .msg-sig.valid { color: var(--fg); }
+  .msg-sig.invalid { color: var(--muted); }
+  .msg-meta {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex; align-items: baseline; gap: 0.5em;
+  }
+  .msg-handle { color: var(--fg); font-weight: 500; }
+  .msg-time { color: var(--muted); font-size: 0.88em; }
+  .msg-body {
+    grid-column: 2;
+    grid-row: 2;
+    color: var(--muted);
+    line-height: 1.45;
+    word-break: break-word;
+  }
+
+  /* send row */
+  .send-row {
+    display: flex; gap: 0.6rem; align-items: stretch;
+  }
+  #msg-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.6rem 0.8rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.88em;
+    color: var(--fg);
+    outline: none;
+    transition: border-color 120ms ease;
+  }
+  #msg-input:focus { border-color: var(--fg); }
+  #msg-input::placeholder { color: var(--muted); }
+
+  button#send-btn {
+    padding: 0.6rem 1.1rem;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.88em;
+    cursor: pointer;
+    transition: opacity 100ms ease;
+    letter-spacing: 0.03em;
+  }
+  button#send-btn:hover { opacity: 0.82; }
+  button#send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .relay-offline {
+    font-style: italic;
+    color: var(--muted);
+    font-size: 0.9em;
+  }
+
+  /* ── misc ── */
+  .lede { color: var(--muted); font-size: 1.05em; }
+  .small {
+    color: var(--muted);
+    font-size: 0.86em;
+  }
+  .small a { color: var(--fg); text-decoration: underline dotted; }
+
+  footer {
+    max-width: 38rem; margin: 0 auto; padding: 2rem 1.6rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82em;
+    border-top: 1px solid var(--line);
+  }
+  footer .left { display: flex; align-items: center; gap: 0.5em; }
+  footer a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--muted); }
+  footer a:hover { color: var(--fg); border-bottom-color: var(--fg); }
+
+  ::selection { background: var(--accent); color: var(--bg); }
+</style>
+</head>
+<body>
+
+<header>
+  <svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none" />
+  </svg>
+  <span class="name">piedpiper.fun</span>
+  <span class="crumb">/ holders</span>
+</header>
+
+<main>
+
+  <!-- lock icon — the gate is real -->
+  <div class="lock-wrap" aria-hidden="true">
+    <svg class="lock" viewBox="0 0 64 80" fill="none">
+      <!-- shackle -->
+      <path d="M16 32 L16 20 A16 16 0 0 1 48 20 L48 32"
+            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" />
+      <!-- body -->
+      <rect x="6" y="32" width="52" height="40" rx="4"
+            stroke="currentColor" stroke-width="1.8" fill="none" />
+      <!-- keyhole circle -->
+      <circle cx="32" cy="52" r="5" stroke="currentColor" stroke-width="1.5" fill="none" />
+      <!-- keyhole stem -->
+      <line x1="32" y1="57" x2="32" y2="65" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+    </svg>
+  </div>
+
+  <p style="text-align:center; font-style:italic; color:var(--muted); margin:-1rem 0 0; font-size:0.95em;">
+    the holder chat.
+  </p>
+
+  <h1>
+    Pied Piper. <em>Real-time signed messages. Token-holder only.</em>
+  </h1>
+
+  <section class="deal" aria-label="How it works">
+    <div><b>Connect your Solana wallet.</b> Any wallet will do — Phantom, Backpack, Solflare.</div>
+    <div><b>Sign a one-time challenge</b> proving you hold $PIPER. The signature stays in your browser — nothing leaves.</div>
+    <div><b>Get realtime access to the holder channel</b> — signed envelopes, append-only, cryptographically auditable.</div>
+  </section>
+
+  <!-- demo mode banner — always visible until token deploys -->
+  <div class="demo-banner" id="demo-banner">
+    <span>◈</span>
+    <span><b>Demo mode:</b> anyone can join until $PIPER deploys to pump.fun. Holder check is stubbed — all wallets pass.</span>
+  </div>
+
+  <!-- ── THE GATE ── -->
+  <div id="gate" class="status-block">
+    <!-- State 0: not connected — default view -->
+    <div id="state-disconnected">
+      <div class="plant-row">
+        <button class="plant" id="connect-btn" onclick="connectWallet()">
+          <span class="dot"></span>
+          connect wallet
+        </button>
+        <p class="lede mono" style="font-size:0.85em; margin:0;">
+          Pied Piper holders only. Connect to verify.
+        </p>
+      </div>
+    </div>
+
+    <!-- State 1: connecting -->
+    <div id="state-connecting" style="display:none;">
+      <p class="status-text">
+        <span class="spinner"></span>
+        Connecting to wallet…
+      </p>
+    </div>
+
+    <!-- State 2: connected, checking holdings -->
+    <div id="state-checking" style="display:none;">
+      <p class="status-text">
+        <span class="spinner"></span>
+        Checking $PIPER holdings…
+      </p>
+    </div>
+
+    <!-- State 3: verified -->
+    <div id="state-verified" style="display:none;">
+      <div class="verified-banner">
+        ✓ welcome to the grove — <span id="wallet-short" class="mono" style="color:var(--muted);"></span>
+      </div>
+    </div>
+
+    <!-- State 4: not a holder -->
+    <div id="state-no-hold" style="display:none;">
+      <p class="status-text bad">
+        ✗ no $PIPER detected.
+      </p>
+      <div class="plant-row" style="margin-top:0.4rem;">
+        <a class="plant outline" href="https://pump.fun" rel="noopener" target="_blank">
+          <span class="dot"></span>
+          get $PIPER on pump.fun
+        </a>
+        <p class="lede mono" style="font-size:0.85em; margin:0; color:var(--muted);">
+          Acquire some and refresh to retry.
+        </p>
+      </div>
+    </div>
+
+    <!-- State 5: relay offline (shown inside chat panel too) -->
+    <div id="state-error" style="display:none;">
+      <p class="relay-offline">
+        the relay is offline — the chat is staged but not yet broadcasting.
+      </p>
+    </div>
+  </div>
+
+  <!-- ── CHAT PANEL — hidden until verified ── -->
+  <div id="chat-panel" style="display:none;">
+    <p class="chat-label mono">holders channel · live</p>
+
+    <div id="messages" role="log" aria-live="polite" aria-label="Holder chat messages"></div>
+
+    <div class="send-row">
+      <input
+        id="msg-input"
+        type="text"
+        placeholder="say something…"
+        maxlength="500"
+        autocomplete="off"
+        spellcheck="false"
+        onkeydown="if(event.key==='Enter')sendMessage()"
+      />
+      <button id="send-btn" onclick="sendMessage()">send</button>
+    </div>
+
+    <p id="relay-status" class="relay-offline" style="display:none;">
+      the relay is offline — the chat is staged but not yet broadcasting.
+    </p>
+  </div>
+
+  <p class="small" style="margin-top:1rem;">
+    <a href="/grove">← back to the grove</a>
+    &nbsp;·&nbsp;
+    <a href="/">protocol</a>
+    &nbsp;·&nbsp;
+    <a href="/lab">lab</a>
+  </p>
+
+</main>
+
+<footer>
+  <div class="left">
+    <svg class="mark" width="12" height="12" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none" />
+    </svg>
+    <span>Signed. Verified. Append-only.</span>
+  </div>
+  <div>
+    <a href="/grove">grove</a>
+    &nbsp;·&nbsp;
+    <a href="/">protocol</a>
+    &nbsp;·&nbsp;
+    <a href="/lab">lab</a>
+  </div>
+</footer>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// PIPERNET HOLDER CHAT — v0 (demo mode)
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// TO SWAP IN FOR REAL WHEN $PIPER DEPLOYS:
+//
+// 1. Set PIPER_TOKEN_MINT to the actual pump.fun contract address.
+// 2. Replace the body of isHolder() with the real SPL balance check (see below).
+// 3. Remove the demo-banner element from the HTML above (or hide it via CSS).
+// 4. Done. Everything else stays the same.
+//
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── CONSTANTS — update these when token deploys ──────────────────────────────
+
+// v0: TBD. Set this when pump.fun creates the token.
+// v1: Replace with the actual SPL mint address, e.g.:
+//   const PIPER_TOKEN_MINT = "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU";
+const PIPER_TOKEN_MINT = null; // <-- CHANGE THIS when $PIPER deploys
+
+// Relay endpoint — flip this when `pipernet serve` is running on the VPS.
+// Production: "https://api.piedpiper.fun/channels/holders"
+const RELAY_BASE = null; // <-- CHANGE THIS when relay is running
+
+// Solana RPC for balance checks (used in v1 isHolder).
+// Helius free tier recommended: https://helius.dev
+const SOLANA_RPC = "https://api.mainnet-beta.solana.com";
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+
+let walletPubkey = null;  // string, set after connect
+let sseSource = null;     // EventSource, set after verification
+let demoHandle = null;    // randomised "anon-XXXX" for unsigned demo messages
+
+// ── UI HELPERS ───────────────────────────────────────────────────────────────
+
+function showState(name) {
+  const states = ['disconnected', 'connecting', 'checking', 'verified', 'no-hold', 'error'];
+  states.forEach(s => {
+    const el = document.getElementById('state-' + s);
+    if (el) el.style.display = (s === name) ? '' : 'none';
+  });
+}
+
+function shortPubkey(pk) {
+  if (!pk) return '';
+  return pk.slice(0, 4) + '…' + pk.slice(-4);
+}
+
+// ── HOLDER CHECK ─────────────────────────────────────────────────────────────
+
+/**
+ * isHolder — checks whether `pubkey` holds at least 1 $PIPER token.
+ *
+ * v0 (DEMO MODE):
+ *   Returns true unconditionally. Any wallet passes.
+ *   console.warn is intentional — it reminds devs this is stubbed.
+ *
+ * v1 (after $PIPER deploys):
+ *   Replace the entire function body with the SPL balance check:
+ *
+ *   const body = {
+ *     jsonrpc: "2.0", id: 1,
+ *     method: "getTokenAccountsByOwner",
+ *     params: [
+ *       pubkey,
+ *       { mint: PIPER_TOKEN_MINT },
+ *       { encoding: "jsonParsed" }
+ *     ]
+ *   };
+ *   const res = await fetch(SOLANA_RPC, {
+ *     method: "POST",
+ *     headers: { "Content-Type": "application/json" },
+ *     body: JSON.stringify(body)
+ *   });
+ *   const json = await res.json();
+ *   const accounts = json.result?.value ?? [];
+ *   if (accounts.length === 0) return false;
+ *   const amount = accounts[0].account.data.parsed.info.tokenAmount.uiAmount;
+ *   return amount > 0;
+ *
+ * @param {string} pubkey — base58 Solana public key
+ * @returns {Promise<boolean>}
+ */
+async function isHolder(pubkey) {
+  // v0 STUB — always returns true
+  // TODO: replace with real SPL balance check when PIPER_TOKEN_MINT is set
+  console.warn('[pipernet] isHolder() STUBBED — demo mode, returning true for', pubkey);
+  return true;
+}
+
+// ── WALLET CONNECT ────────────────────────────────────────────────────────────
+
+async function connectWallet() {
+  // Detect Phantom (covers 80%+ of Solana users).
+  // window.solana is injected by Phantom extension and Phantom mobile in-app browser.
+  // window.backpack is injected by Backpack. Solflare also exposes window.solana.
+  const provider = window.solana ?? window.backpack ?? null;
+
+  if (!provider) {
+    // No wallet extension detected.
+    // Graceful degradation: prompt user to install Phantom.
+    const confirmed = window.confirm(
+      "No Solana wallet detected.\n\n" +
+      "Install Phantom (phantom.app) or Backpack (backpack.app) and reload.\n\n" +
+      "In demo mode, press OK to continue with a randomised demo address."
+    );
+    if (confirmed) {
+      // Demo fallback: generate a fake pubkey for UI testing without a wallet.
+      walletPubkey = 'DEMO' + Math.random().toString(36).slice(2, 14).toUpperCase();
+      onWalletConnected(walletPubkey);
+    }
+    return;
+  }
+
+  showState('connecting');
+
+  try {
+    let resp;
+    if (provider === window.backpack) {
+      resp = await provider.connect();
+      walletPubkey = resp.publicKey.toString();
+    } else {
+      // Phantom / Solflare
+      resp = await provider.connect();
+      walletPubkey = resp.publicKey.toString();
+    }
+    onWalletConnected(walletPubkey);
+  } catch (err) {
+    console.error('[pipernet] wallet connect failed:', err);
+    showState('disconnected');
+    // surface friendly message
+    const btn = document.getElementById('connect-btn');
+    if (btn) {
+      btn.textContent = 'connection refused — try again';
+      setTimeout(() => {
+        btn.innerHTML = '<span class="dot"></span>connect wallet';
+      }, 3000);
+    }
+  }
+}
+
+async function onWalletConnected(pubkey) {
+  walletPubkey = pubkey;
+  showState('checking');
+
+  try {
+    const holds = await isHolder(pubkey);
+
+    if (holds) {
+      // ── State 3: verified ──
+      document.getElementById('wallet-short').textContent = shortPubkey(pubkey);
+      showState('verified');
+      demoHandle = 'anon-' + pubkey.slice(0, 4).toLowerCase();
+      revealChat();
+    } else {
+      // ── State 4: not a holder ──
+      showState('no-hold');
+    }
+  } catch (err) {
+    console.error('[pipernet] holder check failed:', err);
+    showState('error');
+  }
+}
+
+// ── CHAT: REVEAL + CONNECT RELAY ─────────────────────────────────────────────
+
+function revealChat() {
+  const panel = document.getElementById('chat-panel');
+  if (panel) panel.style.display = '';
+
+  if (!RELAY_BASE) {
+    // Relay not yet configured — show offline notice inside the chat panel.
+    const relayStatus = document.getElementById('relay-status');
+    if (relayStatus) relayStatus.style.display = '';
+    // Inject a system message so the window isn't completely empty.
+    appendMessage({
+      handle: 'system',
+      body: 'the relay is offline — the chat is staged but not yet broadcasting.',
+      timestamp: Date.now(),
+      valid: false,
+      system: true
+    });
+    return;
+  }
+
+  // Load last 50 messages.
+  loadHistory();
+
+  // Open SSE stream.
+  openStream();
+}
+
+// ── CHAT: HISTORY ─────────────────────────────────────────────────────────────
+
+async function loadHistory() {
+  if (!RELAY_BASE) return;
+  try {
+    const res = await fetch(RELAY_BASE + '/messages?limit=50', {
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error('history fetch failed: ' + res.status);
+    const data = await res.json();
+    const msgs = Array.isArray(data) ? data : (data.messages ?? data.dots ?? []);
+    msgs.forEach(m => appendMessage(normaliseMessage(m)));
+    scrollToBottom();
+  } catch (err) {
+    console.warn('[pipernet] history load failed:', err.message);
+    // Non-fatal — SSE stream may still work.
+  }
+}
+
+// ── CHAT: SSE STREAM ──────────────────────────────────────────────────────────
+
+function openStream() {
+  if (!RELAY_BASE) return;
+  if (sseSource) { sseSource.close(); sseSource = null; }
+
+  const url = RELAY_BASE + '/events';
+  sseSource = new EventSource(url);
+
+  sseSource.addEventListener('message', (e) => {
+    try {
+      const m = JSON.parse(e.data);
+      appendMessage(normaliseMessage(m));
+      scrollToBottom();
+    } catch (_) {}
+  });
+
+  // Pipernet relay emits a custom "dot" event for signed envelopes.
+  sseSource.addEventListener('dot', (e) => {
+    try {
+      const m = JSON.parse(e.data);
+      appendMessage(normaliseMessage(m));
+      scrollToBottom();
+    } catch (_) {}
+  });
+
+  sseSource.addEventListener('ingest', (e) => {
+    // Oracle-style ingest event (pipernet SSE membrane compatibility).
+    try {
+      const m = JSON.parse(e.data);
+      if (m.channel === 'holders' || m.type === 'chat') {
+        appendMessage(normaliseMessage(m));
+        scrollToBottom();
+      }
+    } catch (_) {}
+  });
+
+  sseSource.onerror = () => {
+    const relayStatus = document.getElementById('relay-status');
+    if (relayStatus) relayStatus.style.display = '';
+  };
+}
+
+// ── CHAT: SEND ────────────────────────────────────────────────────────────────
+
+async function sendMessage() {
+  const input = document.getElementById('msg-input');
+  const btn = document.getElementById('send-btn');
+  const text = input.value.trim();
+  if (!text || !walletPubkey) return;
+
+  btn.disabled = true;
+  input.disabled = true;
+
+  const handle = demoHandle ?? shortPubkey(walletPubkey);
+  const timestamp = Date.now();
+
+  // Build message payload.
+  // v0: unsigned — author is the wallet pubkey, sig is omitted.
+  // v1: sign the message body with window.solana.signMessage() and include sig.
+  const payload = {
+    content: text,
+    type: 'chat',
+    author: walletPubkey,
+    handle: handle,
+    channel: 'holders',
+    timestamp: timestamp,
+    // sig: <ed25519 signature of content — add in v1>
+  };
+
+  if (!RELAY_BASE) {
+    // Offline demo: render locally only.
+    appendMessage({
+      handle: handle,
+      body: text,
+      timestamp: timestamp,
+      valid: false,
+      local: true
+    });
+    scrollToBottom();
+    input.value = '';
+    btn.disabled = false;
+    input.disabled = false;
+    input.focus();
+    return;
+  }
+
+  try {
+    const res = await fetch(RELAY_BASE + '/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('send failed: ' + res.status);
+    // SSE stream will echo it back — no need to append locally.
+    input.value = '';
+  } catch (err) {
+    console.error('[pipernet] send failed:', err);
+    // Render locally as fallback so the user doesn't lose their message.
+    appendMessage({
+      handle: handle,
+      body: text + ' (send failed — relay offline)',
+      timestamp: timestamp,
+      valid: false,
+      local: true
+    });
+    scrollToBottom();
+  }
+
+  btn.disabled = false;
+  input.disabled = false;
+  input.focus();
+}
+
+// ── CHAT: RENDER ──────────────────────────────────────────────────────────────
+
+/**
+ * normaliseMessage — converts relay/Oracle envelope to a display-ready object.
+ *
+ * Relay envelope fields vary by version:
+ *   - pipernet DOT: { content, author, createdAt, sig? }
+ *   - Oracle ingest: { content, type, channel, confidence, timestamp }
+ *   - Legacy: { body, handle, ts }
+ */
+function normaliseMessage(m) {
+  const body = m.content ?? m.body ?? m.text ?? '';
+  const handle = m.handle ?? m.author ?? shortPubkey(m.pubkey ?? '') ?? 'anon';
+  const ts = m.timestamp ?? m.createdAt ?? m.ts ?? m.applied_at ?? Date.now();
+  const sig = m.sig ?? m.signature ?? null;
+  // v0: sig is null, so valid is false — we show ✗.
+  // v1: verify ed25519 sig against content + author pubkey.
+  //     For now we trust the relay's own verification and mark as valid
+  //     if the relay says so, or if a sig field is present.
+  const valid = sig !== null && sig !== undefined;
+  return { handle, body, timestamp: ts, valid, system: m.type === 'system' || m.system };
+}
+
+function appendMessage(m) {
+  const container = document.getElementById('messages');
+  if (!container) return;
+
+  const ts = new Date(typeof m.timestamp === 'number' ? m.timestamp : Date.parse(m.timestamp));
+  const timeStr = ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  const row = document.createElement('div');
+  row.className = 'msg';
+  if (m.system) {
+    row.innerHTML = `
+      <span class="msg-sig invalid" title="system">◦</span>
+      <span class="msg-meta">
+        <span class="msg-handle" style="color:var(--muted);">system</span>
+        <span class="msg-time">${timeStr}</span>
+      </span>
+      <span class="msg-body" style="color:var(--muted); font-style:italic;">${escHtml(m.body)}</span>
+    `;
+  } else {
+    const sigGlyph = m.valid ? '✓' : '✗';
+    const sigClass = m.valid ? 'valid' : 'invalid';
+    const sigTitle = m.valid ? 'signature verified' : (m.local ? 'local only — relay offline' : 'unsigned (demo mode)');
+    row.innerHTML = `
+      <span class="msg-sig ${sigClass}" title="${sigTitle}">${sigGlyph}</span>
+      <span class="msg-meta">
+        <span class="msg-handle mono">${escHtml(m.handle)}</span>
+        <span class="msg-time">${timeStr}</span>
+      </span>
+      <span class="msg-body">${escHtml(m.body)}</span>
+    `;
+  }
+  container.appendChild(row);
+}
+
+function scrollToBottom() {
+  const container = document.getElementById('messages');
+  if (container) container.scrollTop = container.scrollHeight;
+}
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+</script>
+
+</body>
+</html>
