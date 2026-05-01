@@ -564,9 +564,9 @@
 // since the page belongs to Pied Piper; MEVICI is the *test gate*, not the brand.
 const PIPER_TOKEN_MINT = "AyUfba64zszzNqVQG3Ya4g2mEjVCWJcHqyGN8Ae2pump"; // MEVICI (test gate until $PIPER deploys)
 
-// Relay endpoint — flip this when `pipernet serve` is running on the VPS.
-// Production: "https://api.piedpiper.fun/channels/holders"
-const RELAY_BASE = null; // <-- CHANGE THIS when relay is running
+// Relay endpoint — pipernet relay on api.mevici.com
+// Channel: holders  |  SSE: RELAY_BASE/channels/holders/events
+const RELAY_BASE = "https://api.mevici.com/pipernet"; // live relay
 
 // Solana RPC for balance checks (used in v1 isHolder).
 // Helius free tier recommended: https://helius.dev
@@ -769,7 +769,7 @@ function revealChat() {
 async function loadHistory() {
   if (!RELAY_BASE) return;
   try {
-    const res = await fetch(RELAY_BASE + '/messages?limit=50', {
+    const res = await fetch(RELAY_BASE + '/channels/holders', {
       headers: { 'Accept': 'application/json' }
     });
     if (!res.ok) throw new Error('history fetch failed: ' + res.status);
@@ -789,7 +789,7 @@ function openStream() {
   if (!RELAY_BASE) return;
   if (sseSource) { sseSource.close(); sseSource = null; }
 
-  const url = RELAY_BASE + '/events';
+  const url = RELAY_BASE + '/channels/holders/events';
   sseSource = new EventSource(url);
 
   sseSource.addEventListener('message', (e) => {
@@ -800,7 +800,16 @@ function openStream() {
     } catch (_) {}
   });
 
-  // Pipernet relay emits a custom "dot" event for signed envelopes.
+  // Pipernet relay emits "envelope" for signed envelopes.
+  sseSource.addEventListener('envelope', (e) => {
+    try {
+      const m = JSON.parse(e.data);
+      appendMessage(normaliseMessage(m));
+      scrollToBottom();
+    } catch (_) {}
+  });
+
+  // Legacy event names kept for backward compat with other relay backends.
   sseSource.addEventListener('dot', (e) => {
     try {
       const m = JSON.parse(e.data);
@@ -871,7 +880,7 @@ async function sendMessage() {
   }
 
   try {
-    const res = await fetch(RELAY_BASE + '/send', {
+    const res = await fetch(RELAY_BASE + '/channels/holders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

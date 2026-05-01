@@ -853,7 +853,7 @@ button.id-btn.primary:hover { opacity: 0.82; background: var(--accent); }
 //    isHolder() stub with the real getTokenAccountsByOwner RPC call.
 //
 // ─────────────────────────────────────────────────────────────────────────────
-const RELAY_BASE       = null;   // <-- CHANGE when relay is running
+const RELAY_BASE       = "https://api.mevici.com/pipernet";   // live relay
 // Until $PIPER deploys to pump.fun, the holder gate is bound to $MEVICI
 // (Blaze's existing pump.fun token). Swap to the real $PIPER mint at launch.
 const PIPER_TOKEN_MINT = "AyUfba64zszzNqVQG3Ya4g2mEjVCWJcHqyGN8Ae2pump"; // MEVICI test gate
@@ -1304,9 +1304,10 @@ function openStream(ch) {
     } catch (_) {}
   };
 
-  sseSource.addEventListener('message', e => onMsg(e.data));
-  sseSource.addEventListener('dot',     e => onMsg(e.data));
-  sseSource.addEventListener('ingest',  e => onMsg(e.data));
+  sseSource.addEventListener('message',  e => onMsg(e.data));
+  sseSource.addEventListener('envelope', e => onMsg(e.data)); // pipernet relay
+  sseSource.addEventListener('dot',      e => onMsg(e.data));
+  sseSource.addEventListener('ingest',   e => onMsg(e.data));
 
   sseSource.onerror = () => {
     // Silently reconnect — EventSource does this automatically.
