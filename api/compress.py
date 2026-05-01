@@ -15,7 +15,7 @@ POST /api/compress
       "encode_ms": int
     }
 
-Uses the same code that lives in github.com/mevBlaze/pipernet under
+Uses the same code that lives in github.com/dot-protocol/pipernet under
 compression/track-b/. Honest output, real numbers, byte-exact round-trip.
 """
 from __future__ import annotations
@@ -32,7 +32,7 @@ import numpy as np
 
 # ============================================================================
 # Inlined arithmetic coder + Markov + Match model + Multi-window mix
-# Same logic as github.com/mevBlaze/pipernet compression/track-b/
+# Same logic as github.com/dot-protocol/pipernet compression/track-b/
 # Inlined here so the serverless function has no cross-file imports.
 # ============================================================================
 
@@ -331,7 +331,7 @@ class handler(BaseHTTPRequestHandler):
                 "encoder": "track-b v0.3 (order-3 Markov + multi-window match, multiplicative mix)",
                 "windows": list(windows),
                 "encode_ms": encode_ms,
-                "source": "https://github.com/mevBlaze/pipernet",
+                "source": "https://github.com/dot-protocol/pipernet",
             }
             out = json.dumps(payload).encode("utf-8")
             self.send_response(200)
