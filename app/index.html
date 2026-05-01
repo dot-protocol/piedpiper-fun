@@ -618,7 +618,7 @@ button.id-btn.primary:hover { opacity: 0.82; background: var(--accent); }
 
 <!-- ─── DEMO BANNER ───────────────────────────────────────────────────────── -->
 <div id="demo-banner">
-  <b>demo mode —</b> $PIPER not yet deployed · relay offline · any wallet passes holder check
+  <b>test mode —</b> gated by $MEVICI until $PIPER deploys · relay offline · real on-chain holder check
 </div>
 
 <!-- ─── THREE-COLUMN LAYOUT ──────────────────────────────────────────────── -->
@@ -780,7 +780,9 @@ button.id-btn.primary:hover { opacity: 0.82; background: var(--accent); }
 //
 // ─────────────────────────────────────────────────────────────────────────────
 const RELAY_BASE       = null;   // <-- CHANGE when relay is running
-const PIPER_TOKEN_MINT = null;   // <-- CHANGE when $PIPER deploys
+// Until $PIPER deploys to pump.fun, the holder gate is bound to $MEVICI
+// (Blaze's existing pump.fun token). Swap to the real $PIPER mint at launch.
+const PIPER_TOKEN_MINT = "AyUfba64zszzNqVQG3Ya4g2mEjVCWJcHqyGN8Ae2pump"; // MEVICI test gate
 const SOLANA_RPC       = "https://api.mainnet-beta.solana.com";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1456,8 +1458,34 @@ function disconnectWallet() {
  * v1: replace body with SPL getTokenAccountsByOwner check (see /holders for template).
  */
 async function isHolder(pubkey) {
-  console.warn('[pipernet] isHolder() STUBBED — demo mode');
-  return true;
+  if (!PIPER_TOKEN_MINT) {
+    console.warn('[pipernet] isHolder() STUBBED — no token mint set, returning true');
+    return true;
+  }
+  try {
+    const body = {
+      jsonrpc: "2.0", id: 1,
+      method: "getTokenAccountsByOwner",
+      params: [
+        pubkey,
+        { mint: PIPER_TOKEN_MINT },
+        { encoding: "jsonParsed" }
+      ]
+    };
+    const res = await fetch(SOLANA_RPC, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    const json = await res.json();
+    const accounts = json.result?.value ?? [];
+    if (accounts.length === 0) return false;
+    const amount = accounts[0].account.data.parsed.info.tokenAmount.uiAmount;
+    return amount > 0;
+  } catch (err) {
+    console.error('[pipernet] isHolder check failed:', err);
+    return false;
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

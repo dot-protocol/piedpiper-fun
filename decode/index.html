@@ -1,0 +1,849 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>decode · piedpiper.fun</title>
+<meta name="description" content="Drop any microdot or .dot.png here. Reads, decodes, and verifies the identity payload entirely in your browser. No upload." />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+<meta property="og:title" content="decode · piedpiper.fun" />
+<meta property="og:description" content="Drop any microdot here. Verify identity entirely in your browser. No upload." />
+<meta property="og:url" content="https://piedpiper.fun/decode" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="decode · piedpiper.fun" />
+<meta name="twitter:description" content="Drop a dot. Verify in seconds." />
+<meta name="twitter:image" content="/og.png" />
+
+<!-- jsQR — MIT, 35KB, decodes QR codes from ImageData entirely in-browser -->
+<!-- https://github.com/cozmo/jsQR  |  pinned to 1.4.0 (latest stable) -->
+<!-- SRI: omitted — add via `openssl dgst -sha256 -binary jsQR.js | base64` on deploy -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js" crossorigin="anonymous"></script>
+
+<style>
+  /* ─── CSS Variables (matches piedpiper.fun exactly) ─────────────────────── */
+  :root {
+    color-scheme: light dark;
+    --bg: white;
+    --fg: black;
+    --muted: rgba(0,0,0,0.55);
+    --line: rgba(0,0,0,0.12);
+    --accent: black;
+    --verified: #1a7f37;
+    --invalid: #c0392b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0b0b;
+      --fg: #f5f5f5;
+      --muted: rgba(255,255,255,0.55);
+      --line: rgba(255,255,255,0.14);
+      --accent: #f5f5f5;
+      --verified: #3fb950;
+      --invalid: #f85149;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
+    font-size: clamp(16px, 1.05vw + 13px, 19px);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+  /* ─── Header ─────────────────────────────────────────────────────────────── */
+  header {
+    display: flex; align-items: center; gap: 0.6em;
+    padding: 1.4rem 1.6rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+  }
+  header .mark { width: 14px; height: 14px; }
+  header .name { color: var(--fg); }
+  header .crumb { color: var(--muted); }
+
+  /* ─── Main ───────────────────────────────────────────────────────────────── */
+  main {
+    max-width: 38rem;
+    margin: 0 auto;
+    padding: 4rem 1.6rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.4rem;
+  }
+
+  /* ─── Page title ─────────────────────────────────────────────────────────── */
+  h1 {
+    font-size: clamp(1.5rem, 2.6vw + 1rem, 2.4rem);
+    line-height: 1.18;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  h1 em { font-style: italic; color: var(--muted); }
+
+  .subtitle {
+    margin: -0.8rem 0 0;
+    color: var(--muted);
+    font-size: 0.97em;
+    line-height: 1.5;
+  }
+
+  /* ─── Drop zone (State 0 + 1) ────────────────────────────────────────────── */
+  #drop-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .drop-zone {
+    position: relative;
+    width: min(280px, 80vw);
+    height: min(280px, 80vw);
+    border-radius: 50%;
+    border: 1.6px solid var(--fg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 120ms ease, border-color 100ms ease;
+    overflow: hidden;
+    user-select: none;
+  }
+  .drop-zone:hover {
+    border-color: var(--fg);
+    border-width: 2px;
+    background: rgba(0,0,0,0.03);
+  }
+  @media (prefers-color-scheme: dark) {
+    .drop-zone:hover { background: rgba(255,255,255,0.04); }
+  }
+  .drop-zone.drag-over {
+    border-width: 2.5px;
+    background: rgba(0,0,0,0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    .drop-zone.drag-over { background: rgba(255,255,255,0.07); }
+  }
+  .drop-zone.analyzing {
+    cursor: default;
+  }
+
+  .drop-label {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    color: var(--muted);
+    text-align: center;
+    padding: 0 2rem;
+    line-height: 1.4;
+    pointer-events: none;
+  }
+
+  /* hidden file input */
+  #file-input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+  }
+
+  .upload-hint {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.8em;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .privacy-note {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.78em;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.5;
+  }
+  .privacy-note a {
+    color: var(--muted);
+    text-decoration: underline dotted;
+  }
+  .privacy-note a:hover { color: var(--fg); }
+
+  /* ─── Spinner (State 1) ──────────────────────────────────────────────────── */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 28px; height: 28px;
+    border: 2px solid var(--line);
+    border-top-color: var(--fg);
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+  }
+  .analyzing-label {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    color: var(--muted);
+  }
+
+  /* ─── Dossier panel (State 2 + 3) ────────────────────────────────────────── */
+  #dossier {
+    display: none;
+    flex-direction: column;
+    gap: 1.6rem;
+  }
+  #dossier.visible { display: flex; }
+
+  .verdict-line {
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 1.05em;
+    font-weight: 600;
+  }
+  .verdict-line.verified { color: var(--verified); }
+  .verdict-line.invalid  { color: var(--invalid); }
+
+  .dossier-grid {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 1.2rem 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+  .dossier-row {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: 0.5em;
+    font-size: 0.9em;
+    align-items: baseline;
+    overflow-wrap: anywhere;
+  }
+  .dossier-key {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    color: var(--muted);
+    font-size: 0.88em;
+    flex-shrink: 0;
+  }
+  .dossier-val {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.88em;
+    word-break: break-all;
+  }
+
+  .tamper-warning {
+    background: rgba(240,60,40,0.07);
+    border-left: 3px solid var(--invalid);
+    padding: 0.9rem 1rem;
+    font-size: 0.9em;
+    color: var(--fg);
+    line-height: 1.5;
+  }
+
+  /* raw JSON expander */
+  details.raw-json {
+    border-top: 1px solid var(--line);
+    padding-top: 0.8rem;
+  }
+  details.raw-json summary {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82em;
+    color: var(--muted);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+  }
+  details.raw-json summary::-webkit-details-marker { display: none; }
+  details.raw-json summary::before {
+    content: '▶';
+    font-size: 0.7em;
+    transition: transform 120ms ease;
+  }
+  details.raw-json[open] summary::before { transform: rotate(90deg); }
+  details.raw-json pre {
+    margin: 0.8rem 0 0;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.78em;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: var(--muted);
+  }
+
+  /* action row */
+  .dossier-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    align-items: center;
+  }
+  button.pill {
+    display: inline-flex; align-items: center; gap: 0.4em;
+    padding: 0.55rem 1.1rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82em;
+    letter-spacing: 0.03em;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--fg);
+    cursor: pointer;
+    transition: background 80ms ease, border-color 80ms ease;
+  }
+  button.pill:hover { background: var(--line); }
+  button.pill.primary {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  button.pill.primary:hover { opacity: 0.86; }
+
+  /* ─── No QR found (State 4) ──────────────────────────────────────────────── */
+  #no-qr {
+    display: none;
+    flex-direction: column;
+    gap: 1.2rem;
+    text-align: center;
+    align-items: center;
+    padding: 2rem 0;
+  }
+  #no-qr.visible { display: flex; }
+
+  .no-qr-msg {
+    color: var(--muted);
+    font-size: 0.97em;
+    font-style: italic;
+    line-height: 1.5;
+  }
+  .no-qr-sub {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82em;
+    color: var(--muted);
+  }
+
+  /* ─── About tooltip / footer block ───────────────────────────────────────── */
+  .about-decode {
+    border-top: 1px solid var(--line);
+    padding-top: 1.4rem;
+    display: grid;
+    gap: 0.5rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.8em;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .about-decode a { color: var(--muted); text-decoration: underline dotted; }
+  .about-decode a:hover { color: var(--fg); }
+  .about-decode b { color: var(--fg); font-weight: 500; }
+
+  /* ─── Footer ──────────────────────────────────────────────────────────────── */
+  footer {
+    max-width: 38rem; margin: 0 auto; padding: 2rem 1.6rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82em;
+    border-top: 1px solid var(--line);
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+  footer .left { display: flex; align-items: center; gap: 0.5em; }
+  footer a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--muted); }
+  footer a:hover { color: var(--fg); border-bottom-color: var(--fg); }
+
+  ::selection { background: var(--accent); color: var(--bg); }
+</style>
+</head>
+<body>
+
+<!-- ─── Header ──────────────────────────────────────────────────────────────── -->
+<header>
+  <svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none"
+      stroke-linecap="round" stroke-dasharray="0 1 0" />
+  </svg>
+  <span class="name">piedpiper.fun</span>
+  <span class="crumb">/ decode</span>
+</header>
+
+<!-- ─── Main ─────────────────────────────────────────────────────────────────── -->
+<main>
+
+  <div>
+    <h1>Decode <em>any</em> dot.</h1>
+    <p class="subtitle">
+      Drop a microdot image. Read the identity. Verify the signature.
+      Entirely in your browser — no upload, no backend, no install.
+    </p>
+  </div>
+
+  <!-- State 0 + 1: Drop zone -->
+  <div id="drop-area">
+    <div class="drop-zone" id="drop-zone" role="button" tabindex="0"
+         aria-label="Drop a dot image or click to open file picker">
+
+      <!-- State 0: placeholder text -->
+      <div id="state-empty">
+        <p class="drop-label">drop a dot here</p>
+      </div>
+
+      <!-- State 1: analyzing spinner (hidden by default) -->
+      <div id="state-analyzing" style="display:none; flex-direction:column; align-items:center; gap:0.8rem;">
+        <div class="spinner"></div>
+        <span class="analyzing-label">decoding…</span>
+      </div>
+
+    </div>
+    <p class="upload-hint">or click to upload</p>
+    <p class="privacy-note">
+      runs entirely in your browser. no upload. open source.
+      ·
+      <a href="https://github.com/dot-protocol/pipernet/tree/main/piedpiper-fun/decode" target="_blank" rel="noopener">view source</a>
+    </p>
+  </div>
+
+  <!-- Hidden file input (accepts images + camera on mobile) -->
+  <input type="file" id="file-input" accept="image/*" capture="environment" aria-hidden="true" />
+
+  <!-- State 2 + 3: Dossier panel -->
+  <div id="dossier" aria-live="polite">
+    <div class="verdict-line" id="verdict-line" aria-label="Verification result">
+      <!-- populated by JS -->
+    </div>
+
+    <!-- Tamper warning shown only in state 3 -->
+    <div class="tamper-warning" id="tamper-warning" style="display:none;">
+      signature did not verify against the embedded pubkey — this dot has been tampered
+      with or forged. the handle and key cannot be trusted.
+    </div>
+
+    <div class="dossier-grid" id="dossier-grid">
+      <!-- rows populated by JS -->
+    </div>
+
+    <details class="raw-json" id="raw-json-details">
+      <summary>raw payload</summary>
+      <pre id="raw-json-pre"></pre>
+    </details>
+
+    <div class="dossier-actions">
+      <button class="pill primary" id="btn-copy-pubkey" onclick="copyPubkey()">copy pubkey</button>
+      <button class="pill" onclick="reset()">scan another</button>
+    </div>
+  </div>
+
+  <!-- State 4: No QR found -->
+  <div id="no-qr" aria-live="polite">
+    <p class="no-qr-msg">no microdot detected.</p>
+    <p class="no-qr-sub">is this a <code>.dot.png</code> or <code>.microdot.jpg</code>?<br/>try a cleaner photo with more light and less angle.</p>
+    <button class="pill" onclick="reset()">try another</button>
+  </div>
+
+  <!-- About / transparency block -->
+  <div class="about-decode">
+    <div><b>what this page does:</b> reads the QR code embedded in any Pipernet identity dot, verifies
+      the Ed25519 self-signature using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto API</a>
+      (built into your browser — no library needed for verification), and shows you the full identity payload.</div>
+    <div><b>works in:</b> Chrome 113+, Firefox 130+, Safari 17+ (Ed25519 SubtleCrypto support required).</div>
+    <div>
+      <a href="/">protocol</a>
+      &nbsp;·&nbsp;
+      <a href="/grove">grove</a>
+      &nbsp;·&nbsp;
+      <a href="/holders">holders</a>
+      &nbsp;·&nbsp;
+      <a href="/app">app</a>
+      &nbsp;·&nbsp;
+      <a href="https://github.com/dot-protocol/pipernet" target="_blank" rel="noopener">github</a>
+    </div>
+  </div>
+
+</main>
+
+<!-- ─── Footer ───────────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="left">
+    <svg class="mark" width="12" height="12" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none" />
+    </svg>
+    <span>The dot speaks for itself.</span>
+  </div>
+  <div>
+    <a href="/">protocol</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/dot-protocol/pipernet">github</a>
+    &nbsp;·&nbsp;
+    <a href="/lab">lab</a>
+    &nbsp;·&nbsp;
+    <a href="/decode">decode any dot</a>
+  </div>
+</footer>
+
+<!-- ─────────────────────────────────────────────────────────────────────────────
+  DECODER SCRIPT
+  All logic is self-contained. No module bundler, no build step.
+
+  TODO v0.3: handle multi-depth microdot decoding. Currently v0.1 only
+  (standard QR inside circular frame). v0.3 microdots use concentric polar
+  rings with d>1 recursion; decoding those requires:
+    1. detecting the outer ring boundary (not part of QR spec)
+    2. reading ring0 data bits (angle + radius sampling)
+    3. recursively resolving depth-1+ payloads
+  The jsQR call below will still find the inner QR for v0.3 if the image
+  is clean enough, but the outer-ring metadata will be silently ignored.
+────────────────────────────────────────────────────────────────────────────── -->
+<script>
+'use strict';
+
+// ─── State ─────────────────────────────────────────────────────────────────
+const MAX_DIM = 1024; // downscale large images before decoding
+let _lastPayload = null;
+let _lastPubkeyHex = null;
+
+// ─── DOM refs ───────────────────────────────────────────────────────────────
+const dropZone      = document.getElementById('drop-zone');
+const fileInput     = document.getElementById('file-input');
+const stateEmpty    = document.getElementById('state-empty');
+const stateAnalyzing = document.getElementById('state-analyzing');
+const dossier       = document.getElementById('dossier');
+const noQr          = document.getElementById('no-qr');
+const verdictLine   = document.getElementById('verdict-line');
+const tamperWarning = document.getElementById('tamper-warning');
+const dossierGrid   = document.getElementById('dossier-grid');
+const rawJsonPre    = document.getElementById('raw-json-pre');
+const btnCopyPubkey = document.getElementById('btn-copy-pubkey');
+
+// ─── Utility helpers ────────────────────────────────────────────────────────
+
+/** Convert hex string to Uint8Array */
+function hexToBytes(hex) {
+  if (hex.length % 2 !== 0) throw new Error('hex string has odd length');
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes[i / 2] = parseInt(hex.slice(i, i + 2), 16);
+  }
+  return bytes;
+}
+
+/**
+ * Canonical JSON: sorted keys, no whitespace, UTF-8.
+ * Mirrors cli/core.py `canonical()` and tools/dot/encode.py `_canonical()`.
+ *
+ * The signed body for a v0.1 dot payload is:
+ *   canonical({ handle, issued_at, pubkey_hex, tier })
+ * (self_signature excluded — same as Python encode.py _build_dot_payload)
+ */
+function canonical(obj) {
+  const sorted = {};
+  Object.keys(obj).sort().forEach(k => { sorted[k] = obj[k]; });
+  return JSON.stringify(sorted);
+}
+
+/**
+ * Verify an Ed25519 self-signature using the Web Crypto API.
+ *
+ * @param {string} pubkeyHex  — 64-char hex (32 bytes raw Ed25519 public key)
+ * @param {string} message    — the canonical JSON string that was signed
+ * @param {string} sigHex     — 128-char hex (64 bytes Ed25519 signature)
+ * @returns {Promise<boolean>}
+ */
+async function verifyEd25519(pubkeyHex, message, sigHex) {
+  const pubkeyBytes = hexToBytes(pubkeyHex);
+  const sigBytes    = hexToBytes(sigHex);
+  const msgBytes    = new TextEncoder().encode(message);
+
+  let cryptoKey;
+  try {
+    cryptoKey = await crypto.subtle.importKey(
+      'raw',
+      pubkeyBytes,
+      { name: 'Ed25519' },
+      false,
+      ['verify']
+    );
+  } catch (e) {
+    console.error('importKey failed:', e);
+    return false;
+  }
+
+  try {
+    return await crypto.subtle.verify('Ed25519', cryptoKey, sigBytes, msgBytes);
+  } catch (e) {
+    console.error('verify failed:', e);
+    return false;
+  }
+}
+
+// ─── Image → ImageData (with downscale) ─────────────────────────────────────
+
+/**
+ * Load a File into a downscaled ImageData suitable for jsQR.
+ * Downscales to MAX_DIM × MAX_DIM if either dimension exceeds that.
+ * @returns {Promise<ImageData>}
+ */
+function fileToImageData(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { naturalWidth: w, naturalHeight: h } = img;
+      if (w > MAX_DIM || h > MAX_DIM) {
+        const scale = MAX_DIM / Math.max(w, h);
+        w = Math.round(w * scale);
+        h = Math.round(h * scale);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      resolve(ctx.getImageData(0, 0, w, h));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('image load failed')); };
+    img.src = url;
+  });
+}
+
+// ─── Core decode pipeline ───────────────────────────────────────────────────
+
+/**
+ * Full pipeline:
+ *   File → ImageData → jsQR → JSON parse → shape validate → Ed25519 verify → render
+ */
+async function processFile(file) {
+  showAnalyzing();
+
+  let imageData;
+  try {
+    imageData = await fileToImageData(file);
+  } catch (e) {
+    console.error('fileToImageData:', e);
+    showNoQr();
+    return;
+  }
+
+  // jsQR synchronous call — may take 50–500ms depending on image size
+  const qrResult = jsQR(imageData.data, imageData.width, imageData.height, {
+    inversionAttempts: 'dontInvert', // dots are black-on-white
+  });
+
+  if (!qrResult) {
+    // No QR found — try once more with inverted colours (dark backgrounds)
+    const qrResultInv = jsQR(imageData.data, imageData.width, imageData.height, {
+      inversionAttempts: 'onlyInvert',
+    });
+    if (!qrResultInv) {
+      showNoQr();
+      return;
+    }
+    await handleQrText(qrResultInv.data);
+    return;
+  }
+
+  await handleQrText(qrResult.data);
+}
+
+async function handleQrText(rawText) {
+  // 1. Parse JSON
+  let payload;
+  try {
+    payload = JSON.parse(rawText);
+  } catch (e) {
+    showNoQr(); // QR found but not JSON — not a dot
+    return;
+  }
+
+  // 2. Shape validate — must have all required dot fields
+  const required = ['handle', 'issued_at', 'pubkey_hex', 'self_signature', 'tier'];
+  for (const field of required) {
+    if (!(field in payload)) {
+      showNoQr(); // QR is valid JSON but not a Pipernet dot
+      return;
+    }
+  }
+
+  // 3. Ed25519 self-signature verification
+  //    Canonical body (mirrors encode.py _build_dot_payload):
+  //    { handle, issued_at, pubkey_hex, tier } — NO self_signature
+  const bodyForVerify = {
+    handle:     payload.handle,
+    issued_at:  payload.issued_at,
+    pubkey_hex: payload.pubkey_hex,
+    tier:       payload.tier,
+  };
+  const canonicalMsg = canonical(bodyForVerify);
+
+  let verified = false;
+  try {
+    verified = await verifyEd25519(payload.pubkey_hex, canonicalMsg, payload.self_signature);
+  } catch (e) {
+    console.error('verification error:', e);
+    verified = false;
+  }
+
+  _lastPayload    = payload;
+  _lastPubkeyHex  = payload.pubkey_hex;
+
+  showDossier(payload, verified);
+}
+
+// ─── UI state transitions ────────────────────────────────────────────────────
+
+function showAnalyzing() {
+  dropZone.classList.add('analyzing');
+  stateEmpty.style.display    = 'none';
+  stateAnalyzing.style.display = 'flex';
+  dossier.classList.remove('visible');
+  noQr.classList.remove('visible');
+}
+
+function showNoQr() {
+  // Reset drop zone back to idle, show no-QR message
+  dropZone.classList.remove('analyzing');
+  stateEmpty.style.display     = 'block';
+  stateAnalyzing.style.display = 'none';
+  dossier.classList.remove('visible');
+  noQr.classList.add('visible');
+}
+
+function showDossier(payload, verified) {
+  // Hide drop area, show dossier
+  document.getElementById('drop-area').style.display = 'none';
+
+  // Verdict line
+  verdictLine.className = 'verdict-line ' + (verified ? 'verified' : 'invalid');
+  verdictLine.innerHTML = verified
+    ? '<span aria-hidden="true">✓</span> verified'
+    : '<span aria-hidden="true">✗</span> invalid signature';
+
+  // Tamper warning
+  tamperWarning.style.display = verified ? 'none' : 'block';
+
+  // Dossier rows
+  const sig = payload.self_signature || '';
+  const sigShort = sig.length > 24 ? sig.slice(0, 24) + '…' : sig;
+  const pubkeyShort = (payload.pubkey_hex || '').slice(0, 32) + '…';
+
+  const rows = [
+    ['handle',      payload.handle     || '—'],
+    ['tier',        payload.tier       || '—'],
+    ['issued_at',   payload.issued_at  || '—'],
+    ['pubkey',      pubkeyShort],
+    ['signature',   sigShort],
+    ['status',      verified ? '✓ self-signature matches pubkey' : '✗ signature mismatch'],
+  ];
+
+  dossierGrid.innerHTML = rows.map(([k, v]) =>
+    `<div class="dossier-row">
+       <span class="dossier-key">${k}</span>
+       <span class="dossier-val">${escapeHtml(String(v))}</span>
+     </div>`
+  ).join('');
+
+  // Raw JSON
+  rawJsonPre.textContent = JSON.stringify(payload, null, 2);
+
+  // Show dossier
+  dossier.classList.add('visible');
+  noQr.classList.remove('visible');
+
+  // Reset drop zone state (for when they scan another)
+  dropZone.classList.remove('analyzing');
+  stateEmpty.style.display     = 'block';
+  stateAnalyzing.style.display = 'none';
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+/** Reset to State 0 */
+function reset() {
+  _lastPayload   = null;
+  _lastPubkeyHex = null;
+
+  document.getElementById('drop-area').style.display = 'flex';
+  dossier.classList.remove('visible');
+  noQr.classList.remove('visible');
+
+  dropZone.classList.remove('analyzing', 'drag-over');
+  stateEmpty.style.display     = 'block';
+  stateAnalyzing.style.display = 'none';
+
+  tamperWarning.style.display = 'none';
+  verdictLine.innerHTML = '';
+  dossierGrid.innerHTML = '';
+  rawJsonPre.textContent = '';
+  fileInput.value = '';
+}
+
+/** Copy pubkey to clipboard */
+async function copyPubkey() {
+  if (!_lastPubkeyHex) return;
+  try {
+    await navigator.clipboard.writeText(_lastPubkeyHex);
+    const orig = btnCopyPubkey.textContent;
+    btnCopyPubkey.textContent = 'copied!';
+    setTimeout(() => { btnCopyPubkey.textContent = orig; }, 1600);
+  } catch (e) {
+    console.error('clipboard write failed:', e);
+  }
+}
+
+// ─── Event wiring ────────────────────────────────────────────────────────────
+
+// Click to open file picker
+dropZone.addEventListener('click', () => { fileInput.click(); });
+dropZone.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+});
+
+// File input change
+fileInput.addEventListener('change', e => {
+  const file = e.target.files && e.target.files[0];
+  if (file) processFile(file);
+});
+
+// Drag and drop
+dropZone.addEventListener('dragover', e => {
+  e.preventDefault();
+  dropZone.classList.add('drag-over');
+});
+dropZone.addEventListener('dragleave', () => {
+  dropZone.classList.remove('drag-over');
+});
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files && e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    processFile(file);
+  }
+});
+
+// Also accept drops on the whole page body (for convenience)
+document.body.addEventListener('dragover', e => e.preventDefault());
+document.body.addEventListener('drop', e => {
+  e.preventDefault();
+  const file = e.dataTransfer.files && e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    processFile(file);
+  }
+});
+</script>
+
+</body>
+</html>

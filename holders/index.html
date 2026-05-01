@@ -357,7 +357,7 @@
   <!-- demo mode banner — always visible until token deploys -->
   <div class="demo-banner" id="demo-banner">
     <span>◈</span>
-    <span><b>Demo mode:</b> anyone can join until $PIPER deploys to pump.fun. Holder check is stubbed — all wallets pass.</span>
+    <span><b>Test mode:</b> gated by $MEVICI until $PIPER deploys to pump.fun. Real on-chain holder check — connect a wallet that holds $MEVICI to enter.</span>
   </div>
 
   <!-- ── THE GATE ── -->
@@ -469,6 +469,8 @@
     <a href="/">protocol</a>
     &nbsp;·&nbsp;
     <a href="/lab">lab</a>
+    &nbsp;·&nbsp;
+    <a href="/decode">decode any dot</a>
   </div>
 </footer>
 
@@ -488,10 +490,11 @@
 
 // ── CONSTANTS — update these when token deploys ──────────────────────────────
 
-// v0: TBD. Set this when pump.fun creates the token.
-// v1: Replace with the actual SPL mint address, e.g.:
-//   const PIPER_TOKEN_MINT = "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU";
-const PIPER_TOKEN_MINT = null; // <-- CHANGE THIS when $PIPER deploys
+// $PIPER on pump.fun has not deployed yet. Until it does, this page is gated
+// on $MEVICI (Blaze's existing pump.fun token, also Solana). Once $PIPER ships,
+// swap PIPER_TOKEN_MINT to its mint address. The variable name stays $PIPER-shaped
+// since the page belongs to Pied Piper; MEVICI is the *test gate*, not the brand.
+const PIPER_TOKEN_MINT = "AyUfba64zszzNqVQG3Ya4g2mEjVCWJcHqyGN8Ae2pump"; // MEVICI (test gate until $PIPER deploys)
 
 // Relay endpoint — flip this when `pipernet serve` is running on the VPS.
 // Production: "https://api.piedpiper.fun/channels/holders"
@@ -560,10 +563,35 @@ function shortPubkey(pk) {
  * @returns {Promise<boolean>}
  */
 async function isHolder(pubkey) {
-  // v0 STUB — always returns true
-  // TODO: replace with real SPL balance check when PIPER_TOKEN_MINT is set
-  console.warn('[pipernet] isHolder() STUBBED — demo mode, returning true for', pubkey);
-  return true;
+  if (!PIPER_TOKEN_MINT) {
+    console.warn('[pipernet] isHolder() STUBBED — no token mint set, returning true');
+    return true;
+  }
+  try {
+    const body = {
+      jsonrpc: "2.0", id: 1,
+      method: "getTokenAccountsByOwner",
+      params: [
+        pubkey,
+        { mint: PIPER_TOKEN_MINT },
+        { encoding: "jsonParsed" }
+      ]
+    };
+    const res = await fetch(SOLANA_RPC, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    const json = await res.json();
+    const accounts = json.result?.value ?? [];
+    if (accounts.length === 0) return false;
+    const amount = accounts[0].account.data.parsed.info.tokenAmount.uiAmount;
+    console.log('[pipernet] isHolder check for', pubkey.slice(0,8) + '…', 'balance:', amount);
+    return amount > 0;
+  } catch (err) {
+    console.error('[pipernet] isHolder check failed:', err);
+    return false;
+  }
 }
 
 // ── WALLET CONNECT ────────────────────────────────────────────────────────────
