@@ -329,19 +329,59 @@
     padding-top: 2rem;
   }
 
+  .chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8em;
+    flex-wrap: wrap;
+  }
+
   .chat-label {
     font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     font-size: 0.82em;
     color: var(--muted);
     letter-spacing: 0.04em;
     text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.45em;
+  }
+
+  /* connection status dot */
+  .conn-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--muted);
+    flex-shrink: 0;
+    transition: background 300ms ease;
+  }
+  .conn-dot.live { background: #22c55e; }
+  .conn-dot.error { background: #ef4444; }
+
+  /* handle edit */
+  .handle-edit {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.78em;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 1px dotted var(--muted);
+    transition: color 100ms ease;
+    white-space: nowrap;
+  }
+  .handle-edit:hover { color: var(--fg); border-bottom-color: var(--fg); }
+
+  /* chat window wrapper — relative for the new-msg pill */
+  .messages-wrap {
+    position: relative;
   }
 
   /* chat window */
   #messages {
     border: 1px solid var(--line);
     border-radius: 4px;
-    height: 320px;
+    height: 340px;
     overflow-y: auto;
     padding: 1rem;
     display: flex;
@@ -350,48 +390,88 @@
     background: var(--bg);
     font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     font-size: 0.84em;
-    scroll-behavior: smooth;
+    /* no scroll-behavior: smooth — causes missed-scroll on rapid append */
   }
-  #messages:empty::after {
-    content: "no messages yet — be first.";
+  #messages.empty::after {
+    content: "the room is quiet. say something.";
     color: var(--muted);
     font-style: italic;
+    pointer-events: none;
   }
 
+  /* new-messages pill */
+  #new-msg-pill {
+    position: absolute;
+    bottom: 0.6rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: var(--bg);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.76em;
+    padding: 0.3em 0.85em;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 150ms ease;
+  }
+  #new-msg-pill.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* message rows */
   .msg {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto;
-    column-gap: 0.5em;
-    row-gap: 0.15em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15em;
+    max-width: 88%;
   }
-  .msg-sig {
-    grid-column: 1;
-    grid-row: 1;
-    font-size: 0.9em;
-    line-height: 1;
-    user-select: none;
+  /* own messages: right-aligned */
+  .msg.own {
+    align-self: flex-end;
+    align-items: flex-end;
   }
-  .msg-sig.valid { color: var(--fg); }
-  .msg-sig.invalid { color: var(--muted); }
   .msg-meta {
-    grid-column: 2;
-    grid-row: 1;
-    display: flex; align-items: baseline; gap: 0.5em;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5em;
   }
-  .msg-handle { color: var(--fg); font-weight: 500; }
-  .msg-time { color: var(--muted); font-size: 0.88em; }
-  .msg-body {
-    grid-column: 2;
-    grid-row: 2;
+  .msg-handle {
+    color: var(--fg);
+    font-weight: 500;
+    font-size: 0.88em;
+  }
+  .msg-time {
+    color: var(--muted);
+    font-size: 0.82em;
+  }
+  .msg-bubble {
     color: var(--muted);
     line-height: 1.45;
     word-break: break-word;
+    padding: 0.4em 0.65em;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    white-space: pre-wrap;
+  }
+  .msg.own .msg-bubble {
+    /* slightly brighter background for own messages */
+    background: rgba(127,127,127,0.08);
+    border-color: rgba(127,127,127,0.18);
+    color: var(--fg);
   }
 
-  /* send row */
+  /* send area */
+  .send-area {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
   .send-row {
-    display: flex; gap: 0.6rem; align-items: stretch;
+    display: flex; gap: 0.6rem; align-items: flex-end;
   }
   #msg-input {
     flex: 1;
@@ -404,6 +484,11 @@
     color: var(--fg);
     outline: none;
     transition: border-color 120ms ease;
+    resize: none;
+    min-height: 2.6rem;
+    max-height: 8rem;
+    overflow-y: auto;
+    line-height: 1.45;
   }
   #msg-input:focus { border-color: var(--fg); }
   #msg-input::placeholder { color: var(--muted); }
@@ -419,14 +504,29 @@
     cursor: pointer;
     transition: opacity 100ms ease;
     letter-spacing: 0.03em;
+    flex-shrink: 0;
+    height: 2.6rem;
   }
   button#send-btn:hover { opacity: 0.82; }
   button#send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .send-hint {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.76em;
+    color: var(--muted);
+    min-height: 1.1em;
+  }
+  .send-hint.error { color: var(--fg); }
 
   .relay-offline {
     font-style: italic;
     color: var(--muted);
     font-size: 0.9em;
+  }
+
+  @media (max-width: 479px) {
+    #messages { height: 280px; }
+    main { padding: 2rem 1rem 5rem; }
   }
 
   /* ── misc ── */
@@ -581,21 +681,33 @@
 
   <!-- ── CHAT PANEL — hidden until verified ── -->
   <div id="chat-panel" style="display:none;">
-    <p class="chat-label mono">holders channel · live</p>
+    <div class="chat-header">
+      <p class="chat-label mono">
+        <span class="conn-dot" id="conn-dot"></span>
+        holders channel · live
+      </p>
+      <span class="handle-edit mono" id="handle-display" onclick="promptHandle()" title="click to change handle"></span>
+    </div>
 
-    <div id="messages" role="log" aria-live="polite" aria-label="Holder chat messages"></div>
+    <div class="messages-wrap">
+      <div id="messages" class="empty" role="log" aria-live="polite" aria-label="Holder chat messages"></div>
+      <div id="new-msg-pill" onclick="scrollToBottom()">↓ new messages</div>
+    </div>
 
-    <div class="send-row">
-      <input
-        id="msg-input"
-        type="text"
-        placeholder="say something…"
-        maxlength="500"
-        autocomplete="off"
-        spellcheck="false"
-        onkeydown="if(event.key==='Enter')sendMessage()"
-      />
-      <button id="send-btn" onclick="sendMessage()">send</button>
+    <div class="send-area">
+      <div class="send-row">
+        <textarea
+          id="msg-input"
+          placeholder="say something."
+          maxlength="500"
+          autocomplete="off"
+          spellcheck="false"
+          rows="1"
+          onkeydown="handleInputKey(event)"
+        ></textarea>
+        <button id="send-btn" onclick="sendMessage()">send</button>
+      </div>
+      <p class="send-hint" id="send-hint">shift + enter for newline</p>
     </div>
 
     <p id="relay-status" class="relay-offline" style="display:none;">
@@ -1032,7 +1144,7 @@ async function onWalletConnected(pubkey) {
       // ── State 3: verified ──
       document.getElementById('wallet-short').textContent = shortPubkey(pubkey);
       showState('verified');
-      demoHandle = 'anon-' + pubkey.slice(0, 4).toLowerCase();
+      demoHandle = shortPubkey(pubkey); // default; overridden by resolveHandle() in revealChat
       // Populate the holder identity card asynchronously.
       updateHolderCard(pubkey);
       revealChat();
@@ -1046,32 +1158,98 @@ async function onWalletConnected(pubkey) {
   }
 }
 
+// ── CHAT STATE ────────────────────────────────────────────────────────────────
+
+let userHandle = null;            // resolved after promptHandle() or default
+let seenSequences = new Set();    // dedup by sequence number
+let userScrolledUp = false;       // true when user has scrolled away from bottom
+let pendingNewCount = 0;          // messages arrived while scrolled up
+let _optimisticId = 0;            // counter for optimistic message IDs
+
+// ── HANDLE MANAGEMENT ────────────────────────────────────────────────────────
+
+function resolveHandle() {
+  if (userHandle) return userHandle;
+  try {
+    const stored = localStorage.getItem('pipernet-handle');
+    if (stored) { userHandle = stored; return userHandle; }
+  } catch (_) {}
+  userHandle = shortPubkey(walletPubkey);
+  return userHandle;
+}
+
+function promptHandle() {
+  const current = resolveHandle();
+  const input = window.prompt('set your handle (max 24 chars):', current);
+  if (input === null) return; // cancelled
+  const clean = input.trim().slice(0, 24);
+  userHandle = clean || current;
+  demoHandle = userHandle;
+  try { localStorage.setItem('pipernet-handle', userHandle); } catch (_) {}
+  updateHandleDisplay();
+}
+
+function updateHandleDisplay() {
+  const el = document.getElementById('handle-display');
+  if (el) el.textContent = resolveHandle();
+}
+
 // ── CHAT: REVEAL + CONNECT RELAY ─────────────────────────────────────────────
 
 function revealChat() {
   const panel = document.getElementById('chat-panel');
   if (panel) panel.style.display = '';
 
+  // resolve handle (prompt once if no stored handle)
+  resolveHandle();
+  // first-time: if handle is still a wallet short, offer to customise
+  try {
+    if (!localStorage.getItem('pipernet-handle')) {
+      const custom = window.prompt(
+        'set a handle for the chat (or leave blank to use wallet address):',
+        ''
+      );
+      if (custom && custom.trim()) {
+        userHandle = custom.trim().slice(0, 24);
+        try { localStorage.setItem('pipernet-handle', userHandle); } catch (_) {}
+      }
+      // mark as prompted even if they skipped
+      try { localStorage.setItem('pipernet-handle', userHandle ?? shortPubkey(walletPubkey)); } catch (_) {}
+    }
+  } catch (_) {}
+  demoHandle = resolveHandle();
+  updateHandleDisplay();
+
+  // wire up scroll detection
+  const container = document.getElementById('messages');
+  if (container) {
+    container.addEventListener('scroll', onMessagesScroll, { passive: true });
+  }
+
   if (!RELAY_BASE) {
-    // Relay not yet configured — show offline notice inside the chat panel.
+    setConnState('error');
     const relayStatus = document.getElementById('relay-status');
     if (relayStatus) relayStatus.style.display = '';
-    // Inject a system message so the window isn't completely empty.
-    appendMessage({
-      handle: 'system',
-      body: 'the relay is offline — the chat is staged but not yet broadcasting.',
-      timestamp: Date.now(),
-      valid: false,
-      system: true
-    });
     return;
   }
 
   // Load last 50 messages.
   loadHistory();
-
   // Open SSE stream.
   openStream();
+}
+
+function onMessagesScroll() {
+  const container = document.getElementById('messages');
+  if (!container) return;
+  const atBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 40;
+  if (atBottom && userScrolledUp) {
+    userScrolledUp = false;
+    pendingNewCount = 0;
+    hidePill();
+  } else if (!atBottom) {
+    userScrolledUp = true;
+  }
 }
 
 // ── CHAT: HISTORY ─────────────────────────────────────────────────────────────
@@ -1085,7 +1263,9 @@ async function loadHistory() {
     if (!res.ok) throw new Error('history fetch failed: ' + res.status);
     const data = await res.json();
     const msgs = Array.isArray(data) ? data : (data.messages ?? data.dots ?? []);
-    msgs.forEach(m => appendMessage(normaliseMessage(m)));
+    // show last 50
+    const slice = msgs.slice(-50);
+    slice.forEach(m => appendMessage(normaliseMessage(m)));
     scrollToBottom();
   } catch (err) {
     console.warn('[pipernet] history load failed:', err.message);
@@ -1095,6 +1275,12 @@ async function loadHistory() {
 
 // ── CHAT: SSE STREAM ──────────────────────────────────────────────────────────
 
+function setConnState(state) {
+  const dot = document.getElementById('conn-dot');
+  if (!dot) return;
+  dot.className = 'conn-dot' + (state === 'live' ? ' live' : state === 'error' ? ' error' : '');
+}
+
 function openStream() {
   if (!RELAY_BASE) return;
   if (sseSource) { sseSource.close(); sseSource = null; }
@@ -1102,52 +1288,29 @@ function openStream() {
   const url = RELAY_BASE + '/channels/holders/events';
   sseSource = new EventSource(url);
 
-  sseSource.addEventListener('message', (e) => {
-    try {
-      const m = JSON.parse(e.data);
-      appendMessage(normaliseMessage(m));
-      scrollToBottom();
-    } catch (_) {}
-  });
-
-  // Pipernet relay emits "envelope" for signed envelopes.
+  // Pipernet relay emits "envelope" — this is the canonical event name from server.py.
   sseSource.addEventListener('envelope', (e) => {
     try {
       const m = JSON.parse(e.data);
-      appendMessage(normaliseMessage(m));
-      scrollToBottom();
+      appendMessage(normaliseMessage(m), true);
     } catch (_) {}
   });
 
-  // Legacy event names kept for backward compat with other relay backends.
-  sseSource.addEventListener('dot', (e) => {
+  // Fallback: some SSE proxies strip event names, delivering as unnamed "message"
+  sseSource.addEventListener('message', (e) => {
     try {
       const m = JSON.parse(e.data);
-      appendMessage(normaliseMessage(m));
-      scrollToBottom();
+      appendMessage(normaliseMessage(m), true);
     } catch (_) {}
   });
 
-  sseSource.addEventListener('ingest', (e) => {
-    // Oracle-style ingest event (pipernet SSE membrane compatibility).
-    try {
-      const m = JSON.parse(e.data);
-      if (m.channel === 'holders' || m.type === 'chat') {
-        appendMessage(normaliseMessage(m));
-        scrollToBottom();
-      }
-    } catch (_) {}
-  });
-
-  // Track sustained failure — EventSource fires onerror on every transient
-  // reconnect, which is normal. Only flag "offline" after several errors with
-  // no successful messages in between.
   let sseErrorCount = 0;
   let sseConnectedOnce = false;
 
   sseSource.addEventListener('connected', () => {
     sseConnectedOnce = true;
     sseErrorCount = 0;
+    setConnState('live');
     const relayStatus = document.getElementById('relay-status');
     if (relayStatus) relayStatus.style.display = 'none';
     console.log('[pipernet] relay connected');
@@ -1156,14 +1319,14 @@ function openStream() {
   sseSource.onopen = () => {
     sseConnectedOnce = true;
     sseErrorCount = 0;
+    setConnState('live');
     const relayStatus = document.getElementById('relay-status');
     if (relayStatus) relayStatus.style.display = 'none';
   };
 
   sseSource.onerror = () => {
     sseErrorCount += 1;
-    // EventSource auto-reconnects. Only declare "offline" after 5 errors AND
-    // we've never connected, OR after 10 errors total.
+    setConnState('error');
     const looksOffline = (!sseConnectedOnce && sseErrorCount >= 5)
                       || (sseErrorCount >= 10);
     if (looksOffline) {
@@ -1172,9 +1335,27 @@ function openStream() {
       console.warn('[pipernet] relay offline after', sseErrorCount, 'errors');
     }
   };
+
+  // Heartbeat keeps connection alive — just reset error count.
+  sseSource.addEventListener('heartbeat', () => {
+    sseErrorCount = 0;
+    setConnState('live');
+  });
 }
 
 // ── CHAT: SEND ────────────────────────────────────────────────────────────────
+
+function handleInputKey(event) {
+  if (event.key === 'Escape') {
+    event.target.value = '';
+    setSendHint('shift + enter for newline');
+    return;
+  }
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    sendMessage();
+  }
+}
 
 async function sendMessage() {
   const input = document.getElementById('msg-input');
@@ -1184,13 +1365,11 @@ async function sendMessage() {
 
   btn.disabled = true;
   input.disabled = true;
+  setSendHint('');
 
-  const handle = demoHandle ?? shortPubkey(walletPubkey);
+  const handle = resolveHandle();
   const timestamp = Date.now();
 
-  // Build message payload.
-  // v0: unsigned — author is the wallet pubkey, sig is omitted.
-  // v1: sign the message body with window.solana.signMessage() and include sig.
   const payload = {
     content: text,
     type: 'chat',
@@ -1198,25 +1377,27 @@ async function sendMessage() {
     handle: handle,
     channel: 'holders',
     timestamp: timestamp,
-    // sig: <ed25519 signature of content — add in v1>
   };
 
   if (!RELAY_BASE) {
-    // Offline demo: render locally only.
-    appendMessage({
-      handle: handle,
-      body: text,
-      timestamp: timestamp,
-      valid: false,
-      local: true
-    });
+    appendMessage({ handle, body: text, timestamp, valid: false, local: true, own: true }, false);
     scrollToBottom();
     input.value = '';
+    resizeTextarea(input);
     btn.disabled = false;
     input.disabled = false;
     input.focus();
     return;
   }
+
+  // Optimistic render — tagged so SSE echo can dedup it.
+  const optimisticSeq = 'opt-' + (++_optimisticId);
+  appendMessage({
+    handle, body: text, timestamp, valid: false, own: true, optimisticSeq
+  }, false);
+  scrollToBottom();
+  input.value = '';
+  resizeTextarea(input);
 
   try {
     const res = await fetch(RELAY_BASE + '/channels/holders', {
@@ -1224,20 +1405,20 @@ async function sendMessage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    if (!res.ok) throw new Error('send failed: ' + res.status);
-    // SSE stream will echo it back — no need to append locally.
-    input.value = '';
+    if (res.status === 429) {
+      const json = await res.json().catch(() => ({}));
+      const retryAfter = json.retry_after_seconds ?? 60;
+      setSendHint('too many messages — wait ' + retryAfter + 's', true);
+    } else if (!res.ok) {
+      throw new Error('send failed: ' + res.status);
+    }
+    // SSE stream will echo the normalised envelope back.
+    // We mark the optimistic item as "pending relay" so when SSE delivers
+    // a message with the same content + handle in the next few seconds we
+    // suppress a duplicate. (seenSequences dedup handles this via sequence.)
   } catch (err) {
     console.error('[pipernet] send failed:', err);
-    // Render locally as fallback so the user doesn't lose their message.
-    appendMessage({
-      handle: handle,
-      body: text + ' (send failed — relay offline)',
-      timestamp: timestamp,
-      valid: false,
-      local: true
-    });
-    scrollToBottom();
+    setSendHint('send failed — relay may be offline', true);
   }
 
   btn.disabled = false;
@@ -1245,66 +1426,177 @@ async function sendMessage() {
   input.focus();
 }
 
+function setSendHint(text, isError) {
+  const el = document.getElementById('send-hint');
+  if (!el) return;
+  el.textContent = text || 'shift + enter for newline';
+  el.className = 'send-hint' + (isError ? ' error' : '');
+}
+
+function resizeTextarea(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 128) + 'px';
+}
+
 // ── CHAT: RENDER ──────────────────────────────────────────────────────────────
 
 /**
- * normaliseMessage — converts relay/Oracle envelope to a display-ready object.
+ * normaliseMessage — converts relay open-mode envelope to a display-ready object.
  *
- * Relay envelope fields vary by version:
- *   - pipernet DOT: { content, author, createdAt, sig? }
- *   - Oracle ingest: { content, type, channel, confidence, timestamp }
- *   - Legacy: { body, handle, ts }
+ * Pipernet open-mode schema (from _normalise_open_payload in server.py):
+ *   from        — handle string
+ *   body        — [["txt", text_content], ...]
+ *   timestamp   — ISO 8601 string
+ *   sequence    — int (epoch ms if not provided)
+ *   wallet      — original wallet pubkey
+ *   signature   — null in open mode
+ *
+ * Also handles legacy shapes:
+ *   { content, author, createdAt, sig? }  — pre-normalise client sends
+ *   { body: string, handle, ts }          — very old shape
  */
 function normaliseMessage(m) {
-  const body = m.content ?? m.body ?? m.text ?? '';
-  const handle = m.handle ?? m.author ?? shortPubkey(m.pubkey ?? '') ?? 'anon';
+  // Extract text from body: [["txt", text], ...] or fall back to string fields.
+  let body = '';
+  if (Array.isArray(m.body)) {
+    for (const entry of m.body) {
+      if (Array.isArray(entry) && entry[0] === 'txt') { body = entry[1]; break; }
+    }
+  }
+  if (!body) body = m.content ?? (typeof m.body === 'string' ? m.body : '') ?? m.text ?? '';
+
+  const handle = m.from ?? m.handle ?? m.author ?? shortPubkey(m.wallet ?? m.pubkey ?? '') ?? 'anon';
   const ts = m.timestamp ?? m.createdAt ?? m.ts ?? m.applied_at ?? Date.now();
-  const sig = m.sig ?? m.signature ?? null;
-  // v0: sig is null, so valid is false — we show ✗.
-  // v1: verify ed25519 sig against content + author pubkey.
-  //     For now we trust the relay's own verification and mark as valid
-  //     if the relay says so, or if a sig field is present.
-  const valid = sig !== null && sig !== undefined;
-  return { handle, body, timestamp: ts, valid, system: m.type === 'system' || m.system };
+  const seq = m.sequence ?? null;
+
+  // Determine if this is from the current wallet.
+  const isOwn = walletPubkey && (
+    m.wallet === walletPubkey ||
+    m.author === walletPubkey ||
+    (handle === resolveHandle() && !m.wallet)
+  );
+
+  return {
+    handle: String(handle).slice(0, 64),
+    body: String(body),
+    timestamp: ts,
+    valid: false, // open-mode — no sig verification
+    sequence: seq,
+    own: !!isOwn,
+    system: m.type === 'system' || !!m.system,
+  };
 }
 
-function appendMessage(m) {
+/**
+ * relativeTime — "just now", "12s ago", "3m ago", "2h ago", "yesterday"
+ */
+function relativeTime(ts) {
+  const now = Date.now();
+  const t = typeof ts === 'number' ? ts : Date.parse(ts);
+  const diffMs = now - t;
+  if (diffMs < 0) return 'just now';
+  if (diffMs < 10000) return 'just now';
+  if (diffMs < 60000) return Math.floor(diffMs / 1000) + 's ago';
+  if (diffMs < 3600000) return Math.floor(diffMs / 60000) + 'm ago';
+  if (diffMs < 86400000) return Math.floor(diffMs / 3600000) + 'h ago';
+  return new Date(t).toLocaleDateString([], { month: 'short', day: 'numeric' });
+}
+
+/**
+ * walletColorAvatar — deterministic color block from wallet address.
+ * Returns a CSS color string.
+ */
+function walletColor(handle) {
+  let hash = 0;
+  for (let i = 0; i < handle.length; i++) {
+    hash = (hash * 31 + handle.charCodeAt(i)) >>> 0;
+  }
+  const hue = hash % 360;
+  return `hsl(${hue}, 60%, 55%)`;
+}
+
+// Track IDs to avoid double-rendering SSE echo of optimistic messages.
+// Key: sequence number (string). Value: true.
+let _renderedSeqs = new Set();
+
+function appendMessage(m, fromSSE) {
   const container = document.getElementById('messages');
   if (!container) return;
 
-  const ts = new Date(typeof m.timestamp === 'number' ? m.timestamp : Date.parse(m.timestamp));
-  const timeStr = ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  // Remove "empty" placeholder class when first message arrives.
+  container.classList.remove('empty');
+
+  // Dedup by sequence — skip if we've already rendered this seq.
+  if (m.sequence !== null && m.sequence !== undefined) {
+    const key = String(m.sequence);
+    if (_renderedSeqs.has(key)) return;
+    _renderedSeqs.add(key);
+  }
+
+  const tsMs = typeof m.timestamp === 'number' ? m.timestamp : Date.parse(m.timestamp);
+  const relTime = relativeTime(tsMs);
 
   const row = document.createElement('div');
-  row.className = 'msg';
+  row.className = 'msg' + (m.own ? ' own' : '');
+  if (m.sequence) row.dataset.seq = m.sequence;
+
   if (m.system) {
     row.innerHTML = `
-      <span class="msg-sig invalid" title="system">◦</span>
-      <span class="msg-meta">
+      <div class="msg-meta">
         <span class="msg-handle" style="color:var(--muted);">system</span>
-        <span class="msg-time">${timeStr}</span>
-      </span>
-      <span class="msg-body" style="color:var(--muted); font-style:italic;">${escHtml(m.body)}</span>
+        <span class="msg-time">${relTime}</span>
+      </div>
+      <div class="msg-bubble" style="font-style:italic; color:var(--muted);">${escHtml(m.body)}</div>
     `;
   } else {
-    const sigGlyph = m.valid ? '✓' : '✗';
-    const sigClass = m.valid ? 'valid' : 'invalid';
-    const sigTitle = m.valid ? 'signature verified' : (m.local ? 'local only — relay offline' : 'unsigned (demo mode)');
+    const color = walletColor(m.handle);
+    const avatarStyle = `display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;margin-right:0.25em;`;
     row.innerHTML = `
-      <span class="msg-sig ${sigClass}" title="${sigTitle}">${sigGlyph}</span>
-      <span class="msg-meta">
-        <span class="msg-handle mono">${escHtml(m.handle)}</span>
-        <span class="msg-time">${timeStr}</span>
-      </span>
-      <span class="msg-body">${escHtml(m.body)}</span>
+      <div class="msg-meta">
+        <span style="${avatarStyle}" aria-hidden="true"></span>
+        <span class="msg-handle">${escHtml(m.handle)}</span>
+        <span class="msg-time">${relTime}</span>
+      </div>
+      <div class="msg-bubble">${escHtml(m.body)}</div>
     `;
   }
+
   container.appendChild(row);
+
+  // If this arrived via SSE and user has scrolled up, show pill instead of auto-scrolling.
+  if (fromSSE && userScrolledUp) {
+    pendingNewCount++;
+    showPill(pendingNewCount);
+  } else if (!fromSSE) {
+    // History + optimistic: just append; caller controls scroll.
+  } else {
+    // SSE + user is at bottom.
+    container.scrollTop = container.scrollHeight;
+  }
+
+  // Refresh relative timestamps every minute for already-visible messages.
+  // (Lightweight: just schedule once; actual refresh happens in the interval below.)
+}
+
+function showPill(count) {
+  const pill = document.getElementById('new-msg-pill');
+  if (!pill) return;
+  pill.textContent = '↓ ' + count + ' new message' + (count === 1 ? '' : 's');
+  pill.classList.add('visible');
+}
+
+function hidePill() {
+  const pill = document.getElementById('new-msg-pill');
+  if (pill) pill.classList.remove('visible');
 }
 
 function scrollToBottom() {
   const container = document.getElementById('messages');
-  if (container) container.scrollTop = container.scrollHeight;
+  if (!container) return;
+  container.scrollTop = container.scrollHeight;
+  userScrolledUp = false;
+  pendingNewCount = 0;
+  hidePill();
 }
 
 function escHtml(s) {
@@ -1314,6 +1606,33 @@ function escHtml(s) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+
+// Refresh relative timestamps every 30 seconds.
+setInterval(() => {
+  const rows = document.querySelectorAll('#messages .msg');
+  rows.forEach(row => {
+    const timeEl = row.querySelector('.msg-time');
+    if (!timeEl) return;
+    const seq = row.dataset.seq;
+    if (!seq) return;
+    // Re-derive time from sequence (epoch ms) if available.
+    const tsMs = parseInt(seq, 10);
+    if (!isNaN(tsMs) && tsMs > 1e12) {
+      timeEl.textContent = relativeTime(tsMs);
+    }
+  });
+}, 30000);
+
+// ── TEXTAREA AUTO-GROW ───────────────────────────────────────────────────────
+(function() {
+  var ta = document.getElementById('msg-input');
+  if (ta) {
+    ta.addEventListener('input', function() {
+      resizeTextarea(this);
+      setSendHint('');
+    });
+  }
+})();
 
 // ── POSTHOG CUSTOM EVENTS — HOLDERS ─────────────────────────────────────────
 // Instrument wallet connect button
