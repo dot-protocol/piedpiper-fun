@@ -497,7 +497,7 @@
   <!-- demo mode banner — always visible until token deploys -->
   <div class="demo-banner" id="demo-banner">
     <span>◈</span>
-    <span><b>Test mode:</b> gated by $MEVICI until $PIPER deploys to pump.fun. Real on-chain holder check — connect a wallet that holds $MEVICI to enter.</span>
+    <span><b>Live:</b> gated by $PIPER. Connect a wallet that holds $PIPER to enter.</span>
   </div>
 
   <!-- ── THE GATE ── -->
@@ -560,7 +560,7 @@
         ✗ no $PIPER detected.
       </p>
       <div class="plant-row" style="margin-top:0.4rem;">
-        <a class="plant outline" href="https://pump.fun" rel="noopener" target="_blank">
+        <a class="plant outline" href="https://pump.fun/coin/83VTqzxszRFPSzJHvTeNRydcuUmmhEjj9FH4F7TZpump" rel="noopener" target="_blank">
           <span class="dot"></span>
           get $PIPER on pump.fun
         </a>
@@ -658,11 +658,8 @@
 
 // ── CONSTANTS — update these when token deploys ──────────────────────────────
 
-// $PIPER on pump.fun has not deployed yet. Until it does, this page is gated
-// on $MEVICI (Blaze's existing pump.fun token, also Solana). Once $PIPER ships,
-// swap PIPER_TOKEN_MINT to its mint address. The variable name stays $PIPER-shaped
-// since the page belongs to Pied Piper; MEVICI is the *test gate*, not the brand.
-const PIPER_TOKEN_MINT = "AyUfba64zszzNqVQG3Ya4g2mEjVCWJcHqyGN8Ae2pump"; // MEVICI (test gate until $PIPER deploys)
+// $PIPER deployed to pump.fun: https://pump.fun/coin/83VTqzxszRFPSzJHvTeNRydcuUmmhEjj9FH4F7TZpump
+const PIPER_TOKEN_MINT = "83VTqzxszRFPSzJHvTeNRydcuUmmhEjj9FH4F7TZpump"; // $PIPER live
 
 // Relay endpoint — pipernet relay on api.mevici.com
 // Channel: holders  |  SSE: RELAY_BASE/channels/holders/events
