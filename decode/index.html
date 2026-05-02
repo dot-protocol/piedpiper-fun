@@ -423,8 +423,11 @@
 
   ::selection { background: var(--accent); color: var(--bg); }
 </style>
+<link rel="stylesheet" href="/_shared/sidebar.css" />
 </head>
 <body>
+
+<div id="sidebar-mount"></div>
 
 <!-- ─── Header ──────────────────────────────────────────────────────────────── -->
 <header>
@@ -980,6 +983,7 @@ function applyTheme(key) {
   applyTheme(saved);
 })();
 </script>
+<script src="/_shared/sidebar.js" defer></script>
 
 </body>
 </html>

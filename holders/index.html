@@ -551,8 +551,11 @@
 
   ::selection { background: var(--accent); color: var(--bg); }
 </style>
+<link rel="stylesheet" href="/_shared/sidebar.css" />
 </head>
 <body>
+
+<div id="sidebar-mount"></div>
 
 <header>
   <svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -1699,6 +1702,7 @@ function applyTheme(key) {
   applyTheme(saved);
 })();
 </script>
+<script src="/_shared/sidebar.js" defer></script>
 
 </body>
 </html>

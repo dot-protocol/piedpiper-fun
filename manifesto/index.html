@@ -133,8 +133,11 @@
 
   ::selection { background: var(--accent); color: var(--bg); }
 </style>
+<link rel="stylesheet" href="/_shared/sidebar.css" />
 </head>
 <body>
+
+<div id="sidebar-mount"></div>
 
 <main class="stage">
   <p class="line1">I recognize that I am a meme.</p>
@@ -161,5 +164,6 @@
   try { applyTheme(localStorage.getItem('piedpiper-theme') || 'auto'); } catch(e) {}
 })();
 </script>
+<script src="/_shared/sidebar.js" defer></script>
 </body>
 </html>

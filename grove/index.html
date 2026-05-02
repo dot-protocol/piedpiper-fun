@@ -204,8 +204,11 @@
 
   ::selection { background: var(--accent); color: var(--bg); }
 </style>
+<link rel="stylesheet" href="/_shared/sidebar.css" />
 </head>
 <body>
+
+<div id="sidebar-mount"></div>
 
 <header>
   <svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -262,7 +265,7 @@
       plant your tree — soon
     </button>
     <p class="lede mono" style="font-size:0.85em;">
-      ticker: <b>$PIPER</b> · network: solana · launching on <a href="https://pump.fun" style="color:var(--fg); text-decoration:underline dotted;">pump.fun</a>
+      ticker: <b>$PIPER</b> · network: solana · <a href="https://pump.fun/coin/83VTqzxszRFPSzJHvTeNRydcuUmmhEjj9FH4F7TZpump" style="color:var(--fg); text-decoration:underline dotted;" rel="noopener" target="_blank">live on pump.fun</a>
     </p>
     <p class="small" style="margin:0;">
       already a holder? → <a href="/holders">/holders</a>
@@ -355,5 +358,6 @@ if (plantBtn) {
   });
 }
 </script>
+<script src="/_shared/sidebar.js" defer></script>
 </body>
 </html>

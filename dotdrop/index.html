@@ -1,0 +1,500 @@
+<!doctype html>
+<!-- ═══════════════════════════════════════════════════════════════════
+  POSTHOG KEY — grep: phc_PLACEHOLDER_REPLACE_ME
+  Blaze: swap the placeholder string below with your real project key.
+  Run: bash tools/swap-posthog-key.sh phc_your_real_key_here
+  ═══════════════════════════════════════════════════════════════════ -->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<script>
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId captureTraceFeedback captureTraceMetric".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init('phc_PLACEHOLDER_REPLACE_ME', {
+    api_host: 'https://us.i.posthog.com',
+    person_profiles: 'identified_only',
+    capture_pageview: true,
+    capture_pageleave: true,
+    autocapture: true,
+    session_recording: { maskAllInputs: false, maskInputOptions: { password: true } }
+  });
+</script>
+<title>dotdrop · piedpiper.fun</title>
+<meta name="description" content="Drop a file. Type a hashtag. Anyone with the same hashtag can receive it. End-to-end encrypted. No accounts." />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+<meta property="og:title" content="dotdrop · piedpiper.fun" />
+<meta property="og:description" content="Drop a file. Type a hashtag. Anyone with the same hashtag can receive it. End-to-end encrypted. No accounts." />
+<meta property="og:url" content="https://piedpiper.fun/dotdrop" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="dotdrop · piedpiper.fun" />
+<meta name="twitter:description" content="Drop a file. Type a hashtag. Anyone with the same hashtag can receive it. End-to-end encrypted. No accounts." />
+<meta name="twitter:image" content="/og.png" />
+
+<link rel="stylesheet" href="/_shared/sidebar.css" />
+
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: white;
+    --bg2: #f7f7f7;
+    --bg3: #efefef;
+    --fg: black;
+    --muted: rgba(0,0,0,0.55);
+    --muted2: rgba(0,0,0,0.32);
+    --line: rgba(0,0,0,0.12);
+    --accent: black;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0b0b;
+      --bg2: #111111;
+      --bg3: #181818;
+      --fg: #f5f5f5;
+      --muted: rgba(255,255,255,0.55);
+      --muted2: rgba(255,255,255,0.32);
+      --line: rgba(255,255,255,0.14);
+      --accent: #f5f5f5;
+    }
+  }
+  [data-theme="light"]    { --bg:#ffffff; --bg2:#f7f7f7; --bg3:#efefef; --fg:#000000; --muted:rgba(0,0,0,0.55); --muted2:rgba(0,0,0,0.32); --line:rgba(0,0,0,0.12); --accent:#000000; }
+  [data-theme="dark"]     { --bg:#0b0b0b; --bg2:#111111; --bg3:#181818; --fg:#f5f5f5; --muted:rgba(255,255,255,0.55); --muted2:rgba(255,255,255,0.32); --line:rgba(255,255,255,0.14); --accent:#f5f5f5; }
+  [data-theme="sepia"]    { --bg:#f4ecd8; --bg2:#ede4cc; --bg3:#e3d8bc; --fg:#3a2f1d; --muted:rgba(58,47,29,0.55); --muted2:rgba(58,47,29,0.35); --line:rgba(58,47,29,0.18); --accent:#3a2f1d; }
+  [data-theme="terminal"] { --bg:#000000; --bg2:#0a0a0a; --bg3:#111111; --fg:#00ff41; --muted:rgba(0,255,65,0.55); --muted2:rgba(0,255,65,0.35); --line:rgba(0,255,65,0.22); --accent:#00ff41; }
+  [data-theme="mandala"]  { --bg:#fdf6e3; --bg2:#f5ecd4; --bg3:#ede3c5; --fg:#073642; --muted:rgba(7,54,66,0.55); --muted2:rgba(7,54,66,0.35); --line:rgba(7,54,66,0.15); --accent:#cb4b16; }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── MAIN LAYOUT ─────────────────────────────────────────────────── */
+  .page {
+    flex: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: clamp(3.5rem, 10vw, 7rem) 1.8rem clamp(3rem, 8vw, 6rem);
+    width: 100%;
+  }
+
+  /* ── HEADER ──────────────────────────────────────────────────────── */
+  .page-title {
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin: 0 0 0.5rem;
+  }
+  .page-sub {
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+    color: var(--muted);
+    font-style: italic;
+    margin: 0 0 3rem;
+    line-height: 1.5;
+  }
+
+  /* ── SECTION HEADERS ─────────────────────────────────────────────── */
+  .section-label {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--muted2);
+    margin: 2.8rem 0 1rem;
+  }
+
+  /* ── PROSE ───────────────────────────────────────────────────────── */
+  .prose {
+    font-size: clamp(0.95rem, 2vw, 1.05rem);
+    line-height: 1.75;
+    color: var(--fg);
+    max-width: 60ch;
+  }
+  .prose p { margin: 0 0 1.2em; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    background: var(--bg3);
+    border-radius: 3px;
+    padding: 0.1em 0.35em;
+  }
+  .prose a {
+    color: var(--fg);
+    text-underline-offset: 3px;
+  }
+  .prose a:hover { opacity: 0.7; }
+
+  /* ── STEPS ───────────────────────────────────────────────────────── */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    margin: 1.6rem 0;
+  }
+  .step {
+    display: flex;
+    gap: 1.2rem;
+    align-items: flex-start;
+  }
+  .step-num {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted2);
+    background: var(--bg3);
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 0.1em;
+  }
+  .step-body {
+    font-size: 0.97rem;
+    line-height: 1.65;
+    color: var(--fg);
+  }
+  .step-body strong {
+    font-weight: 600;
+  }
+  .step-body small {
+    display: block;
+    color: var(--muted);
+    font-size: 0.85em;
+    margin-top: 0.2em;
+    font-style: italic;
+  }
+
+  /* ── PROPERTIES TABLE ────────────────────────────────────────────── */
+  .prop-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    margin: 1.4rem 0;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  .prop-table td {
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  .prop-table tr:last-child td { border-bottom: none; }
+  .prop-table td:first-child {
+    color: var(--muted);
+    width: 38%;
+    white-space: nowrap;
+  }
+  .prop-table td:last-child {
+    color: var(--fg);
+  }
+
+  /* ── WIRE FORMAT ─────────────────────────────────────────────────── */
+  .wire-box {
+    background: var(--bg2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 1.2rem 1.4rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: var(--muted);
+    overflow-x: auto;
+    margin: 1.4rem 0;
+  }
+  .wire-box .field { color: var(--fg); }
+  .wire-box .comment { color: var(--muted2); }
+
+  /* ── IDENTITY SECTION ────────────────────────────────────────────── */
+  .identity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.4rem 0;
+  }
+  .identity-card {
+    background: var(--bg2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 1rem 1.1rem;
+  }
+  .identity-card .ic-key {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted2);
+    margin-bottom: 0.3rem;
+  }
+  .identity-card .ic-curve {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--fg);
+    margin-bottom: 0.15rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  .identity-card .ic-use {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* ── SOURCE LINKS ────────────────────────────────────────────────── */
+  .source-links {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 1.6rem 0 0;
+  }
+  .source-link {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--muted);
+    padding-bottom: 1px;
+  }
+  .source-link:hover { color: var(--fg); border-bottom-color: var(--fg); }
+
+  /* ── DIVIDER ─────────────────────────────────────────────────────── */
+  hr {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 2.8rem 0;
+  }
+
+  /* ── FOOTER ──────────────────────────────────────────────────────── */
+  footer {
+    padding: 1.2rem 1.8rem;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  footer a {
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--muted);
+  }
+  footer a:hover { color: var(--fg); border-bottom-color: var(--fg); }
+  .theme-picker-wrap {
+    display: inline-flex; align-items: center; gap: 0.35em;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.72em; color: var(--muted);
+  }
+  .theme-picker-wrap select {
+    background: transparent; border: none; border-bottom: 1px dotted var(--muted);
+    color: var(--muted); font-family: inherit; font-size: inherit;
+    cursor: pointer; padding: 0 0.15em; outline: none; appearance: none; -webkit-appearance: none;
+  }
+  .theme-picker-wrap select:hover { color: var(--fg); border-bottom-color: var(--fg); }
+
+  ::selection { background: var(--accent); color: var(--bg); }
+</style>
+</head>
+<body>
+
+<div id="sidebar-mount"></div>
+
+<div class="page">
+
+  <h1 class="page-title">dotdrop</h1>
+  <p class="page-sub">Drop a file. Share a hashtag. No accounts. No servers holding your data.</p>
+
+  <!-- WHAT -->
+  <p class="section-label">what it is</p>
+  <div class="prose">
+    <p>
+      dotdrop is a peer-to-peer encrypted file transfer tool built on the Pipernet protocol. A file leaves your device already encrypted — the server never sees the plaintext. The hashtag is the key.
+    </p>
+    <p>
+      It is part of the axxis.world identity layer. Every transfer is signed with an Ed25519 keypair derived from your device. No account creation. No login. Your identity is your keypair.
+    </p>
+  </div>
+
+  <!-- HOW TO USE -->
+  <p class="section-label">how to use it</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <strong>Open the app.</strong>
+        <small>Go to <a href="https://dotdrop.axxis.world" target="_blank" rel="noopener">dotdrop.axxis.world</a> on the sending device.</small>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <strong>Drop a file and type a <code>#hashtag</code>.</strong>
+        <small>The hashtag is the shared secret. It never leaves the browser unencrypted.</small>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <strong>Share the hashtag out-of-band.</strong>
+        <small>Text it, say it aloud, write it on paper. The channel is <code>piedpiper.fun/dotdrop/#your-tag</code>.</small>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <strong>Receiver opens the same URL.</strong>
+        <small>WebRTC connection is negotiated via Nostr relays. File transfers directly between devices.</small>
+      </div>
+    </div>
+  </div>
+
+  <hr />
+
+  <!-- TECHNICAL DESIGN -->
+  <p class="section-label">technical design</p>
+  <div class="prose">
+    <p>
+      Signaling uses Nostr relays — no custom signaling server. Each DropPeer generates an ephemeral Nostr keypair per session. Offers, answers, and ICE candidates are addressed by Nostr pubkey and relayed through public infrastructure.
+    </p>
+    <p>
+      Files are encrypted with AES-256-GCM before leaving the device. The key is derived from the hashtag using HKDF-SHA256. The Nostr relay sees only opaque ciphertext addressed to a pseudonymous public key.
+    </p>
+  </div>
+
+  <table class="prop-table">
+    <tbody>
+      <tr><td>transport</td><td>WebRTC DataChannel (direct P2P)</td></tr>
+      <tr><td>signaling</td><td>Nostr relays (ephemeral keypairs)</td></tr>
+      <tr><td>encryption</td><td>AES-256-GCM, key from HKDF-SHA256(hashtag)</td></tr>
+      <tr><td>integrity</td><td>SHA-256 of plaintext, verified on receive</td></tr>
+      <tr><td>identity</td><td>Ed25519 (signing), X25519 (DM encryption)</td></tr>
+      <tr><td>storage</td><td>IndexedDB, local only</td></tr>
+      <tr><td>server</td><td>none — no file data touches a server</td></tr>
+      <tr><td>accounts</td><td>none — keypair is your identity</td></tr>
+    </tbody>
+  </table>
+
+  <!-- WIRE FORMAT -->
+  <p class="section-label">canonical dot format</p>
+  <div class="prose">
+    <p>
+      Every transfer is recorded as a canonical DOT — a fixed 153-byte signed observation. Each DOT chains to the previous via SHA-256, forming a tamper-evident local history. The format is identical to the one used across all axxis.world identity operations.
+    </p>
+  </div>
+
+  <div class="wire-box">
+<span class="comment">// 153 bytes, fixed-width — enables O(n) chain traversal</span>
+[0..31]    <span class="field">pubkey</span>   32B  <span class="comment">Ed25519 public key</span>
+[32..95]   <span class="field">sig</span>      64B  <span class="comment">Ed25519 signature over signed bytes (89B)</span>
+[96..127]  <span class="field">chain</span>    32B  <span class="comment">SHA-256(prevDotBytes), zeros for genesis</span>
+[128..135] <span class="field">ts</span>        8B  <span class="comment">Unix ms, big-endian int64</span>
+[136]      <span class="field">type</span>      1B  <span class="comment">0x00=public 0x01=circle 0x02=private 0x03=ephemeral</span>
+[137..152] <span class="field">payload</span>  16B  <span class="comment">zero-padded context (sha256(content)[:16] for drops)</span>
+  </div>
+
+  <!-- IDENTITY LAYER -->
+  <p class="section-label">identity layer (axxis.world)</p>
+  <div class="prose">
+    <p>
+      dotdrop inherits the three-keypair identity model from axxis.world. Keys are generated once per device and stored in IndexedDB — never exported, never transmitted.
+    </p>
+  </div>
+
+  <div class="identity-grid">
+    <div class="identity-card">
+      <div class="ic-key">keypair 1</div>
+      <div class="ic-curve">Ed25519</div>
+      <div class="ic-use">DOT signing. Canonical identity. Used for all observations and transfer records.</div>
+    </div>
+    <div class="identity-card">
+      <div class="ic-key">keypair 2</div>
+      <div class="ic-curve">secp256k1</div>
+      <div class="ic-use">Nostr protocol. Used for signaling relay messages. Ephemeral per DropPeer session.</div>
+    </div>
+    <div class="identity-card">
+      <div class="ic-key">keypair 3</div>
+      <div class="ic-curve">X25519</div>
+      <div class="ic-use">ECDH shared secret for direct message encryption. AES-256-GCM derived from Diffie-Hellman exchange.</div>
+    </div>
+  </div>
+
+  <hr />
+
+  <!-- KNOWLEDGE GRAPH -->
+  <p class="section-label">science corpus</p>
+  <div class="prose">
+    <p>
+      The dotdotdot knowledge graph maps the AXXIS science corpus — papers across physics, biology, computation, and emergence that inform the protocol design. The graph is interactive: nodes are papers, edges are citation or conceptual proximity.
+    </p>
+    <p>
+      Open the graph to explore the research behind the wire format, the compression algorithms, and the emergence threshold experiments.
+    </p>
+  </div>
+
+  <div class="source-links">
+    <a class="source-link" href="https://dots.axxis.world" target="_blank" rel="noopener">dots.axxis.world &#8599;</a>
+    <a class="source-link" href="https://axxis.world" target="_blank" rel="noopener">axxis.world &#8599;</a>
+    <a class="source-link" href="https://github.com/dot-protocol/pipernet" target="_blank" rel="noopener">github &#8599;</a>
+    <a class="source-link" href="/whitepaper">whitepaper</a>
+    <a class="source-link" href="/decode">decode</a>
+  </div>
+
+</div><!-- /page -->
+
+<footer>
+  <span>dotdrop · Pied Piper</span>
+  <div style="display:flex;align-items:center;gap:1em;flex-wrap:wrap;">
+    <a href="/">home</a>
+    &nbsp;·&nbsp;
+    <a href="/app">app</a>
+    &nbsp;·&nbsp;
+    <a href="/holders">holders</a>
+    &nbsp;·&nbsp;
+    <span class="theme-picker-wrap">
+      <span>theme:</span>
+      <select id="theme-select" onchange="applyTheme(this.value)" title="switch theme" aria-label="colour theme">
+        <option value="auto">auto</option>
+        <option value="light">light</option>
+        <option value="dark">dark</option>
+        <option value="sepia">sepia</option>
+        <option value="terminal">terminal</option>
+        <option value="mandala">mandala</option>
+      </select>
+    </span>
+  </div>
+</footer>
+
+<script src="/_shared/sidebar.js" defer></script>
+<script>
+(function() {
+  function applyTheme(k) {
+    k === 'auto'
+      ? document.body.removeAttribute('data-theme')
+      : document.body.setAttribute('data-theme', k);
+    try { localStorage.setItem('piedpiper-theme', k); } catch(e) {}
+    var sel = document.getElementById('theme-select');
+    if (sel && sel.value !== k) sel.value = k;
+  }
+  window.applyTheme = applyTheme;
+  try { applyTheme(localStorage.getItem('piedpiper-theme') || 'auto'); } catch(e) {}
+})();
+</script>
+</body>
+</html>

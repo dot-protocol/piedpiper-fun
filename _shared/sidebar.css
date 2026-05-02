@@ -1,0 +1,220 @@
+/* ─── Pied Piper channel sidebar ─────────────────────────────────────────── */
+
+/* Sidebar is injected into #sidebar-mount. Pages that include it get
+   a left-offset layout. The sidebar itself is fixed on desktop,
+   a drawer on mobile. */
+
+:root {
+  --sb-width: 220px;
+  --sb-bg: var(--bg2, #111111);
+  --sb-fg: var(--muted, rgba(255,255,255,0.52));
+  --sb-active-fg: var(--fg, #f2f2f2);
+  --sb-active-bg: var(--bg3, #181818);
+  --sb-border: var(--line, rgba(255,255,255,0.10));
+  --sb-hash: var(--muted2, rgba(255,255,255,0.30));
+  --sb-label: rgba(255,255,255,0.28);
+  --sb-section-gap: 1.4rem;
+  --sb-item-h: 30px;
+  --sb-font: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* Light theme overrides */
+[data-theme="light"] {
+  --sb-bg: #f7f7f7;
+  --sb-fg: rgba(0,0,0,0.52);
+  --sb-active-fg: #000000;
+  --sb-active-bg: #efefef;
+  --sb-border: rgba(0,0,0,0.10);
+  --sb-hash: rgba(0,0,0,0.30);
+  --sb-label: rgba(0,0,0,0.30);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --sb-bg: #f7f7f7;
+    --sb-fg: rgba(0,0,0,0.52);
+    --sb-active-fg: #000000;
+    --sb-active-bg: #efefef;
+    --sb-border: rgba(0,0,0,0.10);
+    --sb-hash: rgba(0,0,0,0.30);
+    --sb-label: rgba(0,0,0,0.30);
+  }
+}
+[data-theme="sepia"] {
+  --sb-bg: #ede4cc;
+  --sb-fg: rgba(58,47,29,0.55);
+  --sb-active-fg: #3a2f1d;
+  --sb-active-bg: #e3d8bc;
+  --sb-border: rgba(58,47,29,0.18);
+  --sb-hash: rgba(58,47,29,0.35);
+  --sb-label: rgba(58,47,29,0.35);
+}
+[data-theme="terminal"] {
+  --sb-bg: #0a0a0a;
+  --sb-fg: rgba(0,255,65,0.55);
+  --sb-active-fg: #00ff41;
+  --sb-active-bg: #111111;
+  --sb-border: rgba(0,255,65,0.22);
+  --sb-hash: rgba(0,255,65,0.35);
+  --sb-label: rgba(0,255,65,0.35);
+}
+[data-theme="mandala"] {
+  --sb-bg: #f0e7cc;
+  --sb-fg: rgba(7,54,66,0.55);
+  --sb-active-fg: #073642;
+  --sb-active-bg: #e6dcbd;
+  --sb-border: rgba(7,54,66,0.15);
+  --sb-hash: rgba(7,54,66,0.35);
+  --sb-label: rgba(7,54,66,0.35);
+}
+
+/* ─── Hamburger button (mobile only) ──────────────────────────────────────── */
+#pp-hamburger {
+  display: none;
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 200;
+  background: var(--sb-active-bg);
+  border: 1px solid var(--sb-border);
+  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  color: var(--sb-active-fg);
+  font-size: 18px;
+  line-height: 1;
+}
+#pp-hamburger:focus-visible { outline: 2px solid var(--sb-active-fg); outline-offset: 2px; }
+
+/* ─── Sidebar container ────────────────────────────────────────────────────── */
+#pp-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--sb-width);
+  background: var(--sb-bg);
+  border-right: 1px solid var(--sb-border);
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 100;
+  padding: 0 0 2rem;
+  display: flex;
+  flex-direction: column;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb-border) transparent;
+}
+#pp-sidebar::-webkit-scrollbar { width: 4px; }
+#pp-sidebar::-webkit-scrollbar-track { background: transparent; }
+#pp-sidebar::-webkit-scrollbar-thumb { background: var(--sb-border); border-radius: 2px; }
+
+/* ─── Wordmark ─────────────────────────────────────────────────────────────── */
+.sb-wordmark {
+  padding: 1.2rem 1rem 1rem;
+  border-bottom: 1px solid var(--sb-border);
+  margin-bottom: 0.6rem;
+  flex-shrink: 0;
+}
+.sb-brand {
+  font-family: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--sb-active-fg);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+.sb-brand:hover { opacity: 0.8; }
+
+/* ─── Section labels ───────────────────────────────────────────────────────── */
+.sb-section-label {
+  font-family: var(--sb-font);
+  font-size: 0.67rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sb-label);
+  padding: 0 1rem 0.3rem;
+  margin-top: var(--sb-section-gap);
+  flex-shrink: 0;
+}
+
+/* ─── Channel items ────────────────────────────────────────────────────────── */
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 0.18em;
+  height: var(--sb-item-h);
+  padding: 0 1rem;
+  font-family: var(--sb-font);
+  font-size: 0.82rem;
+  color: var(--sb-fg);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: color 0.12s, background 0.12s;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sb-item:hover {
+  color: var(--sb-active-fg);
+  background: var(--sb-active-bg);
+}
+.sb-item.active {
+  color: var(--sb-active-fg);
+  background: var(--sb-active-bg);
+  border-left-color: var(--sb-active-fg);
+  font-weight: 500;
+}
+.sb-hash {
+  color: var(--sb-hash);
+  flex-shrink: 0;
+  margin-right: 0.1em;
+}
+.sb-item.active .sb-hash {
+  color: var(--sb-active-fg);
+  opacity: 0.5;
+}
+.sb-arrow {
+  font-size: 0.7em;
+  margin-left: 0.2em;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+/* ─── Overlay (mobile drawer backdrop) ────────────────────────────────────── */
+#pp-sb-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 99;
+}
+#pp-sb-overlay.visible { display: block; }
+
+/* ─── Page body offset on desktop ─────────────────────────────────────────── */
+body.pp-has-sidebar {
+  padding-left: var(--sb-width);
+}
+
+/* ─── Mobile ───────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  body.pp-has-sidebar {
+    padding-left: 0;
+  }
+  #pp-hamburger {
+    display: flex;
+  }
+  #pp-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+  }
+  #pp-sidebar.open {
+    transform: translateX(0);
+  }
+}
