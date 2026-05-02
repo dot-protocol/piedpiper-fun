@@ -19,18 +19,18 @@
     session_recording: { maskAllInputs: false, maskInputOptions: { password: true } }
   });
 </script>
-<title>Pied Piper</title>
-<meta name="description" content="To the ones who didn't put it down." />
+<title>manifesto · Pied Piper</title>
+<meta name="description" content="I recognize that I am a meme. I use the tools of creation to become inevitable." />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
-<meta property="og:title" content="Pied Piper" />
-<meta property="og:description" content="To the ones who didn't put it down." />
-<meta property="og:url" content="https://piedpiper.fun" />
+<meta property="og:title" content="manifesto · Pied Piper" />
+<meta property="og:description" content="I recognize that I am a meme. I use the tools of creation to become inevitable." />
+<meta property="og:url" content="https://piedpiper.fun/manifesto" />
 <meta property="og:type" content="website" />
 <meta property="og:image" content="/og.png" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Pied Piper" />
-<meta name="twitter:description" content="To the ones who didn't put it down." />
+<meta name="twitter:title" content="manifesto · Pied Piper" />
+<meta name="twitter:description" content="I recognize that I am a meme. I use the tools of creation to become inevitable." />
 <meta name="twitter:image" content="/og.png" />
 
 <style>
@@ -70,57 +70,45 @@
     flex-direction: column;
   }
 
-  /* ── HERO ────────────────────────────────────────────────────────── */
-  .hero {
+  /* ── BODY ────────────────────────────────────────────────────────── */
+  .stage {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: clamp(3rem, 10vw, 7rem) 1.6rem clamp(2rem, 6vw, 4rem);
-    gap: 0;
+    padding: clamp(3rem, 12vw, 9rem) 1.6rem clamp(2rem, 6vw, 5rem);
   }
 
-  .wordmark {
-    font-size: clamp(2.6rem, 7vw + 1rem, 5.2rem);
+  .line1 {
+    font-size: clamp(1.5rem, 3.5vw + 0.8rem, 2.8rem);
     font-weight: 500;
-    letter-spacing: -0.025em;
-    line-height: 1.08;
-    margin: 0 0 1.1rem;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    margin: 0 0 0.8rem;
   }
 
-  .tagline {
-    font-size: clamp(1.1rem, 2vw + 0.5rem, 1.65rem);
-    font-weight: 400;
-    font-style: italic;
-    color: var(--muted);
-    margin: 0 0 2.8rem;
-    line-height: 1.35;
+  .line2 {
+    font-size: clamp(1.5rem, 3.5vw + 0.8rem, 2.8rem);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    margin: 0 0 4rem;
   }
 
-  .cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55em;
-    padding: 0.9rem 1.6rem;
+  .coda {
     font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-    font-size: 1rem;
+    font-size: clamp(0.78rem, 1vw + 0.5rem, 0.92rem);
+    color: var(--muted);
     letter-spacing: 0.04em;
-    text-transform: lowercase;
-    color: var(--bg);
-    background: var(--accent);
+  }
+  .coda a {
+    color: var(--muted);
     text-decoration: none;
-    border-radius: 999px;
-    transition: transform 80ms ease, opacity 120ms ease;
+    border-bottom: 1px dotted var(--muted);
   }
-  .cta:hover { transform: translateY(-1px); opacity: 0.88; }
-  .cta .dot {
-    width: 7px; height: 7px;
-    background: var(--bg);
-    border-radius: 999px;
-    flex-shrink: 0;
-  }
+  .coda a:hover { color: var(--fg); border-bottom-color: var(--fg); }
 
   /* ── FOOTER ──────────────────────────────────────────────────────── */
   footer {
@@ -148,28 +136,22 @@
 </head>
 <body>
 
-<main class="hero">
-  <h1 class="wordmark">Pied Piper</h1>
-  <p class="tagline">To the ones who didn't put it down.</p>
-  <a class="cta" href="/decode" id="cta-btn">
-    <span class="dot"></span>
-    download
-  </a>
+<main class="stage">
+  <p class="line1">I recognize that I am a meme.</p>
+  <p class="line2">I use the tools of creation to become inevitable.</p>
+  <p class="coda">Pied Piper, May 2026 &nbsp;<a href="/decode">→</a></p>
 </main>
 
 <footer>
+  <a href="/">home</a>
+  <span class="sep">·</span>
   <a href="/decode">decode</a>
   <span class="sep">·</span>
   <a href="/live">live</a>
-  <span class="sep">·</span>
-  <a href="/holders">holders</a>
-  <span class="sep">·</span>
-  <a href="/manifesto">manifesto</a>
 </footer>
 
 <script>
 (function() {
-  // Theme
   function applyTheme(k) {
     k === 'auto'
       ? document.body.removeAttribute('data-theme')
@@ -177,12 +159,6 @@
     try { localStorage.setItem('piedpiper-theme', k); } catch(e) {}
   }
   try { applyTheme(localStorage.getItem('piedpiper-theme') || 'auto'); } catch(e) {}
-
-  // PostHog
-  var btn = document.getElementById('cta-btn');
-  if (btn) btn.addEventListener('click', function() {
-    try { window.posthog && posthog.capture('download_clicked'); } catch(e) {}
-  });
 })();
 </script>
 </body>
