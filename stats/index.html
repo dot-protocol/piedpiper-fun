@@ -1,0 +1,672 @@
+<!doctype html>
+<!-- ═══════════════════════════════════════════════════════════════════
+  POSTHOG KEY — grep: phc_PLACEHOLDER_REPLACE_ME
+  Blaze: swap the placeholder string below with your real project key.
+  Run: bash tools/swap-posthog-key.sh phc_your_real_key_here
+  ═══════════════════════════════════════════════════════════════════ -->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<script>
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId captureTraceFeedback captureTraceMetric".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init('phc_PLACEHOLDER_REPLACE_ME', {
+    api_host: 'https://us.i.posthog.com',
+    person_profiles: 'identified_only',
+    capture_pageview: true,
+    capture_pageleave: true,
+    autocapture: true,
+    session_recording: { maskAllInputs: false, maskInputOptions: { password: true } }
+  });
+</script>
+<title>stats · piedpiper.fun</title>
+<meta name="description" content="Live market data for $PIPER. Price, market cap, volume, liquidity." />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+<meta property="og:title" content="stats · piedpiper.fun" />
+<meta property="og:description" content="Live market data for $PIPER. Price, market cap, volume, liquidity." />
+<meta property="og:url" content="https://piedpiper.fun/stats" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="stats · piedpiper.fun" />
+<meta name="twitter:description" content="Live market data for $PIPER. Price, market cap, volume, liquidity." />
+<meta name="twitter:image" content="/og.png" />
+
+<style>
+  /* ── THEME SYSTEM (mirrors site-wide tokens) ─────────────────────── */
+  :root {
+    color-scheme: light dark;
+    --bg: white;
+    --fg: black;
+    --muted: rgba(0,0,0,0.55);
+    --line: rgba(0,0,0,0.12);
+    --accent: black;
+    --up: #16a34a;
+    --down: #dc2626;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0b0b;
+      --fg: #f5f5f5;
+      --muted: rgba(255,255,255,0.55);
+      --line: rgba(255,255,255,0.14);
+      --accent: #f5f5f5;
+      --up: #4ade80;
+      --down: #f87171;
+    }
+  }
+  [data-theme="light"]    { --bg:#ffffff; --fg:#000000; --muted:rgba(0,0,0,0.55);   --line:rgba(0,0,0,0.12);   --accent:#000000; --up:#16a34a; --down:#dc2626; }
+  [data-theme="dark"]     { --bg:#0b0b0b; --fg:#f5f5f5; --muted:rgba(255,255,255,0.55); --line:rgba(255,255,255,0.14); --accent:#f5f5f5; --up:#4ade80; --down:#f87171; }
+  [data-theme="sepia"]    { --bg:#f4ecd8; --fg:#3a2f1d; --muted:rgba(58,47,29,0.55); --line:rgba(58,47,29,0.18); --accent:#3a2f1d; --up:#2d6a2d; --down:#9b1c1c; }
+  [data-theme="terminal"] { --bg:#000000; --fg:#00ff41; --muted:rgba(0,255,65,0.55);  --line:rgba(0,255,65,0.22); --accent:#00ff41; --up:#00ff41; --down:#ff4141; }
+  [data-theme="mandala"]  { --bg:#fdf6e3; --fg:#073642; --muted:rgba(7,54,66,0.55);  --line:rgba(7,54,66,0.15); --accent:#cb4b16; --up:#2d6a2d; --down:#9b1c1c; }
+
+  .theme-picker-wrap {
+    display: flex; align-items: center; gap: 0.4em;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82em; color: var(--muted);
+  }
+  .theme-picker-wrap select {
+    background: transparent; border: none; border-bottom: 1px dotted var(--muted);
+    color: var(--muted); font-family: inherit; font-size: inherit;
+    cursor: pointer; padding: 0 0.2em; outline: none; appearance: none;
+    -webkit-appearance: none;
+  }
+  .theme-picker-wrap select:hover { color: var(--fg); border-bottom-color: var(--fg); }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
+    font-size: clamp(16px, 1.05vw + 13px, 19px);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+  header {
+    display: flex; align-items: center; gap: 0.6em;
+    padding: 1.4rem 1.6rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+  }
+  header .mark { width: 14px; height: 14px; }
+  header .name { color: var(--fg); }
+  header .crumb { color: var(--muted); }
+
+  main {
+    max-width: 38rem;
+    margin: 0 auto;
+    padding: 4rem 1.6rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  h1 {
+    font-size: clamp(1.5rem, 2.6vw + 1rem, 2.4rem);
+    line-height: 1.18;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  h1 em { font-style: italic; color: var(--muted); }
+
+  /* ── price (hero number) ── */
+  .price-hero {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 1.4rem 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .price-label {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.78em;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .price-value {
+    font-size: clamp(2rem, 5vw + 1rem, 3.2rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    font-family: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
+    color: var(--fg);
+  }
+  .price-change {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.92em;
+    font-weight: 500;
+  }
+  .price-change.up   { color: var(--up); }
+  .price-change.down { color: var(--down); }
+  .price-change.flat { color: var(--muted); }
+
+  /* ── data grid ── */
+  .data-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.4rem 2rem;
+  }
+  @media (max-width: 440px) { .data-grid { grid-template-columns: 1fr; gap: 1rem; } }
+
+  .data-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .data-item-label {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.75em;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+  .data-item-value {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 1.05em;
+    color: var(--fg);
+    font-weight: 500;
+  }
+  .data-item-note {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.75em;
+    color: var(--muted);
+  }
+
+  /* ── status bar (refresh indicator) ── */
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.78em;
+    color: var(--muted);
+  }
+  .pulse-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+    flex-shrink: 0;
+    transition: background 200ms ease;
+  }
+  .pulse-dot.fetching {
+    background: var(--accent);
+    animation: blink 0.6s ease-in-out;
+  }
+  @keyframes blink {
+    0%   { opacity: 1; }
+    50%  { opacity: 0.3; }
+    100% { opacity: 1; }
+  }
+
+  /* ── error state ── */
+  .error-notice {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.88em;
+    color: var(--muted);
+    font-style: italic;
+    padding: 1rem 0;
+    border-top: 1px solid var(--line);
+  }
+
+  /* ── action links ── */
+  .action-row {
+    display: flex;
+    gap: 1.4rem;
+    flex-wrap: wrap;
+    align-items: center;
+    padding-top: 0.5rem;
+  }
+  .action-link {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.84em;
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--muted);
+    transition: color 100ms ease, border-color 100ms ease;
+    cursor: pointer;
+  }
+  .action-link:hover { color: var(--fg); border-bottom-color: var(--fg); }
+
+  /* ── disclaimer ── */
+  .disclaimer {
+    color: var(--muted);
+    font-size: 0.82em;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    border-top: 1px solid var(--line);
+    padding-top: 1.2rem;
+    line-height: 1.5;
+  }
+  .disclaimer a { color: var(--muted); text-decoration: underline dotted; }
+
+  footer {
+    max-width: 38rem; margin: 0 auto; padding: 2rem 1.6rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82em;
+    border-top: 1px solid var(--line);
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  footer .left { display: flex; align-items: center; gap: 0.5em; }
+  footer a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--muted); }
+  footer a:hover { color: var(--fg); border-bottom-color: var(--fg); }
+
+  ::selection { background: var(--accent); color: var(--bg); }
+</style>
+</head>
+<body>
+
+<header>
+  <svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none" />
+  </svg>
+  <span class="name">piedpiper.fun</span>
+  <span class="crumb">/ stats</span>
+</header>
+
+<main>
+
+  <h1>$PIPER. <em>Live market data.</em></h1>
+
+  <!-- price hero -->
+  <div class="price-hero" id="price-hero" aria-live="polite" aria-label="Current price">
+    <div class="price-label">price usd</div>
+    <div class="price-value" id="price-usd">—</div>
+    <div class="price-change flat" id="price-change">—</div>
+  </div>
+
+  <!-- data grid -->
+  <div class="data-grid" id="data-grid" aria-label="Market statistics">
+
+    <div class="data-item">
+      <div class="data-item-label">market cap</div>
+      <div class="data-item-value" id="stat-mc">—</div>
+      <div class="data-item-note" id="stat-mc-note"></div>
+    </div>
+
+    <div class="data-item">
+      <div class="data-item-label">fdv</div>
+      <div class="data-item-value" id="stat-fdv">—</div>
+      <div class="data-item-note">fully diluted</div>
+    </div>
+
+    <div class="data-item">
+      <div class="data-item-label">24h volume</div>
+      <div class="data-item-value" id="stat-vol">—</div>
+      <div class="data-item-note" id="stat-txns">—</div>
+    </div>
+
+    <div class="data-item">
+      <div class="data-item-label">liquidity</div>
+      <div class="data-item-value" id="stat-liq">—</div>
+      <div class="data-item-note">pool depth</div>
+    </div>
+
+    <div class="data-item">
+      <div class="data-item-label">1h change</div>
+      <div class="data-item-value" id="stat-1h">—</div>
+    </div>
+
+    <div class="data-item">
+      <div class="data-item-label">pair</div>
+      <div class="data-item-value" id="stat-dex">—</div>
+      <div class="data-item-note" id="stat-pair-age">—</div>
+    </div>
+
+  </div>
+
+  <!-- status bar -->
+  <div class="status-bar" id="status-bar">
+    <span class="pulse-dot" id="pulse-dot"></span>
+    <span id="status-text">loading…</span>
+  </div>
+
+  <!-- error notice (hidden by default) -->
+  <div class="error-notice" id="error-notice" style="display:none;">
+    data unavailable — pump.fun may be the only source for this coin until Raydium graduation.
+    <a class="action-link" href="https://pump.fun/coin/83VTqzxszRFPSzJHvTeNRydcuUmmhEjj9FH4F7TZpump" rel="noopener" target="_blank" style="margin-left:0.5em;">view on pump.fun</a>
+  </div>
+
+  <!-- action links -->
+  <div class="action-row">
+    <a class="action-link" href="https://pump.fun/coin/83VTqzxszRFPSzJHvTeNRydcuUmmhEjj9FH4F7TZpump" rel="noopener" target="_blank" id="pumpfun-link">open on pump.fun</a>
+    <a class="action-link" href="https://dexscreener.com/solana/4z2dpdqa6fw8drt1dwnxxbrsqkbcfkvzxnj7f37uxi7b" rel="noopener" target="_blank" id="dex-link">dexscreener</a>
+    <span class="action-link" id="share-link" role="button" tabindex="0" aria-label="Share current market cap on X">share on x</span>
+  </div>
+
+  <!-- disclaimer -->
+  <div class="disclaimer">
+    this is not investment advice. <a href="/whitepaper">read the whitepaper</a>.
+  </div>
+
+</main>
+
+<footer>
+  <div class="left">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none" />
+    </svg>
+    <span>$PIPER · live</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:1em; flex-wrap:wrap; justify-content:flex-end;">
+    <a href="/holders">holders</a>
+    &nbsp;·&nbsp;
+    <a href="/grove">grove</a>
+    &nbsp;·&nbsp;
+    <a href="/">protocol</a>
+    &nbsp;·&nbsp;
+    <span class="theme-picker-wrap">
+      <span>theme:</span>
+      <select id="theme-select" onchange="applyTheme(this.value)" title="switch theme" aria-label="colour theme">
+        <option value="auto">auto</option>
+        <option value="light">light</option>
+        <option value="dark">dark</option>
+        <option value="sepia">sepia</option>
+        <option value="terminal">terminal</option>
+        <option value="mandala">mandala</option>
+      </select>
+    </span>
+  </div>
+</footer>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// $PIPER LIVE STATS — auto-refreshes every 10 seconds
+// Sources: DexScreener primary, pump.fun frontend API fallback
+// ─────────────────────────────────────────────────────────────────────────────
+
+const MINT = '83VTqzxszRFPSzJHvTeNRydcuUmmhEjj9FH4F7TZpump';
+const PUMPFUN_URL = 'https://pump.fun/coin/' + MINT;
+const DEX_API = 'https://api.dexscreener.com/latest/dex/tokens/' + MINT;
+const PUMP_API = 'https://frontend-api-v3.pump.fun/coins/' + MINT;
+const REFRESH_MS = 10_000;
+
+// Timestamp of last successful fetch
+let lastFetchTs = null;
+let refreshTimer = null;
+let secondsTimer = null;
+
+// ── FORMATTING HELPERS ────────────────────────────────────────────────────────
+
+function fmtUsd(n, decimals) {
+  if (n == null || isNaN(n)) return '—';
+  if (decimals !== undefined) {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  }
+  // Auto precision based on magnitude
+  if (n < 0.000001) return '$' + n.toExponential(2);
+  if (n < 0.001)    return '$' + n.toFixed(8);
+  if (n < 1)        return '$' + n.toFixed(6);
+  if (n < 10)       return '$' + n.toFixed(4);
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtLarge(n) {
+  if (n == null || isNaN(n)) return '—';
+  if (n >= 1_000_000_000) return '$' + (n / 1_000_000_000).toFixed(2) + 'b';
+  if (n >= 1_000_000)     return '$' + (n / 1_000_000).toFixed(2) + 'm';
+  if (n >= 1_000)         return '$' + (n / 1_000).toFixed(1) + 'k';
+  return '$' + n.toFixed(0);
+}
+
+function fmtPct(n) {
+  if (n == null || isNaN(n)) return '—';
+  const sign = n >= 0 ? '+' : '';
+  return sign + n.toFixed(2) + '%';
+}
+
+function fmtAge(createdAtMs) {
+  if (!createdAtMs) return '';
+  const hrs = (Date.now() - createdAtMs) / 3_600_000;
+  if (hrs < 1) return 'created ' + Math.round(hrs * 60) + 'm ago';
+  if (hrs < 48) return 'created ' + hrs.toFixed(1) + 'h ago';
+  return 'created ' + Math.round(hrs / 24) + 'd ago';
+}
+
+function fmtRelative(ts) {
+  if (!ts) return '';
+  const secs = Math.round((Date.now() - ts) / 1000);
+  if (secs < 5)  return 'just now';
+  if (secs < 60) return 'updated ' + secs + 's ago';
+  return 'updated ' + Math.floor(secs / 60) + 'm ago';
+}
+
+// ── ELEMENT HELPERS ───────────────────────────────────────────────────────────
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function setPctClass(id, n) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('up', 'down', 'flat');
+  if (n == null || isNaN(n)) { el.classList.add('flat'); }
+  else if (n > 0)             { el.classList.add('up'); }
+  else if (n < 0)             { el.classList.add('down'); }
+  else                        { el.classList.add('flat'); }
+}
+
+// ── FETCH: DEXSCREENER ────────────────────────────────────────────────────────
+
+async function fetchDexScreener() {
+  const res = await fetch(DEX_API, { headers: { Accept: 'application/json' } });
+  if (!res.ok) throw new Error('dexscreener ' + res.status);
+  const json = await res.json();
+  const pairs = json.pairs ?? [];
+  if (!pairs.length) throw new Error('no pairs');
+  // Prefer highest-liquidity pair
+  pairs.sort((a, b) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0));
+  const p = pairs[0];
+  return {
+    source: 'dexscreener',
+    priceUsd:    parseFloat(p.priceUsd),
+    mc:          p.marketCap ?? null,
+    fdv:         p.fdv ?? null,
+    vol24h:      p.volume?.h24 ?? null,
+    change24h:   p.priceChange?.h24 ?? null,
+    change1h:    p.priceChange?.h1 ?? null,
+    liquidity:   p.liquidity?.usd ?? null,
+    txns24h:     (p.txns?.h24?.buys ?? 0) + (p.txns?.h24?.sells ?? 0),
+    dexId:       p.dexId ?? '',
+    pairCreated: p.pairCreatedAt ?? null,
+    pairUrl:     p.url ?? null,
+  };
+}
+
+// ── FETCH: PUMP.FUN FALLBACK ──────────────────────────────────────────────────
+
+async function fetchPumpFun() {
+  const res = await fetch(PUMP_API, { headers: { Accept: 'application/json' } });
+  if (!res.ok) throw new Error('pump.fun ' + res.status);
+  const p = await res.json();
+  return {
+    source: 'pump.fun',
+    priceUsd:    p.usd_market_cap && p.total_supply ? p.usd_market_cap / (Number(p.total_supply_str || p.total_supply) / 1e6) : null,
+    mc:          p.usd_market_cap ?? null,
+    fdv:         p.usd_market_cap ?? null,  // pump.fun pre-grad: MC == FDV
+    vol24h:      null,
+    change24h:   null,
+    change1h:    null,
+    liquidity:   null,
+    txns24h:     null,
+    dexId:       'pump.fun',
+    pairCreated: p.created_timestamp ?? null,
+    pairUrl:     null,
+    athMc:       p.ath_market_cap ?? null,
+  };
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+
+function render(data) {
+  document.getElementById('error-notice').style.display = 'none';
+
+  // Price hero
+  const priceStr = fmtUsd(data.priceUsd);
+  setText('price-usd', priceStr);
+
+  const ch24 = data.change24h;
+  const chEl = document.getElementById('price-change');
+  if (chEl) {
+    chEl.textContent = ch24 != null ? fmtPct(ch24) + ' (24h)' : '— (24h)';
+    setPctClass('price-change', ch24);
+  }
+
+  // Grid
+  setText('stat-mc',  fmtLarge(data.mc));
+  setText('stat-mc-note', data.source === 'pump.fun' ? 'bonding curve' : 'circulating');
+  setText('stat-fdv', fmtLarge(data.fdv));
+
+  setText('stat-vol', data.vol24h != null ? fmtLarge(data.vol24h) : '—');
+  setText('stat-txns', data.txns24h != null
+    ? data.txns24h.toLocaleString('en-US') + ' txns'
+    : (data.source === 'pump.fun' ? 'via pump.fun' : ''));
+
+  setText('stat-liq', data.liquidity != null ? fmtLarge(data.liquidity) : '—');
+
+  const ch1h = data.change1h;
+  const ch1hEl = document.getElementById('stat-1h');
+  if (ch1hEl) {
+    ch1hEl.textContent = ch1h != null ? fmtPct(ch1h) : '—';
+    setPctClass('stat-1h', ch1h);
+  }
+
+  setText('stat-dex', data.dexId || '—');
+  setText('stat-pair-age', data.pairCreated ? fmtAge(data.pairCreated) : '');
+
+  // Share link
+  updateShareLink(data);
+
+  // DexScreener link
+  if (data.pairUrl) {
+    const dexEl = document.getElementById('dex-link');
+    if (dexEl) dexEl.href = data.pairUrl;
+  }
+
+  // Status
+  lastFetchTs = Date.now();
+  updateStatusText();
+}
+
+function renderError() {
+  document.getElementById('error-notice').style.display = '';
+  setText('status-text', 'data unavailable');
+}
+
+function updateStatusText() {
+  if (!lastFetchTs) return;
+  setText('status-text', fmtRelative(lastFetchTs));
+}
+
+// ── SHARE LINK ────────────────────────────────────────────────────────────────
+
+function updateShareLink(data) {
+  const el = document.getElementById('share-link');
+  if (!el) return;
+
+  const mc = data.mc != null ? fmtLarge(data.mc).replace('$', '') : null;
+  const price = data.priceUsd != null ? fmtUsd(data.priceUsd) : null;
+  const change = data.change24h != null ? ' ' + fmtPct(data.change24h) : '';
+
+  let text;
+  if (mc && price) {
+    text = '$PIPER ' + price + change + ' · MC ' + mc + '\nhttps://piedpiper.fun/stats';
+  } else {
+    text = '$PIPER live stats\nhttps://piedpiper.fun/stats';
+  }
+
+  const url = 'https://x.com/intent/tweet?text=' + encodeURIComponent(text);
+  el.onclick = () => window.open(url, '_blank', 'noopener');
+  el.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.open(url, '_blank', 'noopener'); } };
+}
+
+// ── REFRESH LOOP ──────────────────────────────────────────────────────────────
+
+function setPulsing(active) {
+  const dot = document.getElementById('pulse-dot');
+  if (dot) {
+    if (active) dot.classList.add('fetching');
+    else dot.classList.remove('fetching');
+  }
+}
+
+async function refresh() {
+  setPulsing(true);
+  try {
+    const data = await fetchDexScreener();
+    render(data);
+  } catch (dexErr) {
+    // DexScreener failed — try pump.fun
+    try {
+      const data = await fetchPumpFun();
+      render(data);
+    } catch (pumpErr) {
+      renderError();
+    }
+  }
+  setPulsing(false);
+}
+
+// Live "updated Xs ago" ticker (every second)
+function startSecondsTicker() {
+  if (secondsTimer) clearInterval(secondsTimer);
+  secondsTimer = setInterval(updateStatusText, 1000);
+}
+
+// Initial load + interval
+refresh();
+startSecondsTicker();
+refreshTimer = setInterval(refresh, REFRESH_MS);
+
+// ── POSTHOG ───────────────────────────────────────────────────────────────────
+(function() {
+  var shareEl = document.getElementById('share-link');
+  if (shareEl) {
+    shareEl.addEventListener('click', function() {
+      try { window.posthog && posthog.capture('stats_share_click', { page: 'stats' }); } catch(e) {}
+    });
+  }
+  var pumpEl = document.getElementById('pumpfun-link');
+  if (pumpEl) {
+    pumpEl.addEventListener('click', function() {
+      try { window.posthog && posthog.capture('stats_pumpfun_click', { page: 'stats' }); } catch(e) {}
+    });
+  }
+})();
+</script>
+
+<script>
+// ── THEME SYSTEM ──────────────────────────────────────────────────────────────
+function applyTheme(key) {
+  if (key === 'auto') {
+    document.body.removeAttribute('data-theme');
+  } else {
+    document.body.setAttribute('data-theme', key);
+  }
+  try { localStorage.setItem('piedpiper-theme', key); } catch(e) {}
+  var sel = document.getElementById('theme-select');
+  if (sel && sel.value !== key) sel.value = key;
+}
+(function() {
+  var saved = 'auto';
+  try { saved = localStorage.getItem('piedpiper-theme') || 'auto'; } catch(e) {}
+  applyTheme(saved);
+})();
+</script>
+
+</body>
+</html>
