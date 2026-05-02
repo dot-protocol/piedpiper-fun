@@ -328,7 +328,7 @@
       dotdrop is a peer-to-peer encrypted file transfer tool built on the Pipernet protocol. A file leaves your device already encrypted — the server never sees the plaintext. The hashtag is the key.
     </p>
     <p>
-      It is part of the axxis.world identity layer. Every transfer is signed with an Ed25519 keypair derived from your device. No account creation. No login. Your identity is your keypair.
+      Every transfer is signed with an Ed25519 keypair derived from your device. No account creation. No login. Your identity is your keypair.
     </p>
   </div>
 
@@ -339,7 +339,7 @@
       <div class="step-num">1</div>
       <div class="step-body">
         <strong>Open the app.</strong>
-        <small>Go to <a href="https://dotdrop.axxis.world" target="_blank" rel="noopener">dotdrop.axxis.world</a> on the sending device.</small>
+        <small>Go to <a href="/app">piedpiper.fun/app</a> on the sending device.</small>
       </div>
     </div>
     <div class="step">
@@ -395,7 +395,7 @@
   <p class="section-label">canonical dot format</p>
   <div class="prose">
     <p>
-      Every transfer is recorded as a canonical DOT — a fixed 153-byte signed observation. Each DOT chains to the previous via SHA-256, forming a tamper-evident local history. The format is identical to the one used across all axxis.world identity operations.
+      Every transfer is recorded as a canonical DOT — a fixed 153-byte signed observation. Each DOT chains to the previous via SHA-256, forming a tamper-evident local history. The format is identical across all Pipernet identity operations.
     </p>
   </div>
 
@@ -410,10 +410,10 @@
   </div>
 
   <!-- IDENTITY LAYER -->
-  <p class="section-label">identity layer (axxis.world)</p>
+  <p class="section-label">identity layer</p>
   <div class="prose">
     <p>
-      dotdrop inherits the three-keypair identity model from axxis.world. Keys are generated once per device and stored in IndexedDB — never exported, never transmitted.
+      dotdrop uses a three-keypair identity model. Keys are generated once per device and stored in IndexedDB — never exported, never transmitted.
     </p>
   </div>
 
@@ -449,8 +449,6 @@
   </div>
 
   <div class="source-links">
-    <a class="source-link" href="https://dots.axxis.world" target="_blank" rel="noopener">dots.axxis.world &#8599;</a>
-    <a class="source-link" href="https://axxis.world" target="_blank" rel="noopener">axxis.world &#8599;</a>
     <a class="source-link" href="https://github.com/dot-protocol/pipernet" target="_blank" rel="noopener">github &#8599;</a>
     <a class="source-link" href="/whitepaper">whitepaper</a>
     <a class="source-link" href="/decode">decode</a>
