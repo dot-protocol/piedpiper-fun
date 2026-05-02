@@ -1,0 +1,505 @@
+<!doctype html>
+<!-- ═══════════════════════════════════════════════════════════════════
+  POSTHOG KEY — grep: phc_PLACEHOLDER_REPLACE_ME
+  Blaze: swap the placeholder string below with your real project key.
+  Run: bash tools/swap-posthog-key.sh phc_your_real_key_here
+  ═══════════════════════════════════════════════════════════════════ -->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<script>
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId captureTraceFeedback captureTraceMetric".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init('phc_PLACEHOLDER_REPLACE_ME', {
+    api_host: 'https://us.i.posthog.com',
+    person_profiles: 'identified_only',
+    capture_pageview: true,
+    capture_pageleave: true,
+    autocapture: true,
+    session_recording: { maskAllInputs: false, maskInputOptions: { password: true } }
+  });
+</script>
+<title>live · piedpiper.fun</title>
+<meta name="description" content="Watch Pied Piper get built in real time. Every round of the multi-mind engineering room, public." />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+<meta property="og:title" content="live · piedpiper.fun" />
+<meta property="og:description" content="People don't need to be told the new internet works. They watch it get built." />
+<meta property="og:url" content="https://piedpiper.fun/live" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="live · piedpiper.fun" />
+<meta name="twitter:description" content="People don't need to be told the new internet works. They watch it get built." />
+<meta name="twitter:image" content="/og.png" />
+
+<style>
+/* ─── THEME TOKENS (mirror main site) ────────────────────────────────── */
+:root {
+  color-scheme: light dark;
+  --bg:     white;
+  --bg2:    #f7f7f7;
+  --bg3:    #efefef;
+  --fg:     black;
+  --muted:  rgba(0,0,0,0.52);
+  --muted2: rgba(0,0,0,0.30);
+  --line:   rgba(0,0,0,0.10);
+  --accent: black;
+  --mono: ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --serif: ui-serif,Georgia,"Iowan Old Style","Apple Garamond",serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:#0b0b0b; --bg2:#111111; --bg3:#181818; --fg:#f2f2f2;
+    --muted:rgba(255,255,255,0.52); --muted2:rgba(255,255,255,0.30);
+    --line:rgba(255,255,255,0.10); --accent:#f2f2f2;
+  }
+}
+[data-theme="light"]    { --bg:#fff;    --bg2:#f7f7f7; --bg3:#efefef; --fg:#000;    --muted:rgba(0,0,0,.52);   --muted2:rgba(0,0,0,.30);   --line:rgba(0,0,0,.10);   --accent:#000; }
+[data-theme="dark"]     { --bg:#0b0b0b; --bg2:#111;    --bg3:#181818; --fg:#f2f2f2; --muted:rgba(255,255,255,.52); --muted2:rgba(255,255,255,.30); --line:rgba(255,255,255,.10); --accent:#f2f2f2; }
+[data-theme="terminal"] { --bg:#000;    --bg2:#0a0a0a; --bg3:#111;    --fg:#00ff41; --muted:rgba(0,255,65,.55); --muted2:rgba(0,255,65,.35); --line:rgba(0,255,65,.22); --accent:#00ff41; }
+[data-theme="sepia"]    { --bg:#f4ecd8; --bg2:#ede4cc; --bg3:#e3d8bc; --fg:#3a2f1d; --muted:rgba(58,47,29,.55); --muted2:rgba(58,47,29,.35); --line:rgba(58,47,29,.18); --accent:#3a2f1d; }
+
+/* ─── RESET ───────────────────────────────────────────────────────────── */
+*,*::before,*::after { box-sizing:border-box; }
+html,body { margin:0; padding:0; }
+body {
+  background:var(--bg); color:var(--fg);
+  font-family:var(--serif);
+  font-size:clamp(15px,2.2vw,17px);
+  line-height:1.6;
+  min-height:100dvh;
+}
+
+/* ─── TOP NAV ─────────────────────────────────────────────────────────── */
+nav {
+  position:sticky; top:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0.75rem 1.25rem;
+  background:var(--bg); border-bottom:1px solid var(--line);
+  backdrop-filter:blur(8px);
+}
+.nav-left { display:flex; align-items:center; gap:0.75rem; }
+.nav-logo {
+  font-family:var(--mono); font-size:0.8rem; font-weight:600;
+  text-decoration:none; color:var(--fg); letter-spacing:0.04em;
+}
+.nav-logo span { opacity:0.4; }
+.live-badge {
+  display:inline-flex; align-items:center; gap:0.35em;
+  font-family:var(--mono); font-size:0.68rem; font-weight:600;
+  text-transform:uppercase; letter-spacing:0.08em; color:var(--muted);
+  border:1px solid var(--line); border-radius:999px; padding:0.2em 0.6em;
+}
+.live-dot {
+  width:6px; height:6px; border-radius:50%; background:#e53;
+  animation: pulse 2s ease-in-out infinite;
+}
+.live-dot.connected { background:#2a2; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ─── CONTROLS ────────────────────────────────────────────────────────── */
+.controls {
+  display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;
+  padding:0.65rem 1.25rem; border-bottom:1px solid var(--line);
+  background:var(--bg2);
+}
+.controls label { font-family:var(--mono); font-size:0.72rem; color:var(--muted); }
+.controls select {
+  font-family:var(--mono); font-size:0.72rem; color:var(--fg);
+  background:var(--bg); border:1px solid var(--line); border-radius:4px;
+  padding:0.3em 0.6em; cursor:pointer; outline:none; appearance:none;
+}
+.controls select:focus { border-color:var(--accent); }
+.count-badge {
+  margin-left:auto; font-family:var(--mono); font-size:0.68rem;
+  color:var(--muted2);
+}
+
+/* ─── FEED ────────────────────────────────────────────────────────────── */
+#feed {
+  max-width:760px; margin:0 auto;
+  padding:1.5rem 1.25rem;
+}
+.event-card {
+  margin-bottom:1.25rem;
+  border-left:2px solid var(--line);
+  padding-left:1rem;
+  transition:border-color 0.2s;
+  scroll-margin-top:4rem;
+}
+.event-card:target { border-left-color:var(--accent); }
+.event-card:hover  { border-left-color:var(--accent); }
+
+.event-meta {
+  display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;
+  margin-bottom:0.35rem;
+}
+.event-ts {
+  font-family:var(--mono); font-size:0.68rem; color:var(--muted2);
+}
+.role-badge {
+  font-family:var(--mono); font-size:0.65rem; font-weight:600;
+  text-transform:uppercase; letter-spacing:0.05em; padding:0.1em 0.45em;
+  border-radius:3px; color:var(--bg); background:var(--fg);
+  opacity:0.75;
+}
+.role-badge.user     { background:#4D5BCE; color:#fff; opacity:1; }
+.role-badge.assistant{ background:#2a7a4a; color:#fff; opacity:1; }
+.channel-tag {
+  font-family:var(--mono); font-size:0.63rem; color:var(--muted);
+  border:1px solid var(--line); border-radius:3px; padding:0.1em 0.4em;
+}
+.permalink {
+  font-family:var(--mono); font-size:0.65rem; color:var(--muted2);
+  text-decoration:none; margin-left:auto;
+}
+.permalink:hover { color:var(--fg); }
+
+.event-body {
+  font-size:0.9em; line-height:1.65;
+  white-space:pre-wrap; word-break:break-word;
+  color:var(--fg);
+}
+/* Markdown inline code */
+.event-body code {
+  font-family:var(--mono); font-size:0.83em;
+  background:var(--bg3); border-radius:3px; padding:0.1em 0.35em;
+}
+.event-body pre {
+  background:var(--bg3); border-radius:6px;
+  padding:0.75rem 1rem; overflow-x:auto; margin:0.5rem 0;
+}
+.event-body pre code { background:none; padding:0; }
+
+/* tool-use count chip */
+.tool-chip {
+  font-family:var(--mono); font-size:0.6rem; color:var(--muted2);
+  border:1px solid var(--line); border-radius:2px; padding:0.1em 0.35em;
+}
+
+/* ─── EMPTY / LOADING ─────────────────────────────────────────────────── */
+#empty-state {
+  text-align:center; padding:4rem 1rem;
+  font-family:var(--mono); font-size:0.8rem; color:var(--muted);
+}
+.spinner {
+  display:inline-block; width:12px; height:12px;
+  border:2px solid var(--line); border-top-color:var(--fg);
+  border-radius:50%; animation:spin 0.8s linear infinite; vertical-align:middle;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* ─── FOOTER ──────────────────────────────────────────────────────────── */
+footer {
+  max-width:760px; margin:3rem auto 2rem;
+  padding:0 1.25rem;
+  font-family:var(--mono); font-size:0.7rem; color:var(--muted2);
+  display:flex; gap:1.5rem; flex-wrap:wrap; align-items:center;
+}
+footer a { color:var(--muted); text-decoration:none; }
+footer a:hover { color:var(--fg); }
+
+/* ─── THEME PICKER ────────────────────────────────────────────────────── */
+.theme-picker {
+  display:inline-flex; align-items:center; gap:0.35em;
+  font-family:var(--mono); font-size:0.7rem; color:var(--muted);
+}
+.theme-picker select {
+  background:transparent; border:none; border-bottom:1px dotted var(--muted);
+  color:var(--muted); font-family:inherit; font-size:inherit; cursor:pointer;
+  padding:0 0.15em; outline:none; appearance:none;
+}
+.theme-picker select:hover { color:var(--fg); }
+
+/* ─── RESPONSIVE ──────────────────────────────────────────────────────── */
+@media(max-width:540px) {
+  nav { padding:0.65rem 1rem; }
+  #feed { padding:1rem; }
+  .controls { padding:0.55rem 1rem; }
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a class="nav-logo" href="/">piedpiper<span>.fun</span></a>
+    <span class="nav-logo" style="opacity:0.3;">/</span>
+    <span class="nav-logo">live</span>
+  </div>
+  <span class="live-badge">
+    <span class="live-dot" id="live-dot"></span>
+    <span id="live-label">connecting</span>
+  </span>
+</nav>
+
+<div class="controls">
+  <label for="channel-filter">channel</label>
+  <select id="channel-filter">
+    <option value="all">all</option>
+    <option value="dot-protocol">dot-protocol</option>
+    <option value="room">room</option>
+    <option value="compression">compression</option>
+    <option value="launch">launch</option>
+    <option value="infra">infra</option>
+    <option value="meta">meta</option>
+    <option value="general">general</option>
+  </select>
+  <span class="count-badge" id="count-badge">— events</span>
+</div>
+
+<div id="feed">
+  <div id="empty-state"><span class="spinner"></span>&nbsp; loading…</div>
+</div>
+
+<footer>
+  <a href="/">← home</a>
+  <a href="/app">pipernet</a>
+  <a href="https://github.com/dot-protocol/pipernet" target="_blank">github</a>
+  <span style="flex:1"></span>
+  <div class="theme-picker">
+    theme&nbsp;
+    <select id="theme-sel" onchange="setTheme(this.value)">
+      <option value="auto">auto</option>
+      <option value="dark">dark</option>
+      <option value="light">light</option>
+      <option value="terminal">terminal</option>
+      <option value="sepia">sepia</option>
+    </select>
+  </div>
+</footer>
+
+<script>
+/* ─── THEME ───────────────────────────────────────────────────────────── */
+function setTheme(t) {
+  if (t === 'auto') { document.body.removeAttribute('data-theme'); }
+  else { document.body.setAttribute('data-theme', t); }
+  localStorage.setItem('piedpiper-theme', t);
+}
+(function(){
+  const stored = localStorage.getItem('piedpiper-theme') || 'auto';
+  setTheme(stored);
+  const sel = document.getElementById('theme-sel');
+  if (sel) sel.value = stored;
+})();
+
+/* ─── MARKDOWN LITE ───────────────────────────────────────────────────── */
+function mdToHtml(text) {
+  // Very lightweight: code blocks, inline code, bold, links, line breaks
+  let s = text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    // fenced code blocks ```lang\n...\n```
+    .replace(/```([^\n]*)\n([\s\S]*?)```/g, (_, lang, code) =>
+      `<pre><code class="lang-${lang.trim()}">${code}</code></pre>`)
+    // inline code
+    .replace(/`([^`\n]+)`/g, '<code>$1</code>')
+    // bold **text**
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    // links [text](url)
+    .replace(/\[([^\]]+)\]\((https?:[^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    // double newline → paragraph break
+    .replace(/\n{2,}/g, '<br><br>')
+    // single newline
+    .replace(/\n/g, '<br>');
+  return s;
+}
+
+/* ─── FORMATTING ──────────────────────────────────────────────────────── */
+function fmtTime(ms, iso) {
+  if (!ms && !iso) return '–';
+  try {
+    const d = ms ? new Date(ms) : new Date(iso);
+    return d.toLocaleString(undefined, {
+      month:'short', day:'numeric',
+      hour:'2-digit', minute:'2-digit', hour12:false
+    });
+  } catch(e) { return iso || '–'; }
+}
+
+function buildCard(ev) {
+  const card = document.createElement('div');
+  card.className = 'event-card';
+  card.id = ev.id;
+
+  const tools = ev.tool_uses_count > 0
+    ? `<span class="tool-chip">${ev.tool_uses_count} tool${ev.tool_uses_count===1?'':'s'}</span>`
+    : '';
+
+  card.innerHTML = `
+    <div class="event-meta">
+      <span class="role-badge ${ev.role}">${ev.role === 'user' ? 'blaze' : 'rocky'}</span>
+      <span class="channel-tag">${ev.channel || 'general'}</span>
+      <span class="event-ts">${fmtTime(ev.timestamp_ms, ev.timestamp_iso)}</span>
+      ${tools}
+      <a class="permalink" href="#${ev.id}" title="permalink">#</a>
+    </div>
+    <div class="event-body">${mdToHtml(ev.content || '')}</div>
+  `;
+  return card;
+}
+
+/* ─── STATE ───────────────────────────────────────────────────────────── */
+let allEvents = [];         // all loaded events, newest-last
+let renderedIds = new Set();
+let atTop = true;           // whether user is scrolled to top (= wants live updates)
+const MAX_EVENTS = 500;     // cap DOM cards
+
+function getCurrentChannel() {
+  return document.getElementById('channel-filter').value || 'all';
+}
+
+function updateBadge() {
+  const el = document.getElementById('count-badge');
+  if (el) el.textContent = `${renderedIds.size} event${renderedIds.size===1?'':'s'}`;
+}
+
+function setLiveStatus(connected) {
+  const dot = document.getElementById('live-dot');
+  const label = document.getElementById('live-label');
+  if (dot) dot.className = 'live-dot' + (connected ? ' connected' : '');
+  if (label) label.textContent = connected ? 'live' : 'reconnecting';
+}
+
+function clearFeed() {
+  const feed = document.getElementById('feed');
+  feed.innerHTML = '';
+  renderedIds.clear();
+}
+
+function prependCard(ev) {
+  if (renderedIds.has(ev.id)) return;
+  const feed = document.getElementById('feed');
+  // Remove empty state if present
+  const empty = document.getElementById('empty-state');
+  if (empty) empty.remove();
+
+  renderedIds.add(ev.id);
+  const card = buildCard(ev);
+  // Prepend (newest at top)
+  feed.insertBefore(card, feed.firstChild);
+
+  // Cap DOM size
+  while (feed.children.length > MAX_EVENTS) {
+    const last = feed.lastChild;
+    if (last) { renderedIds.delete(last.id); feed.removeChild(last); }
+  }
+  updateBadge();
+}
+
+function appendCard(ev) {
+  // For initial load (oldest first), append
+  if (renderedIds.has(ev.id)) return;
+  const feed = document.getElementById('feed');
+  const empty = document.getElementById('empty-state');
+  if (empty) empty.remove();
+  renderedIds.add(ev.id);
+  feed.appendChild(buildCard(ev));
+  updateBadge();
+}
+
+/* ─── LOAD INITIAL EVENTS (JSON REST) ────────────────────────────────── */
+async function loadInitial(channel) {
+  clearFeed();
+  document.getElementById('feed').innerHTML = '<div id="empty-state"><span class="spinner"></span>&nbsp; loading…</div>';
+  setLiveStatus(false);
+  try {
+    const url = `/api/live?format=json&channel=${encodeURIComponent(channel)}`;
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+    const events = (data.events || []).sort((a, b) =>
+      ((a.timestamp_ms||0) - (b.timestamp_ms||0)) || ((a.msg_index||0) - (b.msg_index||0))
+    );
+    if (events.length === 0) {
+      document.getElementById('feed').innerHTML =
+        '<div id="empty-state">no events yet — check back soon.</div>';
+    } else {
+      clearFeed();
+      // Append oldest→newest, then scroll to bottom initially
+      events.forEach(appendCard);
+    }
+  } catch(e) {
+    const feed = document.getElementById('feed');
+    feed.innerHTML = `<div id="empty-state">couldn't load events: ${e.message}</div>`;
+  }
+}
+
+/* ─── SSE LIVE FEED ───────────────────────────────────────────────────── */
+let es = null;
+let reconnectTimer = null;
+
+function startSSE(channel) {
+  if (es) { es.close(); es = null; }
+  if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+
+  const url = `/api/live?channel=${encodeURIComponent(channel)}`;
+  es = new EventSource(url);
+
+  es.addEventListener('event', (e) => {
+    setLiveStatus(true);
+    try {
+      const ev = JSON.parse(e.data);
+      if (!ev.error) {
+        // Prepend if user is near top, or just track it
+        prependCard(ev);
+      }
+    } catch(_) {}
+  });
+
+  es.addEventListener('ping', () => {
+    setLiveStatus(true);
+    // EventSource auto-reconnects after server closes; restart SSE
+    reconnectTimer = setTimeout(() => startSSE(channel), 2000);
+  });
+
+  es.addEventListener('error', () => {
+    setLiveStatus(false);
+    es.close();
+    reconnectTimer = setTimeout(() => startSSE(channel), 5000);
+  });
+}
+
+/* ─── INIT ────────────────────────────────────────────────────────────── */
+(async function init() {
+  // Restore channel from URL hash or localStorage
+  const hashChannel = (location.hash.startsWith('#channel:'))
+    ? location.hash.slice(9) : null;
+  const storedChannel = hashChannel || localStorage.getItem('pp-live-channel') || 'all';
+  const sel = document.getElementById('channel-filter');
+  if (sel) sel.value = storedChannel;
+
+  // Check if URL hash is a permalink to a specific event
+  const targetId = location.hash && !location.hash.startsWith('#channel:')
+    ? location.hash.slice(1) : null;
+
+  await loadInitial(storedChannel);
+
+  // If there's a target permalink, scroll to it
+  if (targetId) {
+    const el = document.getElementById(targetId);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  startSSE(storedChannel);
+
+  // Channel filter change
+  if (sel) {
+    sel.addEventListener('change', async () => {
+      const ch = sel.value;
+      localStorage.setItem('pp-live-channel', ch);
+      await loadInitial(ch);
+      startSSE(ch);
+    });
+  }
+
+  // PostHog tracking
+  if (typeof posthog !== 'undefined') {
+    posthog.capture('live_page_viewed', { channel: storedChannel });
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.piedpiper.watcher</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/python3</string>
+    <string>/Users/blaze/Movies/Kin/piedpiper-fun/tools/changelog/watcher.py</string>
+    <string>--interval</string>
+    <string>30</string>
+    <string>--skip-oracle</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/blaze/Movies/Kin/piedpiper-fun</string>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>ThrottleInterval</key>
+  <integer>30</integer>
+
+  <key>StandardOutPath</key>
+  <string>/Users/blaze/Movies/Kin/piedpiper-fun/tools/changelog/watcher.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/Users/blaze/Movies/Kin/piedpiper-fun/tools/changelog/watcher.log</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>SKIP_ORACLE</key>
+    <string>0</string>
+    <key>ORACLE_SSH</key>
+    <string>adrian</string>
+  </dict>
+</dict>
+</plist>
