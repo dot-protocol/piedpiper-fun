@@ -238,6 +238,50 @@
   }
   .action-link:hover { color: var(--fg); border-bottom-color: var(--fg); }
 
+  /* ── lock proof ── */
+  .lock-panel {
+    border-top: 1px solid var(--line);
+    padding-top: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .lock-panel-label {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.75em;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .lock-panel-amount {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 1.1em;
+    font-weight: 500;
+    color: var(--fg);
+  }
+  .lock-panel-meta {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.78em;
+    color: var(--muted);
+  }
+  .lock-panel-prose {
+    font-size: 0.9em;
+    line-height: 1.65;
+    color: var(--muted);
+    font-family: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
+  }
+  .lock-panel-prose p {
+    margin: 0 0 0.4rem;
+  }
+  .lock-panel-link {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82em;
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--muted);
+  }
+  .lock-panel-link:hover { color: var(--fg); border-bottom-color: var(--fg); }
+
   /* ── disclaimer ── */
   .disclaimer {
     color: var(--muted);
@@ -346,6 +390,21 @@
     <span class="action-link" id="share-link" role="button" tabindex="0" aria-label="Share current market cap on X">share on x</span>
   </div>
 
+  <!-- lock proof -->
+  <div class="lock-panel">
+    <div class="lock-panel-label">treasury lock</div>
+    <div class="lock-panel-amount">52,340,699 PIPER</div>
+    <div class="lock-panel-meta">5.234% of total supply &nbsp;·&nbsp; vested via Streamflow Finance &nbsp;·&nbsp; on-chain &nbsp;·&nbsp; verifiable</div>
+    <div class="lock-panel-prose">
+      <p>Pied Piper does not have a series A.</p>
+      <p>Pied Piper does not have an exit plan.</p>
+      <p>Pied Piper does not have insider allocation.</p>
+      <p>The lock is the receipt of those three sentences.</p>
+      <p>The contract is on Solana. The lock is public. Anyone can read it.</p>
+    </div>
+    <a class="lock-panel-link" href="https://app.streamflow.finance/contract/solana/mainnet/6LSxvLLfdKwuU5ZJ9rvBJu8VmEZSFBmkdn96HUzMGXX7?ref=chaotically-tight-parakeet" target="_blank" rel="noopener">verify on streamflow &rarr;</a>
+  </div>
+
   <!-- disclaimer -->
   <div class="disclaimer">
     this is not investment advice. <a href="/whitepaper">read the whitepaper</a>.
@@ -362,6 +421,8 @@
   </div>
   <div style="display:flex; align-items:center; gap:1em; flex-wrap:wrap; justify-content:flex-end;">
     <a href="/holders">holders</a>
+    &nbsp;·&nbsp;
+    <a href="https://app.streamflow.finance/contract/solana/mainnet/6LSxvLLfdKwuU5ZJ9rvBJu8VmEZSFBmkdn96HUzMGXX7?ref=chaotically-tight-parakeet" target="_blank" rel="noopener">lock</a>
     &nbsp;·&nbsp;
     <a href="/grove">grove</a>
     &nbsp;·&nbsp;
