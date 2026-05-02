@@ -512,6 +512,7 @@
         <p class="lede mono" style="font-size:0.85em; margin:0;">
           Pied Piper holders only. Connect to verify.
         </p>
+        <p id="connect-error" class="mono" style="display:none; font-size:0.82em; color:var(--muted); margin:0;"></p>
       </div>
     </div>
 
@@ -965,47 +966,54 @@ function refreshHolderCard() {
 // ── WALLET CONNECT ────────────────────────────────────────────────────────────
 
 async function connectWallet() {
+  // Clear any previous inline error on new attempt.
+  const errEl = document.getElementById('connect-error');
+  if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+
   // Detect Phantom (covers 80%+ of Solana users).
   // window.solana is injected by Phantom extension and Phantom mobile in-app browser.
   // window.backpack is injected by Backpack. Solflare also exposes window.solana.
   const provider = window.solana ?? window.backpack ?? null;
 
   if (!provider) {
-    // No wallet extension detected.
-    // Graceful degradation: prompt user to install Phantom.
-    const confirmed = window.confirm(
-      "No Solana wallet detected.\n\n" +
-      "Install Phantom (phantom.app) or Backpack (backpack.app) and reload.\n\n" +
-      "In demo mode, press OK to continue with a randomised demo address."
-    );
-    if (confirmed) {
-      // Demo fallback: generate a fake pubkey for UI testing without a wallet.
-      walletPubkey = 'DEMO' + Math.random().toString(36).slice(2, 14).toUpperCase();
-      onWalletConnected(walletPubkey);
+    // No wallet extension detected — show inline message instead of confirm().
+    if (errEl) {
+      errEl.textContent = 'no wallet detected — install Phantom (phantom.app) or Backpack (backpack.app) and reload.';
+      errEl.style.display = '';
     }
+    console.warn('[pipernet] no Solana wallet provider found (window.solana / window.backpack undefined)');
     return;
   }
 
   showState('connecting');
 
   try {
-    let resp;
-    if (provider === window.backpack) {
-      resp = await provider.connect();
-      walletPubkey = resp.publicKey.toString();
-    } else {
-      // Phantom / Solflare
-      resp = await provider.connect();
-      walletPubkey = resp.publicKey.toString();
+    // onlyIfTrusted: false ensures Phantom always shows the approval popup,
+    // even if the site was previously connected. Required for explicit user-initiated connect.
+    const resp = await provider.connect({ onlyIfTrusted: false });
+
+    // Defensive: some wallet versions return the provider itself on reconnect.
+    const pubkey = resp?.publicKey ?? provider.publicKey;
+    if (!pubkey) {
+      throw new Error('wallet connected but returned no public key');
     }
+    walletPubkey = pubkey.toString();
     onWalletConnected(walletPubkey);
   } catch (err) {
     console.error('[pipernet] wallet connect failed:', err);
     showState('disconnected');
-    // surface friendly message
+    // Surface inline error — persists until next click attempt.
+    if (errEl) {
+      const isRejected = /rejected|cancelled|denied/i.test(err?.message ?? '');
+      errEl.textContent = isRejected
+        ? 'connection cancelled — click to try again.'
+        : 'connection failed: ' + (err?.message ?? String(err));
+      errEl.style.display = '';
+    }
+    // Also briefly update button text.
     const btn = document.getElementById('connect-btn');
     if (btn) {
-      btn.textContent = 'connection refused — try again';
+      btn.innerHTML = '<span class="dot"></span>try again';
       setTimeout(() => {
         btn.innerHTML = '<span class="dot"></span>connect wallet';
       }, 3000);
