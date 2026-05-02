@@ -20,45 +20,40 @@
   });
 </script>
 <title>live · piedpiper.fun</title>
-<meta name="description" content="Watch Pied Piper get built in real time. Every round of the multi-mind engineering room, public." />
+<meta name="description" content="What shipped. What changed. The record." />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
 <meta property="og:title" content="live · piedpiper.fun" />
-<meta property="og:description" content="People don't need to be told the new internet works. They watch it get built." />
+<meta property="og:description" content="What shipped. What changed. The record." />
 <meta property="og:url" content="https://piedpiper.fun/live" />
 <meta property="og:type" content="website" />
 <meta property="og:image" content="/og.png" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="live · piedpiper.fun" />
-<meta name="twitter:description" content="People don't need to be told the new internet works. They watch it get built." />
+<meta name="twitter:description" content="What shipped. What changed. The record." />
 <meta name="twitter:image" content="/og.png" />
 
 <style>
-/* ─── THEME TOKENS (mirror main site) ────────────────────────────────── */
+/* ─── THEME TOKENS ────────────────────────────────────────────────────── */
 :root {
   color-scheme: light dark;
-  --bg:     white;
-  --bg2:    #f7f7f7;
-  --bg3:    #efefef;
-  --fg:     black;
-  --muted:  rgba(0,0,0,0.52);
-  --muted2: rgba(0,0,0,0.30);
-  --line:   rgba(0,0,0,0.10);
-  --accent: black;
+  --bg:    white;
+  --bg2:   #f7f7f7;
+  --fg:    black;
+  --muted: rgba(0,0,0,0.50);
+  --dim:   rgba(0,0,0,0.28);
+  --line:  rgba(0,0,0,0.10);
+  --accent:black;
   --mono: ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   --serif: ui-serif,Georgia,"Iowan Old Style","Apple Garamond",serif;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg:#0b0b0b; --bg2:#111111; --bg3:#181818; --fg:#f2f2f2;
-    --muted:rgba(255,255,255,0.52); --muted2:rgba(255,255,255,0.30);
+    --bg:#0b0b0b; --bg2:#111; --fg:#f2f2f2;
+    --muted:rgba(255,255,255,0.50); --dim:rgba(255,255,255,0.28);
     --line:rgba(255,255,255,0.10); --accent:#f2f2f2;
   }
 }
-[data-theme="light"]    { --bg:#fff;    --bg2:#f7f7f7; --bg3:#efefef; --fg:#000;    --muted:rgba(0,0,0,.52);   --muted2:rgba(0,0,0,.30);   --line:rgba(0,0,0,.10);   --accent:#000; }
-[data-theme="dark"]     { --bg:#0b0b0b; --bg2:#111;    --bg3:#181818; --fg:#f2f2f2; --muted:rgba(255,255,255,.52); --muted2:rgba(255,255,255,.30); --line:rgba(255,255,255,.10); --accent:#f2f2f2; }
-[data-theme="terminal"] { --bg:#000;    --bg2:#0a0a0a; --bg3:#111;    --fg:#00ff41; --muted:rgba(0,255,65,.55); --muted2:rgba(0,255,65,.35); --line:rgba(0,255,65,.22); --accent:#00ff41; }
-[data-theme="sepia"]    { --bg:#f4ecd8; --bg2:#ede4cc; --bg3:#e3d8bc; --fg:#3a2f1d; --muted:rgba(58,47,29,.55); --muted2:rgba(58,47,29,.35); --line:rgba(58,47,29,.18); --accent:#3a2f1d; }
 
 /* ─── RESET ───────────────────────────────────────────────────────────── */
 *,*::before,*::after { box-sizing:border-box; }
@@ -66,439 +61,270 @@ html,body { margin:0; padding:0; }
 body {
   background:var(--bg); color:var(--fg);
   font-family:var(--serif);
-  font-size:clamp(15px,2.2vw,17px);
-  line-height:1.6;
+  font-size:clamp(14px,2vw,16px);
+  line-height:1.65;
   min-height:100dvh;
 }
 
-/* ─── TOP NAV ─────────────────────────────────────────────────────────── */
+/* ─── NAV ─────────────────────────────────────────────────────────────── */
 nav {
   position:sticky; top:0; z-index:100;
   display:flex; align-items:center; justify-content:space-between;
-  padding:0.75rem 1.25rem;
+  padding:0.7rem 1.25rem;
   background:var(--bg); border-bottom:1px solid var(--line);
   backdrop-filter:blur(8px);
 }
-.nav-left { display:flex; align-items:center; gap:0.75rem; }
+.nav-left { display:flex; align-items:center; gap:0.7rem; }
 .nav-logo {
-  font-family:var(--mono); font-size:0.8rem; font-weight:600;
+  font-family:var(--mono); font-size:0.78rem; font-weight:600;
   text-decoration:none; color:var(--fg); letter-spacing:0.04em;
 }
-.nav-logo span { opacity:0.4; }
+.nav-logo span { opacity:0.38; }
 .live-badge {
-  display:inline-flex; align-items:center; gap:0.35em;
-  font-family:var(--mono); font-size:0.68rem; font-weight:600;
+  display:inline-flex; align-items:center; gap:0.3em;
+  font-family:var(--mono); font-size:0.65rem; font-weight:600;
   text-transform:uppercase; letter-spacing:0.08em; color:var(--muted);
-  border:1px solid var(--line); border-radius:999px; padding:0.2em 0.6em;
+  border:1px solid var(--line); border-radius:999px; padding:0.18em 0.55em;
 }
 .live-dot {
-  width:6px; height:6px; border-radius:50%; background:#e53;
-  animation: pulse 2s ease-in-out infinite;
+  width:5px; height:5px; border-radius:50%; background:#888;
 }
-.live-dot.connected { background:#2a2; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.nav-links { display:flex; gap:1rem; }
+.nav-links a {
+  font-family:var(--mono); font-size:0.72rem; color:var(--muted);
+  text-decoration:none; letter-spacing:0.02em;
+}
+.nav-links a:hover { color:var(--fg); }
 
-/* ─── CONTROLS ────────────────────────────────────────────────────────── */
-.controls {
-  display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;
-  padding:0.65rem 1.25rem; border-bottom:1px solid var(--line);
-  background:var(--bg2);
+/* ─── MAIN ────────────────────────────────────────────────────────────── */
+main {
+  max-width:680px; margin:0 auto;
+  padding:2.5rem 1.25rem 4rem;
 }
-.controls label { font-family:var(--mono); font-size:0.72rem; color:var(--muted); }
-.controls select {
-  font-family:var(--mono); font-size:0.72rem; color:var(--fg);
-  background:var(--bg); border:1px solid var(--line); border-radius:4px;
-  padding:0.3em 0.6em; cursor:pointer; outline:none; appearance:none;
+h1 {
+  font-family:var(--serif); font-size:clamp(1.1rem,3vw,1.3rem);
+  font-weight:400; margin:0 0 0.25rem;
 }
-.controls select:focus { border-color:var(--accent); }
-.count-badge {
-  margin-left:auto; font-family:var(--mono); font-size:0.68rem;
-  color:var(--muted2);
+.subtitle {
+  font-family:var(--mono); font-size:0.72rem; color:var(--muted);
+  margin:0 0 2.5rem;
 }
 
 /* ─── FEED ────────────────────────────────────────────────────────────── */
-#feed {
-  max-width:760px; margin:0 auto;
-  padding:1.5rem 1.25rem;
-}
-.event-card {
-  margin-bottom:1.25rem;
-  border-left:2px solid var(--line);
-  padding-left:1rem;
-  transition:border-color 0.2s;
-  scroll-margin-top:4rem;
-}
-.event-card:target { border-left-color:var(--accent); }
-.event-card:hover  { border-left-color:var(--accent); }
+#feed { list-style:none; margin:0; padding:0; }
 
-.event-meta {
-  display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;
-  margin-bottom:0.35rem;
+.entry {
+  display:grid;
+  grid-template-columns:8.5rem 1fr;
+  gap:0 1rem;
+  padding:0.55rem 0;
+  border-top:1px solid var(--line);
+  align-items:baseline;
 }
-.event-ts {
-  font-family:var(--mono); font-size:0.68rem; color:var(--muted2);
-}
-.role-badge {
-  font-family:var(--mono); font-size:0.65rem; font-weight:600;
-  text-transform:uppercase; letter-spacing:0.05em; padding:0.1em 0.45em;
-  border-radius:3px; color:var(--bg); background:var(--fg);
-  opacity:0.75;
-}
-.role-badge.user     { background:#4D5BCE; color:#fff; opacity:1; }
-.role-badge.assistant{ background:#2a7a4a; color:#fff; opacity:1; }
-.channel-tag {
-  font-family:var(--mono); font-size:0.63rem; color:var(--muted);
-  border:1px solid var(--line); border-radius:3px; padding:0.1em 0.4em;
-}
-.permalink {
-  font-family:var(--mono); font-size:0.65rem; color:var(--muted2);
-  text-decoration:none; margin-left:auto;
-}
-.permalink:hover { color:var(--fg); }
+.entry:last-child { border-bottom:1px solid var(--line); }
 
-.event-body {
-  font-size:0.9em; line-height:1.65;
-  white-space:pre-wrap; word-break:break-word;
-  color:var(--fg);
+.entry-time {
+  font-family:var(--mono); font-size:0.68rem; color:var(--dim);
+  white-space:nowrap; padding-top:0.08em;
 }
-/* Markdown inline code */
-.event-body code {
-  font-family:var(--mono); font-size:0.83em;
-  background:var(--bg3); border-radius:3px; padding:0.1em 0.35em;
+.entry-body { min-width:0; }
+.entry-title {
+  font-family:var(--serif); font-size:0.9rem; color:var(--fg);
+  display:block; line-height:1.45;
 }
-.event-body pre {
-  background:var(--bg3); border-radius:6px;
-  padding:0.75rem 1rem; overflow-x:auto; margin:0.5rem 0;
+.entry-title a {
+  color:inherit; text-decoration:none;
+  border-bottom:1px solid var(--line);
 }
-.event-body pre code { background:none; padding:0; }
-
-/* tool-use count chip */
-.tool-chip {
-  font-family:var(--mono); font-size:0.6rem; color:var(--muted2);
-  border:1px solid var(--line); border-radius:2px; padding:0.1em 0.35em;
+.entry-title a:hover { border-bottom-color:var(--accent); }
+.entry-detail {
+  font-family:var(--serif); font-size:0.78rem; color:var(--muted);
+  margin:0.2rem 0 0; line-height:1.5;
+}
+.entry-sha a {
+  font-family:var(--mono); font-size:0.72rem; color:var(--muted);
+  text-decoration:none;
+}
+.entry-sha a:hover { color:var(--fg); }
+.entry-sha .sha-id {
+  font-family:var(--mono); font-size:0.68rem;
+  background:var(--bg2); border:1px solid var(--line);
+  border-radius:3px; padding:0.05em 0.4em; margin-right:0.4em;
+  display:inline-block;
 }
 
-/* ─── EMPTY / LOADING ─────────────────────────────────────────────────── */
-#empty-state {
-  text-align:center; padding:4rem 1rem;
-  font-family:var(--mono); font-size:0.8rem; color:var(--muted);
+/* type dots */
+.type-dot {
+  display:inline-block; width:6px; height:6px; border-radius:50%;
+  margin-right:0.45em; vertical-align:middle; flex-shrink:0;
 }
-.spinner {
-  display:inline-block; width:12px; height:12px;
-  border:2px solid var(--line); border-top-color:var(--fg);
-  border-radius:50%; animation:spin 0.8s linear infinite; vertical-align:middle;
+.type-launch  { background:#c77; }
+.type-lock    { background:#7a7; }
+.type-feature { background:#77a; }
+.type-tweet   { background:#aaa; }
+.type-deploy  { background:#a7a; }
+.type-note    { background:#aa7; }
+.type-commit  { background:#777; }
+
+/* ─── EMPTY / STATUS ──────────────────────────────────────────────────── */
+#status {
+  font-family:var(--mono); font-size:0.8rem; color:var(--dim);
+  padding:2rem 0 1rem; text-align:center;
 }
-@keyframes spin { to{transform:rotate(360deg)} }
 
 /* ─── FOOTER ──────────────────────────────────────────────────────────── */
 footer {
-  max-width:760px; margin:3rem auto 2rem;
-  padding:0 1.25rem;
-  font-family:var(--mono); font-size:0.7rem; color:var(--muted2);
-  display:flex; gap:1.5rem; flex-wrap:wrap; align-items:center;
+  border-top:1px solid var(--line);
+  padding:1.5rem 1.25rem;
+  text-align:center;
+  font-family:var(--mono); font-size:0.68rem; color:var(--dim);
 }
-footer a { color:var(--muted); text-decoration:none; }
+footer a { color:inherit; text-decoration:none; border-bottom:1px solid var(--line); }
 footer a:hover { color:var(--fg); }
-
-/* ─── THEME PICKER ────────────────────────────────────────────────────── */
-.theme-picker {
-  display:inline-flex; align-items:center; gap:0.35em;
-  font-family:var(--mono); font-size:0.7rem; color:var(--muted);
-}
-.theme-picker select {
-  background:transparent; border:none; border-bottom:1px dotted var(--muted);
-  color:var(--muted); font-family:inherit; font-size:inherit; cursor:pointer;
-  padding:0 0.15em; outline:none; appearance:none;
-}
-.theme-picker select:hover { color:var(--fg); }
-
-/* ─── RESPONSIVE ──────────────────────────────────────────────────────── */
-@media(max-width:540px) {
-  nav { padding:0.65rem 1rem; }
-  #feed { padding:1rem; }
-  .controls { padding:0.55rem 1rem; }
-}
 </style>
 </head>
-
 <body>
 
 <nav>
   <div class="nav-left">
-    <a class="nav-logo" href="/">piedpiper<span>.fun</span></a>
-    <span class="nav-logo" style="opacity:0.3;">/</span>
-    <span class="nav-logo">live</span>
+    <a class="nav-logo" href="/"><span>pied</span>piper<span>.fun</span></a>
+    <span class="live-badge"><span class="live-dot"></span>live</span>
   </div>
-  <span class="live-badge">
-    <span class="live-dot" id="live-dot"></span>
-    <span id="live-label">connecting</span>
-  </span>
+  <div class="nav-links">
+    <a href="/">home</a>
+    <a href="/whitepaper">whitepaper</a>
+    <a href="/stats">stats</a>
+    <a href="/holders">holders</a>
+  </div>
 </nav>
 
-<div class="controls">
-  <label for="channel-filter">channel</label>
-  <select id="channel-filter">
-    <option value="all">all</option>
-    <option value="dot-protocol">dot-protocol</option>
-    <option value="room">room</option>
-    <option value="compression">compression</option>
-    <option value="launch">launch</option>
-    <option value="infra">infra</option>
-    <option value="meta">meta</option>
-    <option value="general">general</option>
-  </select>
-  <span class="count-badge" id="count-badge">— events</span>
-</div>
+<main>
+  <h1>what shipped</h1>
+  <p class="subtitle">curated milestones + commits from <a href="https://github.com/dot-protocol/pipernet" target="_blank" rel="noopener">dot-protocol/pipernet</a></p>
 
-<div id="feed">
-  <div id="empty-state"><span class="spinner"></span>&nbsp; loading…</div>
-</div>
+  <div id="status">loading...</div>
+  <ul id="feed"></ul>
+</main>
 
 <footer>
-  <a href="/">← home</a>
-  <a href="/app">pipernet</a>
-  <a href="https://github.com/dot-protocol/pipernet" target="_blank">github</a>
-  <span style="flex:1"></span>
-  <div class="theme-picker">
-    theme&nbsp;
-    <select id="theme-sel" onchange="setTheme(this.value)">
-      <option value="auto">auto</option>
-      <option value="dark">dark</option>
-      <option value="light">light</option>
-      <option value="terminal">terminal</option>
-      <option value="sepia">sepia</option>
-    </select>
-  </div>
+  <a href="https://github.com/dot-protocol/pipernet" target="_blank" rel="noopener">github.com/dot-protocol/pipernet</a>
+  &nbsp;&middot;&nbsp;
+  <a href="/whitepaper">read the spec</a>
+  &nbsp;&middot;&nbsp;
+  auto-refreshes every 60s
 </footer>
 
 <script>
-/* ─── THEME ───────────────────────────────────────────────────────────── */
-function setTheme(t) {
-  if (t === 'auto') { document.body.removeAttribute('data-theme'); }
-  else { document.body.setAttribute('data-theme', t); }
-  localStorage.setItem('piedpiper-theme', t);
-}
-(function(){
-  const stored = localStorage.getItem('piedpiper-theme') || 'auto';
-  setTheme(stored);
-  const sel = document.getElementById('theme-sel');
-  if (sel) sel.value = stored;
-})();
-
-/* ─── MARKDOWN LITE ───────────────────────────────────────────────────── */
-function mdToHtml(text) {
-  // Very lightweight: code blocks, inline code, bold, links, line breaks
-  let s = text
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    // fenced code blocks ```lang\n...\n```
-    .replace(/```([^\n]*)\n([\s\S]*?)```/g, (_, lang, code) =>
-      `<pre><code class="lang-${lang.trim()}">${code}</code></pre>`)
-    // inline code
-    .replace(/`([^`\n]+)`/g, '<code>$1</code>')
-    // bold **text**
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    // links [text](url)
-    .replace(/\[([^\]]+)\]\((https?:[^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
-    // double newline → paragraph break
-    .replace(/\n{2,}/g, '<br><br>')
-    // single newline
-    .replace(/\n/g, '<br>');
-  return s;
+/* ─── helpers ─────────────────────────────────────────────────────────── */
+function relTime(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return '';
+  const sec = Math.floor((Date.now() - d) / 1000);
+  if (sec < 60)        return 'just now';
+  if (sec < 3600)      return Math.floor(sec/60) + 'm ago';
+  if (sec < 86400)     return Math.floor(sec/3600) + 'h ago';
+  if (sec < 86400*30)  return Math.floor(sec/86400) + 'd ago';
+  if (sec < 86400*365) return Math.floor(sec/86400/30) + 'mo ago';
+  return Math.floor(sec/86400/365) + 'y ago';
 }
 
-/* ─── FORMATTING ──────────────────────────────────────────────────────── */
-function fmtTime(ms, iso) {
-  if (!ms && !iso) return '–';
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ─── render ──────────────────────────────────────────────────────────── */
+function renderCurated(ev) {
+  const type = ev.type || 'note';
+  const timeStr = relTime(ev.ts);
+  const titleHtml = ev.url
+    ? `<a href="${esc(ev.url)}" target="_blank" rel="noopener">${esc(ev.title)}</a>`
+    : esc(ev.title);
+  const bodyHtml = ev.body ? `<p class="entry-detail">${esc(ev.body)}</p>` : '';
+  return `
+<li class="entry" data-ts="${esc(ev.ts)}">
+  <span class="entry-time">${esc(timeStr)}</span>
+  <div class="entry-body">
+    <span class="entry-title">
+      <span class="type-dot type-${esc(type)}"></span>${titleHtml}
+    </span>
+    ${bodyHtml}
+  </div>
+</li>`;
+}
+
+function renderCommit(c) {
+  const sha  = esc(c.sha.slice(0,7));
+  const date = c.commit.author.date;
+  const timeStr = relTime(date);
+  // Strip internal prefixes (wip:, chore: scratch, [internal])
+  const rawMsg = c.commit.message.split('\n')[0];
+  const skipRe = /^(wip:|chore:\s*scratch|\[internal\])/i;
+  if (skipRe.test(rawMsg)) return '';
+  const msg  = esc(rawMsg);
+  const url  = `https://github.com/dot-protocol/pipernet/commit/${c.sha}`;
+  return `
+<li class="entry" data-ts="${esc(date)}">
+  <span class="entry-time">${esc(timeStr)}</span>
+  <div class="entry-body entry-sha">
+    <span class="type-dot type-commit"></span>
+    <a href="${url}" target="_blank" rel="noopener">
+      <span class="sha-id">${sha}</span>${msg}
+    </a>
+  </div>
+</li>`;
+}
+
+/* ─── fetch + merge ───────────────────────────────────────────────────── */
+async function load() {
+  const feed   = document.getElementById('feed');
+  const status = document.getElementById('status');
+
+  let curated = [];
+  let commits  = [];
+
   try {
-    const d = ms ? new Date(ms) : new Date(iso);
-    return d.toLocaleString(undefined, {
-      month:'short', day:'numeric',
-      hour:'2-digit', minute:'2-digit', hour12:false
-    });
-  } catch(e) { return iso || '–'; }
-}
-
-function buildCard(ev) {
-  const card = document.createElement('div');
-  card.className = 'event-card';
-  card.id = ev.id;
-
-  const tools = ev.tool_uses_count > 0
-    ? `<span class="tool-chip">${ev.tool_uses_count} tool${ev.tool_uses_count===1?'':'s'}</span>`
-    : '';
-
-  card.innerHTML = `
-    <div class="event-meta">
-      <span class="role-badge ${ev.role}">${ev.role === 'user' ? 'blaze' : 'rocky'}</span>
-      <span class="channel-tag">${ev.channel || 'general'}</span>
-      <span class="event-ts">${fmtTime(ev.timestamp_ms, ev.timestamp_iso)}</span>
-      ${tools}
-      <a class="permalink" href="#${ev.id}" title="permalink">#</a>
-    </div>
-    <div class="event-body">${mdToHtml(ev.content || '')}</div>
-  `;
-  return card;
-}
-
-/* ─── STATE ───────────────────────────────────────────────────────────── */
-let allEvents = [];         // all loaded events, newest-last
-let renderedIds = new Set();
-let atTop = true;           // whether user is scrolled to top (= wants live updates)
-const MAX_EVENTS = 500;     // cap DOM cards
-
-function getCurrentChannel() {
-  return document.getElementById('channel-filter').value || 'all';
-}
-
-function updateBadge() {
-  const el = document.getElementById('count-badge');
-  if (el) el.textContent = `${renderedIds.size} event${renderedIds.size===1?'':'s'}`;
-}
-
-function setLiveStatus(connected) {
-  const dot = document.getElementById('live-dot');
-  const label = document.getElementById('live-label');
-  if (dot) dot.className = 'live-dot' + (connected ? ' connected' : '');
-  if (label) label.textContent = connected ? 'live' : 'reconnecting';
-}
-
-function clearFeed() {
-  const feed = document.getElementById('feed');
-  feed.innerHTML = '';
-  renderedIds.clear();
-}
-
-function prependCard(ev) {
-  if (renderedIds.has(ev.id)) return;
-  const feed = document.getElementById('feed');
-  // Remove empty state if present
-  const empty = document.getElementById('empty-state');
-  if (empty) empty.remove();
-
-  renderedIds.add(ev.id);
-  const card = buildCard(ev);
-  // Prepend (newest at top)
-  feed.insertBefore(card, feed.firstChild);
-
-  // Cap DOM size
-  while (feed.children.length > MAX_EVENTS) {
-    const last = feed.lastChild;
-    if (last) { renderedIds.delete(last.id); feed.removeChild(last); }
-  }
-  updateBadge();
-}
-
-function appendCard(ev) {
-  // For initial load (oldest first), append
-  if (renderedIds.has(ev.id)) return;
-  const feed = document.getElementById('feed');
-  const empty = document.getElementById('empty-state');
-  if (empty) empty.remove();
-  renderedIds.add(ev.id);
-  feed.appendChild(buildCard(ev));
-  updateBadge();
-}
-
-/* ─── LOAD INITIAL EVENTS (JSON REST) ────────────────────────────────── */
-async function loadInitial(channel) {
-  clearFeed();
-  document.getElementById('feed').innerHTML = '<div id="empty-state"><span class="spinner"></span>&nbsp; loading…</div>';
-  setLiveStatus(false);
-  try {
-    const url = `/api/live?format=json&channel=${encodeURIComponent(channel)}`;
-    const resp = await fetch(url);
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const data = await resp.json();
-    const events = (data.events || []).sort((a, b) =>
-      ((a.timestamp_ms||0) - (b.timestamp_ms||0)) || ((a.msg_index||0) - (b.msg_index||0))
-    );
-    if (events.length === 0) {
-      document.getElementById('feed').innerHTML =
-        '<div id="empty-state">no events yet — check back soon.</div>';
-    } else {
-      clearFeed();
-      // Append oldest→newest, then scroll to bottom initially
-      events.forEach(appendCard);
+    const r = await fetch('/data/events.json', { cache: 'no-store' });
+    if (r.ok) {
+      const j = await r.json();
+      curated = j.events || [];
     }
-  } catch(e) {
-    const feed = document.getElementById('feed');
-    feed.innerHTML = `<div id="empty-state">couldn't load events: ${e.message}</div>`;
+  } catch(e) { /* static file may 404 before first deploy — silent */ }
+
+  try {
+    const r = await fetch(
+      'https://api.github.com/repos/dot-protocol/pipernet/commits?per_page=30',
+      { headers: { 'Accept': 'application/vnd.github.v3+json' } }
+    );
+    if (r.ok) commits = await r.json();
+  } catch(e) { /* GitHub API rate-limit or network — degrade gracefully */ }
+
+  // Merge into a single list, newest first
+  const all = [
+    ...curated.map(e => ({ ts: e.ts, _type: 'curated', _data: e })),
+    ...commits
+      .filter(c => c && c.commit && c.commit.author)
+      .map(c => ({ ts: c.commit.author.date, _type: 'commit', _data: c }))
+  ].sort((a, b) => new Date(b.ts) - new Date(a.ts));
+
+  if (all.length === 0) {
+    status.textContent = 'the feed is quiet. read the spec.';
+    return;
   }
+
+  status.textContent = '';
+  let html = '';
+  for (const item of all) {
+    if (item._type === 'curated') html += renderCurated(item._data);
+    else                          html += renderCommit(item._data);
+  }
+  feed.innerHTML = html;
 }
 
-/* ─── SSE LIVE FEED ───────────────────────────────────────────────────── */
-let es = null;
-let reconnectTimer = null;
-
-function startSSE(channel) {
-  if (es) { es.close(); es = null; }
-  if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
-
-  const url = `/api/live?channel=${encodeURIComponent(channel)}`;
-  es = new EventSource(url);
-
-  es.addEventListener('event', (e) => {
-    setLiveStatus(true);
-    try {
-      const ev = JSON.parse(e.data);
-      if (!ev.error) {
-        // Prepend if user is near top, or just track it
-        prependCard(ev);
-      }
-    } catch(_) {}
-  });
-
-  es.addEventListener('ping', () => {
-    setLiveStatus(true);
-    // EventSource auto-reconnects after server closes; restart SSE
-    reconnectTimer = setTimeout(() => startSSE(channel), 2000);
-  });
-
-  es.addEventListener('error', () => {
-    setLiveStatus(false);
-    es.close();
-    reconnectTimer = setTimeout(() => startSSE(channel), 5000);
-  });
-}
-
-/* ─── INIT ────────────────────────────────────────────────────────────── */
-(async function init() {
-  // Restore channel from URL hash or localStorage
-  const hashChannel = (location.hash.startsWith('#channel:'))
-    ? location.hash.slice(9) : null;
-  const storedChannel = hashChannel || localStorage.getItem('pp-live-channel') || 'all';
-  const sel = document.getElementById('channel-filter');
-  if (sel) sel.value = storedChannel;
-
-  // Check if URL hash is a permalink to a specific event
-  const targetId = location.hash && !location.hash.startsWith('#channel:')
-    ? location.hash.slice(1) : null;
-
-  await loadInitial(storedChannel);
-
-  // If there's a target permalink, scroll to it
-  if (targetId) {
-    const el = document.getElementById(targetId);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-
-  startSSE(storedChannel);
-
-  // Channel filter change
-  if (sel) {
-    sel.addEventListener('change', async () => {
-      const ch = sel.value;
-      localStorage.setItem('pp-live-channel', ch);
-      await loadInitial(ch);
-      startSSE(ch);
-    });
-  }
-
-  // PostHog tracking
-  if (typeof posthog !== 'undefined') {
-    posthog.capture('live_page_viewed', { channel: storedChannel });
-  }
-})();
+/* ─── init + auto-refresh ─────────────────────────────────────────────── */
+load();
+setInterval(load, 60_000);
 </script>
 
 </body>

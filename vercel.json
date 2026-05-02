@@ -5,10 +5,6 @@
     "api/compress.py": {
       "runtime": "@vercel/python@4.3.1",
       "maxDuration": 30
-    },
-    "api/live.py": {
-      "runtime": "@vercel/python@4.3.1",
-      "maxDuration": 30
     }
   },
   "headers": [
@@ -24,6 +20,14 @@
       "source": "/dot.md",
       "headers": [
         { "key": "Content-Type", "value": "text/markdown; charset=utf-8" }
+      ]
+    },
+    {
+      "source": "/data/(.*)\\.json",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Content-Type", "value": "application/json; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=60" }
       ]
     }
   ]

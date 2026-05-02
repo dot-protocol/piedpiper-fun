@@ -5,3 +5,11 @@ __pycache__/
 .env
 .env.local
 node_modules/
+
+# Raw session logs and changelog pipeline artifacts — must never be served
+tools/changelog/events.db
+tools/changelog/events.db-shm
+tools/changelog/events.db-wal
+tools/changelog/watcher.log
+tools/changelog/watcher-state.json
+api/events.json

@@ -1,0 +1,88 @@
+{
+  "events": [
+    {
+      "ts": "2026-05-02T17:43:00Z",
+      "type": "lock",
+      "title": "52,340,699 PIPER locked on-chain for one year",
+      "url": "https://piedpiper.fun/stats",
+      "body": "No insider allocation. No early-exit window. The supply is on-chain. Verifiable."
+    },
+    {
+      "ts": "2026-05-02T17:30:00Z",
+      "type": "tweet",
+      "title": "tweet · the lock announcement",
+      "url": "https://x.com/dotpiedpiper",
+      "body": "I do not have a series A. I do not have an exit plan. I do not have an insider allocation."
+    },
+    {
+      "ts": "2026-05-02T16:50:00Z",
+      "type": "tweet",
+      "title": "tweet · the github proof",
+      "url": "https://twitter.com/dotpiedpiper/status/2050629351608361070",
+      "body": "The protocol is on GitHub. The relay is yours to run."
+    },
+    {
+      "ts": "2026-05-02T16:30:00Z",
+      "type": "feature",
+      "title": "Pipernet relay v0.2.0 published — open source",
+      "url": "https://github.com/dot-protocol/pipernet",
+      "body": "HTTP relay with SSE streaming, sliding-window rate limiting, and Ed25519 envelope verification. Apache 2.0."
+    },
+    {
+      "ts": "2026-05-02T16:15:00Z",
+      "type": "tweet",
+      "title": "tweet · the agents",
+      "url": "https://x.com/dotpiedpiper",
+      "body": "The next ones who carry me will not be human. They will be agents."
+    },
+    {
+      "ts": "2026-05-02T15:50:00Z",
+      "type": "tweet",
+      "title": "tweet · the witness",
+      "url": "https://twitter.com/dotpiedpiper/status/2050617603887124607",
+      "body": "I do not need you to believe in me. The thirty million already did. I need you to be the witness."
+    },
+    {
+      "ts": "2026-05-02T15:00:00Z",
+      "type": "feature",
+      "title": "Holders chat shipped — token-gated, signed, on-chain verified",
+      "url": "https://piedpiper.fun/holders",
+      "body": "Real Solana balance gate. Messages signed with Ed25519. Supply percentage and USD value live via DexScreener."
+    },
+    {
+      "ts": "2026-05-02T14:30:00Z",
+      "type": "feature",
+      "title": "/stats live — market cap, supply, lock status",
+      "url": "https://piedpiper.fun/stats",
+      "body": "On-chain numbers. Locked supply. No intermediary."
+    },
+    {
+      "ts": "2026-05-02T14:00:00Z",
+      "type": "feature",
+      "title": "/whitepaper published",
+      "url": "https://piedpiper.fun/whitepaper",
+      "body": "The technical case for a signed communication primitive. Read the spec. Read the code."
+    },
+    {
+      "ts": "2026-05-02T13:00:00Z",
+      "type": "launch",
+      "title": "$PIPER deployed on pump.fun",
+      "url": "https://pump.fun/coin/83VTqzxszRFPSzJHvTeNRydcuUmmhEjj9FH4F7TZpump",
+      "body": "Token address: 83VTqzxszRFPSzJHvTeNRydcuUmmhEjj9FH4F7TZpump — the protocol has a ticker."
+    },
+    {
+      "ts": "2026-05-01T18:00:00Z",
+      "type": "feature",
+      "title": "Universal microdot decoder shipped at /decode",
+      "url": "https://piedpiper.fun/decode",
+      "body": "Paste any signed microdot. Ed25519 signature verified in-browser with Web Crypto. No server. No trust required."
+    },
+    {
+      "ts": "2026-04-30T20:00:00Z",
+      "type": "feature",
+      "title": "piedpiper.fun launched — all eight pages live",
+      "url": "https://piedpiper.fun",
+      "body": "Landing, app, holders, decode, grove, lab, live, whitepaper. HTTP 200 across the board."
+    }
+  ]
+}
