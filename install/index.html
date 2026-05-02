@@ -1,0 +1,366 @@
+<!doctype html>
+<!-- ═══════════════════════════════════════════════════════════════════
+  POSTHOG KEY — grep: phc_PLACEHOLDER_REPLACE_ME
+  Blaze: swap the placeholder string below with your real project key.
+  Run: bash tools/swap-posthog-key.sh phc_your_real_key_here
+  ═══════════════════════════════════════════════════════════════════ -->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<script>
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId captureTraceFeedback captureTraceMetric".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init('phc_PLACEHOLDER_REPLACE_ME', {
+    api_host: 'https://us.i.posthog.com',
+    person_profiles: 'identified_only',
+    capture_pageview: true,
+    capture_pageleave: true,
+    autocapture: true,
+    session_recording: { maskAllInputs: false, maskInputOptions: { password: true } }
+  });
+</script>
+<title>install · Pied Piper</title>
+<meta name="description" content="Pied Piper native client. Drop files across devices. No accounts. No servers in the path." />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+<meta property="og:title" content="install · Pied Piper" />
+<meta property="og:description" content="Pied Piper native client. Drop files across devices. No accounts. No servers in the path." />
+<meta property="og:url" content="https://piedpiper.fun/install" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="install · Pied Piper" />
+<meta name="twitter:description" content="Pied Piper native client. Drop files across devices. No accounts. No servers in the path." />
+<meta name="twitter:image" content="/og.png" />
+
+<link rel="stylesheet" href="/_shared/sidebar.css" />
+
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: white;
+    --bg2: #f7f7f7;
+    --bg3: #efefef;
+    --fg: black;
+    --muted: rgba(0,0,0,0.55);
+    --muted2: rgba(0,0,0,0.32);
+    --line: rgba(0,0,0,0.12);
+    --accent: black;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0b0b;
+      --bg2: #111111;
+      --bg3: #181818;
+      --fg: #f5f5f5;
+      --muted: rgba(255,255,255,0.55);
+      --muted2: rgba(255,255,255,0.32);
+      --line: rgba(255,255,255,0.14);
+      --accent: #f5f5f5;
+    }
+  }
+  [data-theme="light"]    { --bg:#ffffff; --bg2:#f7f7f7; --bg3:#efefef; --fg:#000000; --muted:rgba(0,0,0,0.55); --muted2:rgba(0,0,0,0.32); --line:rgba(0,0,0,0.12); --accent:#000000; }
+  [data-theme="dark"]     { --bg:#0b0b0b; --bg2:#111111; --bg3:#181818; --fg:#f5f5f5; --muted:rgba(255,255,255,0.55); --muted2:rgba(255,255,255,0.32); --line:rgba(255,255,255,0.14); --accent:#f5f5f5; }
+  [data-theme="sepia"]    { --bg:#f4ecd8; --bg2:#ede4cc; --bg3:#e3d8bc; --fg:#3a2f1d; --muted:rgba(58,47,29,0.55); --muted2:rgba(58,47,29,0.35); --line:rgba(58,47,29,0.18); --accent:#3a2f1d; }
+  [data-theme="terminal"] { --bg:#000000; --bg2:#0a0a0a; --bg3:#111111; --fg:#00ff41; --muted:rgba(0,255,65,0.55); --muted2:rgba(0,255,65,0.35); --line:rgba(0,255,65,0.22); --accent:#00ff41; }
+  [data-theme="mandala"]  { --bg:#fdf6e3; --bg2:#f5ecd4; --bg3:#ede3c5; --fg:#073642; --muted:rgba(7,54,66,0.55); --muted2:rgba(7,54,66,0.35); --line:rgba(7,54,66,0.15); --accent:#073642; }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page {
+    flex: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: clamp(3.5rem, 10vw, 7rem) 1.8rem clamp(3rem, 8vw, 5rem);
+    width: 100%;
+  }
+
+  .page-title {
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin: 0 0 0.5rem;
+  }
+  .page-sub {
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    color: var(--muted);
+    font-style: italic;
+    margin: 0 0 3.2rem;
+    line-height: 1.5;
+  }
+
+  /* ── SECTION LABEL ─────────────────────────────────────────────── */
+  .section-label {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted2);
+    margin: 2.6rem 0 1rem;
+  }
+
+  /* ── DOWNLOAD CARDS ────────────────────────────────────────────── */
+  .platforms {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .platform-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 1.4rem;
+    background: var(--bg);
+    gap: 1rem;
+  }
+  .platform-row + .platform-row {
+    border-top: 1px solid var(--line);
+  }
+
+  .platform-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .platform-name {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  .platform-detail {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.55rem 1.1rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.03em;
+    color: var(--bg);
+    background: var(--accent);
+    text-decoration: none;
+    border-radius: 999px;
+    white-space: nowrap;
+    transition: opacity 100ms ease, transform 80ms ease;
+    flex-shrink: 0;
+  }
+  .download-btn:hover { opacity: 0.82; transform: translateY(-1px); }
+  .download-btn .dot {
+    width: 6px; height: 6px;
+    background: var(--bg);
+    border-radius: 999px;
+  }
+
+  /* coming-soon badge */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.45rem 0.9rem;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ── highlighted row (detected platform) ──────────────────────── */
+  .platform-row.detected {
+    background: var(--bg2);
+  }
+  .platform-row.detected .platform-name::after {
+    content: " — your device";
+    font-weight: 400;
+    color: var(--muted);
+    font-family: ui-serif, Georgia, "Iowan Old Style", serif;
+    font-style: italic;
+    font-size: 0.88em;
+  }
+
+  /* ── FOOTNOTE ──────────────────────────────────────────────────── */
+  .footnote {
+    margin: 2.4rem 0 0;
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.6;
+  }
+  .footnote a {
+    color: var(--muted);
+    text-underline-offset: 2px;
+  }
+  .footnote a:hover { color: var(--fg); }
+
+  /* ── FOOTER ────────────────────────────────────────────────────── */
+  footer {
+    padding: 1.4rem 1.6rem 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.2em;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--line);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.8em;
+    color: var(--muted);
+  }
+  footer a {
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--muted);
+  }
+  footer a:hover { color: var(--fg); border-bottom-color: var(--fg); }
+  footer .sep { opacity: 0.3; user-select: none; }
+</style>
+</head>
+<body>
+
+<div id="sidebar-mount"></div>
+
+<main class="page">
+  <h1 class="page-title">install</h1>
+  <p class="page-sub">Native client. Drop files across devices, across networks.<br>No accounts. No cloud in the path.</p>
+
+  <p class="section-label">desktop + mobile</p>
+
+  <div class="platforms" id="platform-list">
+
+    <div class="platform-row" data-platform="mac">
+      <div class="platform-info">
+        <span class="platform-name">macOS</span>
+        <span class="platform-detail">Apple Silicon + Intel, macOS 12+</span>
+      </div>
+      <a class="download-btn" href="https://github.com/dot-protocol/dotdrop/releases/latest" target="_blank" rel="noopener" id="dl-mac">
+        <span class="dot"></span>
+        download dmg
+      </a>
+    </div>
+
+    <div class="platform-row" data-platform="android">
+      <div class="platform-info">
+        <span class="platform-name">Android</span>
+        <span class="platform-detail">Android 6+, APK sideload</span>
+      </div>
+      <a class="download-btn" href="https://github.com/dot-protocol/dotdrop/releases/latest" target="_blank" rel="noopener" id="dl-android">
+        <span class="dot"></span>
+        download apk
+      </a>
+    </div>
+
+    <div class="platform-row" data-platform="windows">
+      <div class="platform-info">
+        <span class="platform-name">Windows</span>
+        <span class="platform-detail">Windows 10+</span>
+      </div>
+      <span class="badge">coming soon</span>
+    </div>
+
+    <div class="platform-row" data-platform="ios">
+      <div class="platform-info">
+        <span class="platform-name">iOS</span>
+        <span class="platform-detail">iPhone + iPad, iOS 14+</span>
+      </div>
+      <span class="badge">coming soon</span>
+    </div>
+
+    <div class="platform-row" data-platform="linux">
+      <div class="platform-info">
+        <span class="platform-name">Linux</span>
+        <span class="platform-detail">x64 + ARM64</span>
+      </div>
+      <span class="badge">coming soon</span>
+    </div>
+
+  </div>
+
+  <p class="footnote">
+    Built on <a href="https://github.com/localsend/localsend" target="_blank" rel="noopener">LocalSend</a> (Apache 2.0).
+    Source at <a href="https://github.com/dot-protocol/dotdrop" target="_blank" rel="noopener">github.com/dot-protocol/dotdrop</a>.
+    See <a href="https://github.com/dot-protocol/dotdrop/blob/main/NOTICE.md" target="_blank" rel="noopener">NOTICE.md</a> for upstream attribution.
+  </p>
+</main>
+
+<footer>
+  <a href="/">home</a>
+  <span class="sep">·</span>
+  <a href="/app">app</a>
+  <span class="sep">·</span>
+  <a href="/holders">holders</a>
+  <span class="sep">·</span>
+  <a href="/decode">decode</a>
+  <span class="sep">·</span>
+  <a href="https://github.com/dot-protocol/pipernet" target="_blank" rel="noopener">github</a>
+  <span class="sep">·</span>
+  <a href="https://x.com/dotpiedpiper" target="_blank" rel="noopener">launch</a>
+</footer>
+
+<script>
+(function() {
+  // Theme persistence
+  function applyTheme(k) {
+    k === 'auto'
+      ? document.body.removeAttribute('data-theme')
+      : document.body.setAttribute('data-theme', k);
+    try { localStorage.setItem('piedpiper-theme', k); } catch(e) {}
+  }
+  try { applyTheme(localStorage.getItem('piedpiper-theme') || 'auto'); } catch(e) {}
+
+  // Detect platform and highlight the matching row
+  var ua = (navigator.userAgent || '').toLowerCase();
+  var platform = '';
+  if (/iphone|ipad|ipod/.test(ua)) {
+    platform = 'ios';
+  } else if (/android/.test(ua)) {
+    platform = 'android';
+  } else if (/macintosh|mac os x/.test(ua)) {
+    platform = 'mac';
+  } else if (/windows/.test(ua)) {
+    platform = 'windows';
+  } else if (/linux/.test(ua)) {
+    platform = 'linux';
+  }
+
+  if (platform) {
+    var row = document.querySelector('[data-platform="' + platform + '"]');
+    if (row) row.classList.add('detected');
+  }
+
+  // PostHog: track download clicks
+  function trackDownload(platform) {
+    try { window.posthog && posthog.capture('dotdrop_download_clicked', { platform: platform }); } catch(e) {}
+  }
+
+  var dlMac = document.getElementById('dl-mac');
+  var dlAndroid = document.getElementById('dl-android');
+  if (dlMac) dlMac.addEventListener('click', function() { trackDownload('mac'); });
+  if (dlAndroid) dlAndroid.addEventListener('click', function() { trackDownload('android'); });
+})();
+</script>
+<script src="/_shared/sidebar.js" defer></script>
+</body>
+</html>
