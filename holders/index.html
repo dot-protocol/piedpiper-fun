@@ -1105,7 +1105,15 @@ async function connectWallet() {
   try {
     // onlyIfTrusted: false ensures Phantom always shows the approval popup,
     // even if the site was previously connected. Required for explicit user-initiated connect.
-    const resp = await provider.connect({ onlyIfTrusted: false });
+    //
+    // Race against a 15-second timeout — Phantom's service worker can silently hang
+    // (disconnected port error in the extension) causing the promise to never settle.
+    // Without this, the UI is stuck in "connecting" with no recoverable path.
+    const connectPromise = provider.connect({ onlyIfTrusted: false });
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('wallet connection timed out — your wallet extension may need a reload. Try refreshing the page.')), 15000)
+    );
+    const resp = await Promise.race([connectPromise, timeoutPromise]);
 
     // Defensive: some wallet versions return the provider itself on reconnect.
     const pubkey = resp?.publicKey ?? provider.publicKey;
