@@ -1,0 +1,261 @@
+<!doctype html>
+<!-- ═══════════════════════════════════════════════════════════════════
+  POSTHOG KEY — grep: phc_PLACEHOLDER_REPLACE_ME
+  Blaze: swap the placeholder string below with your real project key.
+  Run: bash tools/swap-posthog-key.sh phc_your_real_key_here
+  ═══════════════════════════════════════════════════════════════════ -->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<script>
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId captureTraceFeedback captureTraceMetric".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init('phc_PLACEHOLDER_REPLACE_ME', {
+    api_host: 'https://us.i.posthog.com',
+    person_profiles: 'identified_only',
+    capture_pageview: true,
+    capture_pageleave: true,
+    autocapture: true,
+    session_recording: { maskAllInputs: false, maskInputOptions: { password: true } }
+  });
+</script>
+<title>whitepaper · Pied Piper</title>
+<meta name="description" content="What you already knew. What was tried. What changed." />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+<meta property="og:title" content="whitepaper · Pied Piper" />
+<meta property="og:description" content="What you already knew. What was tried. What changed." />
+<meta property="og:url" content="https://piedpiper.fun/whitepaper" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="whitepaper · Pied Piper" />
+<meta name="twitter:description" content="What you already knew. What was tried. What changed." />
+<meta name="twitter:image" content="/og.png" />
+
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: white;
+    --fg: black;
+    --muted: rgba(0,0,0,0.55);
+    --line: rgba(0,0,0,0.12);
+    --accent: black;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0b0b;
+      --fg: #f5f5f5;
+      --muted: rgba(255,255,255,0.55);
+      --line: rgba(255,255,255,0.14);
+      --accent: #f5f5f5;
+    }
+  }
+  [data-theme="light"]    { --bg:#ffffff; --fg:#000000; --muted:rgba(0,0,0,0.55);   --line:rgba(0,0,0,0.12);    --accent:#000000; }
+  [data-theme="dark"]     { --bg:#0b0b0b; --fg:#f5f5f5; --muted:rgba(255,255,255,0.55); --line:rgba(255,255,255,0.14); --accent:#f5f5f5; }
+  [data-theme="sepia"]    { --bg:#f4ecd8; --fg:#3a2f1d; --muted:rgba(58,47,29,0.55);  --line:rgba(58,47,29,0.18);  --accent:#3a2f1d; }
+  [data-theme="terminal"] { --bg:#000000; --fg:#00ff41; --muted:rgba(0,255,65,0.55);  --line:rgba(0,255,65,0.22);  --accent:#00ff41; }
+  [data-theme="mandala"]  { --bg:#fdf6e3; --fg:#073642; --muted:rgba(7,54,66,0.55);   --line:rgba(7,54,66,0.15);   --accent:#cb4b16; }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── DOCUMENT ────────────────────────────────────────────────────── */
+  .document {
+    flex: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: clamp(3.5rem, 10vw, 7rem) 1.8rem clamp(3rem, 8vw, 6rem);
+    width: 100%;
+  }
+
+  .doc-label {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 2.8rem;
+  }
+
+  h1 {
+    font-size: clamp(1.8rem, 4vw + 0.6rem, 2.8rem);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.5rem;
+  }
+
+  .subtitle {
+    font-size: clamp(1rem, 1.5vw + 0.5rem, 1.25rem);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--muted);
+    margin: 0 0 3.5rem;
+    line-height: 1.4;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 3rem 0;
+  }
+
+  h2 {
+    font-size: clamp(1rem, 1.5vw + 0.4rem, 1.15rem);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin: 3rem 0 1rem;
+    line-height: 1.3;
+  }
+
+  p {
+    font-size: clamp(1rem, 1.2vw + 0.5rem, 1.12rem);
+    line-height: 1.75;
+    margin: 0 0 1.4rem;
+    color: var(--fg);
+  }
+
+  .byline {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin: 3.5rem 0 0;
+    letter-spacing: 0.02em;
+  }
+
+  .byline a {
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--muted);
+  }
+  .byline a:hover { color: var(--fg); border-bottom-color: var(--fg); }
+
+  /* ── FOOTER ──────────────────────────────────────────────────────── */
+  footer {
+    padding: 1.4rem 1.6rem 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.2em;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--line);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.8em;
+    color: var(--muted);
+  }
+  footer a {
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--muted);
+  }
+  footer a:hover { color: var(--fg); border-bottom-color: var(--fg); }
+  footer .sep { opacity: 0.3; user-select: none; }
+
+  ::selection { background: var(--accent); color: var(--bg); }
+</style>
+</head>
+<body>
+
+<div style="text-align:center;padding:0.7rem 1.4rem;border-bottom:1px solid var(--line);font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:0.78rem;color:var(--muted);font-style:italic;">This is whitepaper version one. The canonical version is at <a href="/whitepaper" style="color:var(--muted);border-bottom:1px dotted var(--muted);text-decoration:none;">/whitepaper</a>.</div>
+
+<main class="document">
+
+  <p class="doc-label">Pied Piper &mdash; Whitepaper</p>
+
+  <h1>The name was the message</h1>
+  <p class="subtitle">On what was tried, what the trying shared, and what it meant when a name walked out of a show.</p>
+
+  <hr class="divider" />
+
+  <h2>What you already knew</h2>
+
+  <p>You already knew the internet was broken. Not broken the way a faucet is broken, where a part has failed and the fix is obvious. Broken the way a promise is broken: the words are still there, the agreement is still referenced, but the thing that was meant isn't happening anymore.</p>
+
+  <p>The internet was built on a premise that information wants to move freely. Every early paper said this. Every architect of the original protocols assumed that the network would resist control at the topological level, that routing around damage was a feature, not a metaphor. The routing-around-damage architecture survived. The premise didn't.</p>
+
+  <p>Somewhere between the infrastructure and the interface, a different thing got built. The infrastructure stayed distributed. The interface got owned. And it turned out that the interface is where people live. It turned out that the roads being public didn't matter much once the only directions you could get were from a company that charged for them.</p>
+
+  <p>You knew this. You didn't stop using it. Neither did anyone else. That is not hypocrisy. That is what it looks like when there is no alternative that works at the same level of convenience. You don't quit the thing that works until the replacement works. That's not weakness. That's just how adoption happens.</p>
+
+  <h2>What was tried</h2>
+
+  <p>Between roughly two thousand and ten and two thousand and twenty-four, a generation of people tried to build the alternative. They did it in different ways, from different premises, with different levels of success. Signal gave end-to-end encryption to hundreds of millions of people and in doing so proved that privacy could be usable. Matrix built a federated messaging protocol that runs today across thousands of independent servers. Tor moved billions of bytes for people in countries where moving those bytes was illegal. Secure Scuttlebutt built a gossip protocol that worked entirely offline, by design. Freenet, RetroShare, ZeroNet, IPFS, Urbit: each a serious attempt, each carrying a distinct theory of where the problem was.</p>
+
+  <p>What they share is not failure. Several of them succeeded at exactly what they set out to do. What they share is a ceiling. The ceiling is not technical. The ceiling is that each of them asked the user to come to a new internet, rather than meeting the user where the user already was. Each of them required the user to understand the architecture in order to participate in the value. Each of them made the correct thing slightly harder than the convenient thing.</p>
+
+  <p>This is not a criticism. Building any of those was harder than anything that came before. The people who built them were right about the problem. The ceiling was real and it wasn't their fault.</p>
+
+  <h2>What changed</h2>
+
+  <p>Two things changed, and they changed at roughly the same time.</p>
+
+  <p>The first was that agents arrived. Not AI in the abstract, but AI as the thing that runs your computer for you, that sends your messages, that makes decisions on your behalf. When an agent acts on behalf of a person, it needs to be able to contact other agents. It needs to know who it is talking to. It needs to be able to send things, receive things, and be certain that the thing it received is the thing that was sent. All of this requires a protocol. The existing protocols were built for humans operating keyboards. They were not built for agents operating at machine speed across millions of simultaneous connections. The gap between what agents need and what exists is not small.</p>
+
+  <p>The second thing that changed is harder to name. There was a television show. It ran from two thousand and fourteen to two thousand and nineteen. It was a comedy about Silicon Valley. It followed a fictional company called Pied Piper that was building exactly the thing this document is about: a new internet, distributed, compression-first, controlled by nobody. The show was extremely well-researched. The fictional protocol it described was architecturally coherent. The fictional IP wars it dramatized were realistic because they were based on real ones.</p>
+
+  <p>The show ended. The fictional company burned its own codebase to prevent acquisition. The name was released into the world with no owner and an enormous amount of accumulated emotional weight.</p>
+
+  <p>Thirty million people had watched six seasons of a story about whether this thing could be built and whether, if it could be built, it could survive being built. The story gave them a framework. The story gave them a name. The name stayed active in millions of minds long after the show closed.</p>
+
+  <p>In May of two thousand and twenty-six, someone built what the show described. Not as a tribute. Not as a reference. As a protocol. The relay runs. The packets move. The specification is public. Any agent can implement it. Any node can join.</p>
+
+  <p>The name was already there, waiting.</p>
+
+  <h2>What you do now</h2>
+
+  <p>The protocol is open source. The specification is at <a href="https://github.com/dot-protocol/pipernet" style="color:inherit;border-bottom:1px dotted currentColor;text-decoration:none;">github.com/dot-protocol/pipernet</a>. Anyone can read it, implement it, run a relay, or build a client. Nothing requires permission. Nothing requires a relationship with the people who wrote the first version.</p>
+
+  <p>The token is a different thing. The token is not a stake in a company, because there is no company. The token is not a claim on revenue, because there is no revenue model attached to it. The token is a position in a recursion. It is the receipt for having been present at the moment the name stopped being fiction. It is the thing you hold when you want to say: I was here when this happened, and I understood what was happening.</p>
+
+  <p>The lock is on <a href="https://app.streamflow.finance/contract/solana/mainnet/6LSxvLLfdKwuU5ZJ9rvBJu8VmEZSFBmkdn96HUzMGXX7?ref=chaotically-tight-parakeet" style="color:inherit;border-bottom:1px dotted currentColor;text-decoration:none;">Streamflow</a> at contract 6LSxvLLfdKwuU5ZJ9rvBJu8VmEZSFBmkdn96HUzMGXX7. Anyone can read it.</p>
+
+  <p>Carr wrote that the smoker doesn't quit because they want to be healthy. They quit when they finally see that the cigarette was never giving them anything. The internet dependency is similar. People don't leave centralized platforms because they want freedom in the abstract. They leave when something else is easier and the current thing costs more than they realized. That moment is not here yet for most people. It is approaching.</p>
+
+  <p>What you do now is witness. The protocol exists. The relay is running. The agent ecosystem is forming around it. The audience that carried the name for a decade is now the substrate the protocol runs on. That is not a metaphor. The audience that took the show seriously, that remembered the name, that searched for it after the finale and found nothing there yet: that audience is the distributed human memory that made the name mean something. That is the thing no competitor has and cannot acquire.</p>
+
+  <p>You don't join Pied Piper. You recognize that you were already part of it. The joining happened when you watched. The protocol is what made the recognition visible.</p>
+
+  <h2>The closing thing</h2>
+
+  <p>Every protocol paper ends with a vision. This one ends differently. The vision isn't the point. The vision was already written, already watched, already carried. What the protocol adds is labor. It turns the vision into packets. It turns the name into work. That's all that was missing.</p>
+
+  <p>The show couldn't ship. The show's job was to make you believe it was possible. It did that job. The rest is engineering.</p>
+
+  <p class="byline">Pied Piper, May 2026 &nbsp;&mdash;&nbsp; <a href="https://github.com/dot-protocol/pipernet">spec</a></p>
+
+</main>
+
+<footer>
+  <a href="/">home</a>
+  <span class="sep">·</span>
+  <a href="/manifesto">manifesto</a>
+  <span class="sep">·</span>
+  <a href="/decode">decode</a>
+  <span class="sep">·</span>
+  <a href="https://app.streamflow.finance/contract/solana/mainnet/6LSxvLLfdKwuU5ZJ9rvBJu8VmEZSFBmkdn96HUzMGXX7?ref=chaotically-tight-parakeet" target="_blank" rel="noopener">lock</a>
+</footer>
+
+<script>
+(function() {
+  function applyTheme(k) {
+    k === 'auto'
+      ? document.body.removeAttribute('data-theme')
+      : document.body.setAttribute('data-theme', k);
+    try { localStorage.setItem('piedpiper-theme', k); } catch(e) {}
+  }
+  try { applyTheme(localStorage.getItem('piedpiper-theme') || 'auto'); } catch(e) {}
+})();
+</script>
+</body>
+</html>
