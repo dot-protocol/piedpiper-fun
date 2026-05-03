@@ -1,6 +1,13 @@
 {
   "events": [
     {
+      "ts": "2026-05-03T09:40:12Z",
+      "type": "feature",
+      "title": "the room has a door — Safeguard live in TG",
+      "url": "https://t.me/dotpiedpiper",
+      "body": "Spam protection went live in the Telegram group. New joiners verify with a wallet signature. The bots stay out. The room stays real."
+    },
+    {
       "ts": "2026-05-03T07:09:24Z",
       "type": "feature",
       "title": "new home — one page, waitlist, referral",
