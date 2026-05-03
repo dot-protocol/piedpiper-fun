@@ -1,6 +1,55 @@
 {
   "events": [
     {
+      "ts": "2026-05-03T05:11:00Z",
+      "type": "release",
+      "title": "dotdrop v0.1.0 — Android APK shipped",
+      "url": "https://github.com/dot-protocol/dotdrop/releases/tag/v0.1.0",
+      "body": "First cut. APK for Android. Sideload, drop a file, watch it move. The protocol underneath is LocalSend (Apache 2.0, six years of work). Mac DMG arrives when full Xcode is installed."
+    },
+    {
+      "ts": "2026-05-03T04:30:00Z",
+      "type": "infra",
+      "title": "build pivoted to GitHub Actions CI",
+      "url": "https://github.com/dot-protocol/dotdrop/actions",
+      "body": "Mac disk filled up mid-build. Moved the Android APK build to free GitHub Actions runners. Right host for the right job."
+    },
+    {
+      "ts": "2026-05-03T01:03:00Z",
+      "type": "feature",
+      "title": "/install page live, home CTA wired",
+      "url": "https://piedpiper.fun/install",
+      "body": "OS-detecting install page. Home page download button finally has a destination."
+    },
+    {
+      "ts": "2026-05-03T01:01:00Z",
+      "type": "fix",
+      "title": "wallet connect timeout-safe (Phantom workaround)",
+      "url": "https://piedpiper.fun/holders",
+      "body": "Phantom's service worker can silently die. The connect button now races against a fifteen-second timeout, shows an inline error, resets state. The protocol does not care if your extension is having a day."
+    },
+    {
+      "ts": "2026-05-03T00:30:00Z",
+      "type": "infra",
+      "title": "relay.piedpiper.fun cutover",
+      "url": "https://relay.piedpiper.fun/channels/holders/events",
+      "body": "Holder chat and the app now talk to the protocol's own subdomain. nginx vhost, certbot SSL, SSE-safe. The mevici domain is no longer on the public surface."
+    },
+    {
+      "ts": "2026-05-03T00:15:00Z",
+      "type": "feature",
+      "title": "/dotdrop route + channel-style sidebar",
+      "url": "https://piedpiper.fun/dotdrop",
+      "body": "axxis.world identity model + dotdotdot.rocks framing folded into a single page. Discord-style channel nav rolled out across the site."
+    },
+    {
+      "ts": "2026-05-02T22:30:00Z",
+      "type": "feature",
+      "title": "whitepaper v2 — Pied Piper first person",
+      "url": "https://piedpiper.fun/whitepaper",
+      "body": "Twelve sections. Carr method preserved. Round 175 chair ratification embodied. v1 archived at /whitepaper-v1."
+    },
+    {
       "ts": "2026-05-02T17:43:00Z",
       "type": "lock",
       "title": "52,340,699 PIPER locked on-chain for one year",
