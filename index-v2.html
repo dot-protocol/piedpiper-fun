@@ -110,6 +110,65 @@ a { color: inherit; text-decoration: none; }
 }
 .topbar-install:hover { opacity: 0.85; transform: translateY(-1px); }
 
+/* ── WAITLIST FORM ─────────────────────────────────────────────── */
+.waitlist-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 4rem;
+  align-self: stretch;
+}
+.waitlist-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+.waitlist-input {
+  flex: 1;
+  background: transparent;
+  border: 1px solid rgba(240,240,240,0.22);
+  border-radius: 2px;
+  padding: 0.75em 1em;
+  font-family: var(--mono);
+  font-size: 0.88em;
+  color: var(--fg);
+  outline: none;
+  transition: border-color 180ms var(--ease);
+  min-width: 0;
+}
+.waitlist-input::placeholder { color: var(--muted); }
+.waitlist-input:focus { border-color: var(--accent); }
+.waitlist-btn {
+  flex-shrink: 0;
+  padding: 0.75em 1.4em;
+  background: var(--accent);
+  color: #0b0b0b;
+  font-family: var(--mono);
+  font-size: 0.85em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: opacity 180ms var(--ease), transform 80ms ease;
+}
+.waitlist-btn:hover:not(:disabled) { opacity: 0.85; transform: translateY(-1px); }
+.waitlist-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.waitlist-microcopy {
+  font-family: var(--mono);
+  font-size: 0.76em;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.waitlist-error {
+  font-family: var(--mono);
+  font-size: 0.78em;
+  color: #e06c75;
+  display: none;
+}
+.waitlist-error.visible { display: block; }
+
 /* ── MAIN COLUMN ───────────────────────────────────────────────── */
 main {
   width: 100%;
@@ -331,7 +390,7 @@ footer a:hover { color: var(--fg); border-bottom-color: var(--fg); }
 <!-- top bar -->
 <div class="topbar">
   <span class="topbar-logo" aria-label="Pied Piper"><span>&#x25CF;</span>Pied Piper</span>
-  <a href="/install" class="topbar-install" id="top-install-btn">install</a>
+  <a href="/dashboard" class="topbar-install" id="top-dashboard-btn">dashboard</a>
 </div>
 
 <!-- main column -->
@@ -343,12 +402,26 @@ footer a:hover { color: var(--fg); border-bottom-color: var(--fg); }
     I let people send things to each other
     <strong>without a company in the middle.</strong>
   </p>
-  <a href="/install" class="hero-cta" id="hero-install-btn">
-    install
-    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-      <path d="M6.5 1v8M3 6l3.5 3.5L10 6M1.5 11.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </a>
+  <form class="waitlist-form" id="waitlist-form" novalidate>
+    <!-- honeypot: bots fill this, humans do not -->
+    <input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true"
+           style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" />
+    <div class="waitlist-row">
+      <input
+        type="email"
+        name="email"
+        id="waitlist-email"
+        class="waitlist-input"
+        placeholder="your@email.com"
+        autocomplete="email"
+        required
+        aria-label="Email address"
+      />
+      <button type="submit" class="waitlist-btn" id="waitlist-btn">join waitlist</button>
+    </div>
+    <span class="waitlist-error" id="waitlist-error" role="alert"></span>
+    <p class="waitlist-microcopy">no spam. no series A. you'll get the link when it ships.</p>
+  </form>
 
   <!-- 2. STORY -->
   <div class="story" aria-label="About Pied Piper">
@@ -438,6 +511,8 @@ footer a:hover { color: var(--fg); border-bottom-color: var(--fg); }
 (function () {
   'use strict';
 
+  var RELAY = 'https://relay.piedpiper.fun';
+
   /* Theme restore (mirrors site-wide pattern) */
   function applyTheme(k) {
     k === 'auto'
@@ -447,14 +522,82 @@ footer a:hover { color: var(--fg); border-bottom-color: var(--fg); }
   }
   try { applyTheme(localStorage.getItem('piedpiper-theme') || 'auto'); } catch (e) {}
 
+  /* Capture referral code from ?ref= on page load */
+  (function captureRef() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var ref = params.get('ref');
+      if (ref && /^[a-z0-9]{8}$/.test(ref)) {
+        localStorage.setItem('piper_ref', ref);
+        // Clean URL without reload
+        var clean = window.location.pathname + (window.location.hash || '');
+        history.replaceState(null, '', clean);
+      }
+    } catch (e) {}
+  })();
+
   /* PostHog events */
-  function track(evt) {
-    try { window.posthog && posthog.capture(evt); } catch (e) {}
+  function track(evt, props) {
+    try { window.posthog && posthog.capture(evt, props || {}); } catch (e) {}
   }
-  var heroBtn = document.getElementById('hero-install-btn');
-  var topBtn  = document.getElementById('top-install-btn');
-  if (heroBtn) heroBtn.addEventListener('click', function () { track('install_clicked_hero'); });
-  if (topBtn)  topBtn.addEventListener('click',  function () { track('install_clicked_top'); });
+
+  /* Waitlist form */
+  var form   = document.getElementById('waitlist-form');
+  var input  = document.getElementById('waitlist-email');
+  var btn    = document.getElementById('waitlist-btn');
+  var errEl  = document.getElementById('waitlist-error');
+
+  function showError(msg) {
+    errEl.textContent = msg;
+    errEl.classList.add('visible');
+  }
+  function clearError() {
+    errEl.textContent = '';
+    errEl.classList.remove('visible');
+  }
+
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      clearError();
+
+      var email = (input.value || '').trim();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showError('enter a valid email address.');
+        input.focus();
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'joining…';
+
+      var honeypot = form.querySelector('input[name="company"]');
+      var payload = {
+        email: email,
+        referrer_code: (function() { try { return localStorage.getItem('piper_ref') || ''; } catch(x) { return ''; } })(),
+        company: honeypot ? honeypot.value : ''
+      };
+
+      fetch(RELAY + '/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(function (r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+      .then(function (res) {
+        if (!res.ok || res.data.error) {
+          throw new Error(res.data.error || 'signup failed');
+        }
+        track('waitlist_signup', { position: res.data.position });
+        window.location.href = '/dashboard?key=' + encodeURIComponent(res.data.dashboard_key);
+      })
+      .catch(function (err) {
+        btn.disabled = false;
+        btn.textContent = 'join waitlist';
+        showError(err.message || 'something went wrong. try again.');
+      });
+    });
+  }
 
   /* Live $PIPER market data — DexScreener */
   var MINT = '83VTqzxszRFPSzJHvTeNRydcuUmmhEjj9FH4F7TZpump';

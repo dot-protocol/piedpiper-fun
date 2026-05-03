@@ -1,0 +1,386 @@
+<!doctype html>
+<!-- dashboard/index.html — Pied Piper waitlist dashboard -->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>your spot — Pied Piper</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<style>
+/* ── TOKENS ────────────────────────────────────────────────────── */
+:root {
+  --bg:      #0b0b0b;
+  --fg:      #f0f0f0;
+  --muted:   rgba(240,240,240,0.46);
+  --line:    rgba(240,240,240,0.10);
+  --accent:  #c8f542;
+  --mono:    ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --serif:   ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
+  --ease:    cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--serif);
+  font-size: clamp(15px, 1.1vw + 12px, 18px);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--accent); color: #0b0b0b; }
+
+/* ── TOPBAR ────────────────────────────────────────────────────── */
+.topbar {
+  width: 100%;
+  max-width: 560px;
+  padding: 1.8rem 1.4rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.topbar-logo {
+  font-family: var(--mono);
+  font-size: 0.78em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+.topbar-logo span { color: var(--accent); margin-right: 0.2em; }
+
+/* ── MAIN COLUMN ───────────────────────────────────────────────── */
+main {
+  width: 100%;
+  max-width: 560px;
+  padding: clamp(3.5rem, 10vw, 5.5rem) 1.4rem clamp(2rem, 6vw, 3.5rem);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── POSITION HERO ─────────────────────────────────────────────── */
+.position-hero {
+  margin-bottom: 2.8rem;
+}
+.position-label {
+  font-family: var(--mono);
+  font-size: 0.72em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+.position-number {
+  font-family: var(--serif);
+  font-size: clamp(3.5rem, 12vw, 6rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--accent);
+}
+.position-total {
+  font-family: var(--mono);
+  font-size: 0.82em;
+  color: var(--muted);
+  margin-top: 0.4rem;
+}
+
+/* ── INVITE BLOCK ──────────────────────────────────────────────── */
+.invite-block {
+  border-top: 1px solid var(--line);
+  padding-top: 2rem;
+  margin-bottom: 2rem;
+}
+.invite-label {
+  font-family: var(--mono);
+  font-size: 0.72em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+.invite-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+.invite-url {
+  flex: 1;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 0.7em 0.9em;
+  font-family: var(--mono);
+  font-size: 0.8em;
+  color: var(--fg);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: default;
+  min-width: 0;
+}
+.copy-btn {
+  flex-shrink: 0;
+  padding: 0.7em 1.2em;
+  background: var(--accent);
+  color: #0b0b0b;
+  font-family: var(--mono);
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: opacity 180ms var(--ease);
+}
+.copy-btn:hover { opacity: 0.85; }
+.copy-btn.copied {
+  background: rgba(200,245,66,0.2);
+  color: var(--accent);
+}
+
+/* ── REFERRAL COUNT ────────────────────────────────────────────── */
+.ref-count {
+  border-top: 1px solid var(--line);
+  padding-top: 1.8rem;
+  margin-bottom: 2rem;
+}
+.ref-count-num {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 7vw, 3.5rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--fg);
+  margin-bottom: 0.3rem;
+}
+.ref-count-label {
+  font-family: var(--mono);
+  font-size: 0.78em;
+  color: var(--muted);
+}
+
+/* ── TIP ───────────────────────────────────────────────────────── */
+.tip {
+  border-top: 1px solid var(--line);
+  padding-top: 1.8rem;
+  margin-bottom: 2.8rem;
+  font-family: var(--mono);
+  font-size: 0.78em;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ── STATES: loading / error / no-key ─────────────────────────── */
+.state-msg {
+  font-size: clamp(1rem, 2vw + 0.4rem, 1.2rem);
+  color: var(--muted);
+  line-height: 1.65;
+  margin-bottom: 1.5rem;
+}
+.state-msg a {
+  color: var(--accent);
+  border-bottom: 1px solid transparent;
+  transition: border-color 180ms var(--ease);
+}
+.state-msg a:hover { border-bottom-color: var(--accent); }
+
+/* ── FOOTER ────────────────────────────────────────────────────── */
+footer {
+  width: 100%;
+  max-width: 560px;
+  padding: 1.4rem 1.4rem 2rem;
+  border-top: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 0.72em;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+footer a {
+  color: var(--muted);
+  border-bottom: 1px dotted var(--muted);
+  transition: color 180ms var(--ease), border-color 180ms var(--ease);
+}
+footer a:hover { color: var(--fg); border-bottom-color: var(--fg); }
+
+/* ── HIDDEN ────────────────────────────────────────────────────── */
+[hidden] { display: none !important; }
+
+@media (max-width: 420px) {
+  .invite-row { flex-direction: column; }
+  .copy-btn { align-self: flex-start; }
+  footer { flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="/" class="topbar-logo" aria-label="Pied Piper home"><span>&#x25CF;</span>Pied Piper</a>
+</div>
+
+<main>
+
+  <!-- no key state -->
+  <div id="state-no-key" hidden>
+    <p class="state-msg">no key &mdash; check your bookmark, or <a href="/">join the waitlist</a>.</p>
+  </div>
+
+  <!-- loading state -->
+  <div id="state-loading" hidden>
+    <p class="state-msg">loading&hellip;</p>
+  </div>
+
+  <!-- error state -->
+  <div id="state-error" hidden>
+    <p class="state-msg" id="error-msg">this dashboard does not exist. did you bookmark the right link?</p>
+    <p class="state-msg"><a href="/">back to piedpiper.fun</a></p>
+  </div>
+
+  <!-- dashboard content -->
+  <div id="state-dashboard" hidden>
+
+    <!-- position hero -->
+    <div class="position-hero">
+      <p class="position-label">your spot</p>
+      <div class="position-number" id="dash-position">&mdash;</div>
+      <p class="position-total" id="dash-total"></p>
+    </div>
+
+    <!-- invite link -->
+    <div class="invite-block">
+      <p class="invite-label">your invite link</p>
+      <div class="invite-row">
+        <span class="invite-url" id="dash-invite-url" aria-label="invite URL"></span>
+        <button class="copy-btn" id="copy-btn" type="button">copy</button>
+      </div>
+    </div>
+
+    <!-- referral count -->
+    <div class="ref-count">
+      <div class="ref-count-num" id="dash-ref-count">0</div>
+      <p class="ref-count-label" id="dash-ref-label">people joined through you</p>
+    </div>
+
+    <!-- tip -->
+    <div class="tip">
+      share your link. when they join, you move up.
+    </div>
+
+  </div>
+
+</main>
+
+<footer>
+  <a href="/">back to piedpiper.fun</a>
+  <span>open source. apache 2.</span>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var RELAY = 'https://relay.piedpiper.fun';
+
+  function show(id) {
+    ['state-no-key','state-loading','state-error','state-dashboard'].forEach(function(s) {
+      var el = document.getElementById(s);
+      if (el) el.hidden = (s !== id);
+    });
+  }
+
+  function setText(id, val) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
+
+  // Get key from ?key= param. Do not persist it; never log it.
+  var key = (function() {
+    try {
+      return new URLSearchParams(window.location.search).get('key') || '';
+    } catch(e) { return ''; }
+  })();
+
+  if (!key) {
+    show('state-no-key');
+    return;
+  }
+
+  show('state-loading');
+
+  fetch(RELAY + '/waitlist/dashboard/' + encodeURIComponent(key))
+    .then(function(r) {
+      return r.json().then(function(d) { return { ok: r.ok, status: r.status, data: d }; });
+    })
+    .then(function(res) {
+      if (res.status === 404 || !res.ok) {
+        var errMsg = document.getElementById('error-msg');
+        if (errMsg) errMsg.textContent = 'this dashboard does not exist. did you bookmark the right link?';
+        show('state-error');
+        return;
+      }
+
+      var d = res.data;
+
+      // Position
+      setText('dash-position', d.position);
+      setText('dash-total', 'of ' + d.total_count + ' on the waitlist');
+
+      // Invite URL
+      var urlEl = document.getElementById('dash-invite-url');
+      if (urlEl) urlEl.textContent = d.invite_url;
+
+      // Referral count
+      var n = d.referrals_count || 0;
+      setText('dash-ref-count', n);
+      setText('dash-ref-label', n === 1 ? 'person joined through you' : 'people joined through you');
+
+      show('state-dashboard');
+
+      // Copy button
+      var copyBtn = document.getElementById('copy-btn');
+      if (copyBtn && d.invite_url) {
+        copyBtn.addEventListener('click', function() {
+          navigator.clipboard.writeText(d.invite_url).then(function() {
+            copyBtn.textContent = 'copied';
+            copyBtn.classList.add('copied');
+            setTimeout(function() {
+              copyBtn.textContent = 'copy';
+              copyBtn.classList.remove('copied');
+            }, 2000);
+          }).catch(function() {
+            // fallback: select the text
+            if (urlEl) {
+              var range = document.createRange();
+              range.selectNode(urlEl);
+              window.getSelection().removeAllRanges();
+              window.getSelection().addRange(range);
+            }
+          });
+        });
+      }
+    })
+    .catch(function() {
+      show('state-error');
+    });
+
+})();
+</script>
+
+</body>
+</html>
