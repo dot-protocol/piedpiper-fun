@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <rect width="192" height="192" fill="#0b0b0b"/>
+  <!-- Italic P glyph — hand-drawn paths, chartreuse on near-black -->
+  <!-- Stem: slightly italic (skewed right at top) -->
+  <path d="M58 148 L65 44 L85 44 L78 148 Z" fill="#c8f542"/>
+  <!-- Bowl: wide rounded cap from stem top to midway -->
+  <path d="M65 44 Q130 38 134 72 Q138 106 82 112 L80 96 Q118 92 116 74 Q114 58 85 58 Z" fill="#c8f542"/>
+</svg>

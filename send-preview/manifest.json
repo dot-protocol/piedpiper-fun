@@ -1,0 +1,55 @@
+{
+    "name": "Pied Piper Send",
+    "short_name": "PP Send",
+    "icons": [
+        {
+            "src": "images/pied-piper-mark.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        },
+        {
+            "src": "images/pied-piper-mark-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "images/pied-piper-mark-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "images/pied-piper-mark-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "images/pied-piper-mark-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "background_color": "#0b0b0b",
+    "start_url": "./",
+    "display": "standalone",
+    "theme_color": "#c8f542",
+    "share_target": {
+        "action": "/",
+        "method":"POST",
+        "enctype": "multipart/form-data",
+        "params": {
+            "title": "title",
+            "text": "text",
+            "url": "url",
+            "files": [{
+                "name": "allfiles",
+                "accept": ["*/*"]
+            }]
+        }
+    },
+    "launch_handler": {
+        "client_mode": "focus-existing"
+    }
+}

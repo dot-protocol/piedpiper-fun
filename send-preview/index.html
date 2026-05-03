@@ -27,14 +27,15 @@
     <meta name="twitter:description" content="Send anything to anyone, with no company in the middle. Open source, peer-to-peer.">
     <meta name="og:description" content="Send anything to anyone, with no company in the middle. Open source, peer-to-peer.">
     <!-- Icons -->
-    <link rel="icon" sizes="96x96" href="images/favicon-96x96.png">
-    <link rel="shortcut icon" href="images/favicon-96x96.png">
-    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
-    <link rel="apple-touch-icon-precomposed" href="images/apple-touch-icon.png">
-    <meta name="msapplication-TileImage" content="images/mstile-150x150.png">
-    <link rel="fluid-icon" type="image/png" href="images/android-chrome-192x192.png">
-    <meta name="twitter:image" content="images/android-chrome-512x512.png">
-    <meta property="og:image" content="images/android-chrome-512x512.png">
+    <link rel="icon" type="image/svg+xml" href="images/pied-piper-mark.svg">
+    <link rel="icon" sizes="96x96" href="images/pied-piper-mark-96.png">
+    <link rel="shortcut icon" href="images/pied-piper-mark-96.png">
+    <link rel="apple-touch-icon" href="images/pied-piper-mark-180.png">
+    <link rel="apple-touch-icon-precomposed" href="images/pied-piper-mark-180.png">
+    <meta name="msapplication-TileImage" content="images/pied-piper-mark-192.png">
+    <link rel="fluid-icon" type="image/png" href="images/pied-piper-mark-192.png">
+    <meta name="twitter:image" content="images/pied-piper-mark-512.png">
+    <meta property="og:image" content="images/pied-piper-mark-512.png">
     <!-- Pied Piper: signaling server for static deployments.
          When PP_SIGNALING_SERVER is set, network.js skips the /config endpoint
          and connects directly to the specified WebSocket host. -->
@@ -111,6 +112,9 @@
                 <use xlink:href="#caret"></use>
             </svg>
         </div>
+        <a href="/" class="pp-wordmark" style="margin-right:auto;text-decoration:none;display:flex;align-items:center;height:40px;padding:0 4px;">
+            <span style="font-family:ui-serif,Georgia,'Iowan Old Style','Apple Garamond',serif;font-style:italic;font-weight:600;font-size:1.15rem;color:#c8f542;letter-spacing:-0.01em;line-height:1;white-space:nowrap;">Pied Piper</span>
+        </a>
     </header>
     <!-- Center -->
     <div id="center" class="opacity-0">
@@ -698,8 +702,10 @@
     <canvas class="circles opacity-0"></canvas>
     <!-- SVG Icon Library -->
     <svg style="display: none;">
-        <symbol id="wifi-tethering" viewBox="0 0 24 24">
-            <path d="M12 11c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 2c0-3.31-2.69-6-6-6s-6 2.69-6 6c0 2.22 1.21 4.15 3 5.19l1-1.74c-1.19-.7-2-1.97-2-3.45 0-2.21 1.79-4 4-4s4 1.79 4 4c0 1.48-.81 2.75-2 3.45l1 1.74c1.79-1.04 3-2.97 3-5.19zM12 3C6.48 3 2 7.48 2 13c0 3.7 2.01 6.92 4.99 8.65l1-1.73C5.61 18.53 4 15.96 4 13c0-4.42 3.58-8 8-8s8 3.58 8 8c0 2.96-1.61 5.53-4 6.92l1 1.73c2.99-1.73 5-4.95 5-8.65 0-5.52-4.48-10-10-10z"></path>
+        <symbol id="wifi-tethering" viewBox="0 0 192 192">
+            <!-- Pied Piper P mark — italic bowl and stem -->
+            <path d="M58 148 L65 44 L85 44 L78 148 Z"/>
+            <path d="M65 44 Q130 38 134 72 Q138 106 82 112 L80 96 Q118 92 116 74 Q114 58 85 58 Z"/>
         </symbol>
         <symbol id="desktop-mac" viewBox="0 0 24 24">
             <path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H3V4h18v10z"></path>
