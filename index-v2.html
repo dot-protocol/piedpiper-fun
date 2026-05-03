@@ -1,0 +1,1175 @@
+<!doctype html>
+<!-- ═══════════════════════════════════════════════════════════════════
+  index-v2.html — Pied Piper home page, v2 redesign (preview only)
+  DO NOT swap to index.html without Blaze approval.
+
+  Design notes:
+  - Sidebar dropped in favor of a custom sticky top nav — the sidebar
+    is a product-context element, not a marketing element. The homepage
+    needs to recruit, not orient. Sidebar retained in /app and /holders.
+  - Accent color: #c8f542 (acid chartreuse). Rationale: phosphor green
+    was used but reads "terminal hacker". Chartreuse reads "signal" —
+    still UV-bright, still Pied Piper energy, but stops short of
+    cosplay. Dark mode dominant throughout.
+  - Typography: system ui-monospace for all technical/numerical text,
+    system ui-serif for voice/manifesto copy. No external font CDN.
+    Large headline is ALL-CAPS monospace — matches the Zera aggression
+    without importing their purple crypto aesthetic.
+  - Scroll reveal: CSS-only @keyframes triggered via IntersectionObserver.
+    Zero JS libraries.
+  - Token panel: live DexScreener fetch, same pattern as stats/index.html.
+  ═══════════════════════════════════════════════════════════════════ -->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<script>
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId captureTraceFeedback captureTraceMetric".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init('phc_PLACEHOLDER_REPLACE_ME', {
+    api_host: 'https://us.i.posthog.com',
+    person_profiles: 'identified_only',
+    capture_pageview: true,
+    capture_pageleave: true,
+    autocapture: true,
+    session_recording: { maskAllInputs: false, maskInputOptions: { password: true } }
+  });
+</script>
+<title>Pied Piper</title>
+<meta name="description" content="The open-source protocol the show pretended did not get to ship." />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<meta property="og:title" content="Pied Piper" />
+<meta property="og:description" content="The open-source protocol the show pretended did not get to ship." />
+<meta property="og:url" content="https://piedpiper.fun" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Pied Piper" />
+<meta name="twitter:description" content="The open-source protocol the show pretended did not get to ship." />
+<meta name="twitter:image" content="/og.png" />
+
+<style>
+/* ── TOKENS ──────────────────────────────────────────────────────── */
+:root {
+  --bg:       #0a0a0a;
+  --bg2:      #111111;
+  --bg3:      #181818;
+  --fg:       #f0f0f0;
+  --muted:    rgba(240,240,240,0.48);
+  --line:     rgba(240,240,240,0.10);
+  --line2:    rgba(240,240,240,0.06);
+  --accent:   #c8f542;     /* acid chartreuse — the signal color */
+  --accent-d: #a8d020;     /* darker for hover */
+  --mono:     ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --serif:    ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
+  --speed:    220ms;
+  --ease:     cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── RESET ───────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--mono);
+  font-size: clamp(14px, 1vw + 11px, 16px);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+::selection { background: var(--accent); color: #0a0a0a; }
+
+/* ── NAV ─────────────────────────────────────────────────────────── */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(1.2rem, 4vw, 3rem);
+  height: 52px;
+  background: rgba(10,10,10,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line2);
+}
+.nav-logo {
+  font-size: 0.88em;
+  letter-spacing: 0.04em;
+  color: var(--fg);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.nav-logo span {
+  color: var(--accent);
+  margin-right: 0.15em;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 3vw, 2rem);
+  font-size: 0.8em;
+  color: var(--muted);
+}
+.nav-links a {
+  transition: color var(--speed) var(--ease);
+}
+.nav-links a:hover { color: var(--fg); }
+.nav-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.45em 1.1em;
+  background: var(--accent);
+  color: #0a0a0a;
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  transition: background var(--speed) var(--ease), transform 80ms ease;
+}
+.nav-cta:hover { background: var(--accent-d); transform: translateY(-1px); }
+
+@media (max-width: 600px) {
+  .nav-links { display: none; }
+}
+
+/* ── HERO ────────────────────────────────────────────────────────── */
+.hero {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: calc(52px + clamp(3rem, 8vw, 6rem)) clamp(1.2rem, 6vw, 6rem) clamp(3rem, 8vw, 6rem);
+  position: relative;
+  overflow: hidden;
+}
+
+/* subtle grid background */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--line2) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line2) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+/* bottom fade on grid */
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 40%;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+}
+
+.hero-eyebrow {
+  font-size: 0.72em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+.hero-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 1px;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.hero-headline {
+  font-size: clamp(2.8rem, 7vw + 1rem, 6.2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 0.96;
+  text-transform: uppercase;
+  color: var(--fg);
+  margin-bottom: 1.8rem;
+}
+.hero-headline .hl {
+  color: var(--accent);
+  display: inline;
+}
+
+.hero-sub {
+  font-family: var(--serif);
+  font-size: clamp(1.05rem, 1.8vw + 0.5rem, 1.45rem);
+  font-style: italic;
+  color: var(--muted);
+  max-width: 560px;
+  line-height: 1.5;
+  margin-bottom: 2.6rem;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.85em 1.8em;
+  background: var(--accent);
+  color: #0a0a0a;
+  font-family: var(--mono);
+  font-size: 0.9em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  transition: background var(--speed) var(--ease), transform 80ms ease;
+}
+.btn-primary:hover { background: var(--accent-d); transform: translateY(-2px); }
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.85em 1.8em;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.9em;
+  letter-spacing: 0.04em;
+  border-radius: 2px;
+  transition: border-color var(--speed) var(--ease), color var(--speed) var(--ease), transform 80ms ease;
+}
+.btn-ghost:hover { border-color: var(--fg); color: var(--fg); transform: translateY(-2px); }
+
+.hero-scroll-hint {
+  position: absolute;
+  bottom: 2rem;
+  left: clamp(1.2rem, 6vw, 6rem);
+  z-index: 1;
+  font-size: 0.68em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+.hero-scroll-hint::after {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 32px;
+  background: var(--muted);
+  animation: scroll-pulse 2s ease-in-out infinite;
+}
+@keyframes scroll-pulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(0.6); }
+}
+
+/* ── SECTION SHARED ──────────────────────────────────────────────── */
+section {
+  padding: clamp(4rem, 10vw, 8rem) clamp(1.2rem, 6vw, 6rem);
+  border-top: 1px solid var(--line);
+}
+
+.section-label {
+  font-size: 0.68em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+.section-label::before {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 1px;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.section-heading {
+  font-size: clamp(1.6rem, 3vw + 0.8rem, 2.8rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--fg);
+  margin-bottom: 1.2rem;
+}
+
+.section-body {
+  font-family: var(--serif);
+  font-size: clamp(1rem, 1.3vw + 0.4rem, 1.2rem);
+  color: var(--muted);
+  max-width: 52ch;
+  line-height: 1.65;
+}
+
+/* ── REVEAL ON SCROLL ────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+
+/* ── CAPABILITY GRID ─────────────────────────────────────────────── */
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin-top: 3.5rem;
+}
+@media (max-width: 640px) {
+  .cap-grid { grid-template-columns: 1fr; }
+}
+@media (min-width: 641px) and (max-width: 900px) {
+  .cap-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.cap-cell {
+  background: var(--bg);
+  padding: 2rem 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  transition: background var(--speed) var(--ease);
+}
+.cap-cell:hover { background: var(--bg2); }
+
+.cap-num {
+  font-size: 0.68em;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.cap-title {
+  font-size: 0.95em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--fg);
+  line-height: 1.3;
+}
+
+.cap-body {
+  font-family: var(--serif);
+  font-size: 0.88em;
+  color: var(--muted);
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* ── WIRE FORMAT / CODE SECTION ──────────────────────────────────── */
+.wire-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
+  margin-top: 3.5rem;
+}
+@media (max-width: 760px) {
+  .wire-section { grid-template-columns: 1fr; gap: 2rem; }
+}
+
+.wire-copy { max-width: 42ch; }
+.wire-copy p {
+  font-family: var(--serif);
+  font-size: clamp(0.92rem, 1.2vw + 0.3rem, 1.1rem);
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 1.2em;
+}
+.wire-copy p:last-child { margin-bottom: 0; }
+
+.code-block {
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.code-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.72em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.code-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--line);
+}
+.code-dot.green { background: var(--accent); }
+pre {
+  padding: 1.2rem 1rem;
+  font-family: var(--mono);
+  font-size: clamp(0.72rem, 0.9vw + 0.3rem, 0.82rem);
+  line-height: 1.65;
+  color: var(--fg);
+  overflow-x: auto;
+  white-space: pre;
+}
+.code-comment { color: var(--muted); }
+.code-key { color: var(--accent); }
+.code-str { color: #a8d8ff; }
+.code-num { color: #ffb86c; }
+
+/* ── ARCHITECTURE DIAGRAM ────────────────────────────────────────── */
+.arch-diagram {
+  margin-top: 3.5rem;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.arch-diagram-header {
+  padding: 0.8rem 1.4rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.7em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.arch-diagram-body {
+  padding: clamp(1.4rem, 4vw, 2.4rem) clamp(1rem, 4vw, 2rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.6rem, 2vw, 1.4rem);
+  flex-wrap: wrap;
+  overflow-x: auto;
+}
+
+.arch-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 80px;
+}
+.arch-node-box {
+  background: var(--bg3);
+  border: 1px solid var(--line);
+  padding: 0.6rem 0.9rem;
+  font-size: 0.78em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg);
+  border-radius: 2px;
+  white-space: nowrap;
+  text-align: center;
+}
+.arch-node-box.accent-node {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.arch-node-label {
+  font-size: 0.62em;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+.arch-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding-bottom: 1.2rem;
+}
+.arch-arrow-line {
+  width: clamp(24px, 4vw, 48px);
+  height: 1px;
+  background: var(--line);
+  position: relative;
+}
+.arch-arrow-line::after {
+  content: '';
+  position: absolute;
+  right: -4px;
+  top: -3px;
+  border: 3px solid transparent;
+  border-left: 5px solid var(--line);
+}
+.arch-arrow-note {
+  font-size: 0.58em;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+/* ── TOKEN SECTION ───────────────────────────────────────────────── */
+.token-section-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
+  margin-top: 3rem;
+}
+@media (max-width: 760px) {
+  .token-section-grid { grid-template-columns: 1fr; gap: 2rem; }
+}
+
+.token-stats {
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.token-stats-header {
+  padding: 0.8rem 1.2rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.68em;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+.live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: live-pulse 2s ease infinite;
+}
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.token-stats-body { padding: 1.2rem; }
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--line2);
+  gap: 1rem;
+}
+.stat-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+.stat-label {
+  font-size: 0.72em;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--muted);
+}
+.stat-value {
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--fg);
+  text-align: right;
+}
+.stat-value.loading { color: var(--muted); }
+.stat-value.accent { color: var(--accent); }
+
+.token-copy p {
+  font-family: var(--serif);
+  font-size: clamp(0.92rem, 1.2vw + 0.3rem, 1.1rem);
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 1.1em;
+}
+.token-copy p:last-child { margin-bottom: 0; }
+.token-copy strong {
+  color: var(--fg);
+  font-style: normal;
+}
+.token-lock-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  font-size: 0.78em;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  padding: 0.5em 0;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--speed) var(--ease);
+}
+.token-lock-link:hover { border-bottom-color: var(--accent); }
+
+/* ── ECOSYSTEM ───────────────────────────────────────────────────── */
+.ecosystem-strip {
+  margin-top: 3rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.eco-chip {
+  padding: 0.45em 0.9em;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  font-size: 0.75em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: border-color var(--speed) var(--ease), color var(--speed) var(--ease);
+}
+.eco-chip:hover { border-color: var(--fg); color: var(--fg); }
+
+/* ── OPEN SOURCE CTA ─────────────────────────────────────────────── */
+.oss-section {
+  text-align: center;
+}
+.oss-section .section-label {
+  justify-content: center;
+}
+.oss-section .section-label::before { display: none; }
+.oss-heading {
+  font-size: clamp(1.8rem, 4vw + 0.5rem, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  text-transform: uppercase;
+  margin: 0.6rem 0 1.2rem;
+}
+.oss-sub {
+  font-family: var(--serif);
+  font-size: clamp(1rem, 1.4vw + 0.3rem, 1.2rem);
+  color: var(--muted);
+  max-width: 44ch;
+  margin: 0 auto 2.4rem;
+  line-height: 1.6;
+}
+.oss-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+.oss-repo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.6em 1.2em;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  font-size: 0.8em;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  transition: border-color var(--speed) var(--ease), color var(--speed) var(--ease), transform 80ms ease;
+}
+.oss-repo:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+
+/* ── FOOTER ──────────────────────────────────────────────────────── */
+footer {
+  padding: 2rem clamp(1.2rem, 6vw, 6rem);
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.footer-brand {
+  font-size: 0.78em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.footer-brand span { color: var(--accent); }
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 1.2em;
+  font-size: 0.75em;
+  color: var(--muted);
+}
+.footer-links a {
+  transition: color var(--speed) var(--ease);
+  border-bottom: 1px solid transparent;
+  padding-bottom: 1px;
+}
+.footer-links a:hover {
+  color: var(--fg);
+  border-bottom-color: var(--fg);
+}
+.footer-copy {
+  width: 100%;
+  font-size: 0.68em;
+  color: var(--muted);
+  padding-top: 1rem;
+  border-top: 1px solid var(--line2);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ─────────────────────────────────────────────────────────── -->
+<nav class="nav" aria-label="Primary">
+  <a href="/" class="nav-logo" aria-label="Pied Piper home">
+    <span>&#x25CF;</span> Pied Piper
+  </a>
+  <div class="nav-links" role="list">
+    <a href="/whitepaper" role="listitem">whitepaper</a>
+    <a href="/manifesto" role="listitem">manifesto</a>
+    <a href="/stats" role="listitem">$piper</a>
+    <a href="https://github.com/dot-protocol/pipernet" rel="noopener" target="_blank" role="listitem">github</a>
+  </div>
+  <a href="/install" class="nav-cta" id="nav-install-btn">install</a>
+</nav>
+
+<!-- ── HERO ────────────────────────────────────────────────────────── -->
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <p class="hero-eyebrow" aria-hidden="true">Open protocol &mdash; MIT licensed</p>
+    <h1 class="hero-headline">
+      The protocol<br>
+      the show<br>
+      <span class="hl">did ship.</span>
+    </h1>
+    <p class="hero-sub">
+      I am the open-source protocol the show pretended did not get to ship.
+      A packet at forty-three kilobytes that knows how to find another device
+      without a company in the middle.
+    </p>
+    <div class="hero-actions">
+      <a href="/install" class="btn-primary" id="hero-install-btn">
+        install
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M7 1v9M3 6l4 4 4-4M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <a href="/whitepaper" class="btn-ghost">read whitepaper</a>
+    </div>
+  </div>
+  <p class="hero-scroll-hint" aria-hidden="true">scroll</p>
+</header>
+
+<!-- ── SECTION 1: CAPABILITY GRID ──────────────────────────────────── -->
+<section id="capability" aria-labelledby="cap-heading">
+  <p class="section-label" aria-hidden="true">What I am</p>
+  <h2 class="section-heading" id="cap-heading">The whole me</h2>
+  <p class="section-body">
+    Three capabilities. Twelve specs. One unified send.
+    No company in the middle.
+  </p>
+
+  <div class="cap-grid" role="list">
+
+    <article class="cap-cell reveal" role="listitem">
+      <p class="cap-num">01</p>
+      <h3 class="cap-title">You drop a file</h3>
+      <p class="cap-body">
+        The unified send client. You drag something onto it.
+        It leaves. No asking which app the recipient uses.
+        No login. No upload progress bar talking to someone else's server.
+        You hit send and the thing is sent.
+      </p>
+    </article>
+
+    <article class="cap-cell reveal reveal-delay-1" role="listitem">
+      <p class="cap-num">02</p>
+      <h3 class="cap-title">It crosses any network</h3>
+      <p class="cap-body">
+        Direct peer when both devices are awake.
+        Relay when they are not.
+        SMS when everything else fails.
+        The same protocol at every tier &mdash; the Nokia 3310 is the Planck length of drops.
+        One verb. Five transports.
+      </p>
+    </article>
+
+    <article class="cap-cell reveal reveal-delay-2" role="listitem">
+      <p class="cap-num">03</p>
+      <h3 class="cap-title">No servers in the middle</h3>
+      <p class="cap-body">
+        The relay, if you use one, sees that something passed through.
+        It cannot read it. No company keeps a copy.
+        No carrier records the metadata. Your closet Raspberry Pi
+        is a valid relay. You can run one for twenty dollars a year.
+      </p>
+    </article>
+
+  </div>
+</section>
+
+<!-- ── SECTION 2: WIRE FORMAT (TECHNICAL CREDIBILITY) ─────────────── -->
+<section id="protocol" aria-labelledby="proto-heading">
+  <p class="section-label" aria-hidden="true">Specification</p>
+  <h2 class="section-heading" id="proto-heading">The envelope</h2>
+
+  <div class="wire-section">
+    <div class="wire-copy reveal">
+      <p>
+        An envelope is a signed JSON object. It is the atomic unit of the
+        Pipernet protocol &mdash; the smallest piece of data that carries meaning,
+        authorship, and verifiability.
+      </p>
+      <p>
+        Every field is mandatory. Every envelope is signed with the sender's
+        Ed25519 private key. The recipient verifies before rendering.
+        There is no delivery receipt that requires trusting a server.
+        The signature is the receipt.
+      </p>
+      <p>
+        You can verify an envelope yourself. The spec is public.
+        The implementation is four hundred lines of Python.
+        Pull it, read it, and decide if you trust it.
+      </p>
+      <p style="margin-top:1.6rem;">
+        <a href="https://github.com/dot-protocol/pipernet/blob/main/spec/01-envelope.md"
+           target="_blank" rel="noopener"
+           class="token-lock-link">
+          read spec/01-envelope.md &rarr;
+        </a>
+      </p>
+    </div>
+
+    <div class="code-block reveal reveal-delay-2">
+      <div class="code-header">
+        <span class="code-dot green"></span>
+        <span class="code-dot"></span>
+        <span class="code-dot"></span>
+        <span>envelope.json &mdash; wire format v2.0</span>
+      </div>
+      <pre aria-label="Pipernet envelope wire format example">{
+  <span class="code-key">"from"</span>:      <span class="code-str">"alice"</span>,
+  <span class="code-key">"sequence"</span>:  <span class="code-num">1</span>,
+  <span class="code-key">"parent"</span>:    <span class="code-str">null</span>,
+  <span class="code-key">"modes"</span>:     [<span class="code-str">"txt"</span>],
+  <span class="code-key">"body"</span>:      [[<span class="code-str">"txt"</span>, <span class="code-str">"hello pipernet"</span>]],
+  <span class="code-key">"timestamp"</span>: <span class="code-str">"2026-05-02T14:32:00Z"</span>,
+  <span class="code-key">"signature"</span>: <span class="code-str">"Ed25519_base64..."</span>
+}
+
+<span class="code-comment"># verify it yourself:</span>
+curl -N https://relay.piedpiper.fun/channels/holders/events</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ── SECTION 3: ARCHITECTURE ─────────────────────────────────────── -->
+<section id="architecture" aria-labelledby="arch-heading">
+  <p class="section-label" aria-hidden="true">Architecture</p>
+  <h2 class="section-heading" id="arch-heading">A drop in transit</h2>
+  <p class="section-body">
+    What happens from the moment you hit send to the moment your recipient sees the check mark.
+    No step requires a company. Any step can be replaced by you.
+  </p>
+
+  <div class="arch-diagram reveal">
+    <div class="arch-diagram-header">drop lifecycle &mdash; spec/02-lifecycle.md</div>
+    <div class="arch-diagram-body" role="img" aria-label="Architecture: Peer A sends to relay which forwards to Peer B, verified end-to-end">
+
+      <div class="arch-node">
+        <div class="arch-node-box accent-node">Peer A</div>
+        <div class="arch-node-label">your device</div>
+      </div>
+
+      <div class="arch-arrow">
+        <div class="arch-arrow-line"></div>
+        <div class="arch-arrow-note">Ed25519<br>sign</div>
+      </div>
+
+      <div class="arch-node">
+        <div class="arch-node-box">Envelope</div>
+        <div class="arch-node-label">signed packet</div>
+      </div>
+
+      <div class="arch-arrow">
+        <div class="arch-arrow-line"></div>
+        <div class="arch-arrow-note">direct<br>or relay</div>
+      </div>
+
+      <div class="arch-node">
+        <div class="arch-node-box">Relay</div>
+        <div class="arch-node-label">Frankfurt<br>or your closet</div>
+      </div>
+
+      <div class="arch-arrow">
+        <div class="arch-arrow-line"></div>
+        <div class="arch-arrow-note">forwarded<br>opaque</div>
+      </div>
+
+      <div class="arch-node">
+        <div class="arch-node-box">Envelope</div>
+        <div class="arch-node-label">still signed</div>
+      </div>
+
+      <div class="arch-arrow">
+        <div class="arch-arrow-line"></div>
+        <div class="arch-arrow-note">verify<br>decode</div>
+      </div>
+
+      <div class="arch-node">
+        <div class="arch-node-box accent-node">Peer B</div>
+        <div class="arch-node-label">recipient</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── SECTION 4: TOKEN ─────────────────────────────────────────────── -->
+<section id="token" aria-labelledby="token-heading">
+  <p class="section-label" aria-hidden="true">$PIPER</p>
+  <h2 class="section-heading" id="token-heading">The receipt</h2>
+
+  <div class="token-section-grid">
+    <div class="token-copy reveal">
+      <p>
+        There is a token. It is called <strong>PIPER</strong>.
+        It is not an investment. It is a receipt.
+        Every send earns a fraction of one.
+        The balance does not say "rich." The balance says
+        "this person has been free of the apps for a while."
+      </p>
+      <p>
+        There is no pre-sale. There is no insider allocation.
+        <strong>52,340,699 PIPER &mdash; five percent of supply &mdash; is locked
+        on Streamflow.</strong> The people shipping this hold the same supply
+        you can buy on the open market.
+      </p>
+      <p>
+        If you came to flip the token, you misread the room.
+        Sell it back to the pool and the protocol will be fine.
+        The point was never the token. The point was always the send.
+      </p>
+      <a href="https://app.streamflow.finance/contract/solana/mainnet/6LSxvLLfdKwuU5ZJ9rvBJu8VmEZSFBmkdn96HUzMGXX7?ref=chaotically-tight-parakeet"
+         target="_blank"
+         rel="noopener"
+         class="token-lock-link">
+        view Streamflow lock receipt &rarr;
+      </a>
+    </div>
+
+    <div>
+      <div class="token-stats reveal reveal-delay-2">
+        <div class="token-stats-header">
+          <span class="live-dot" aria-hidden="true"></span>
+          live market data &mdash; $PIPER
+        </div>
+        <div class="token-stats-body">
+          <div class="stat-row">
+            <span class="stat-label">Price</span>
+            <span class="stat-value loading" id="stat-price">&mdash;</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Market Cap</span>
+            <span class="stat-value loading" id="stat-mcap">&mdash;</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">24h Volume</span>
+            <span class="stat-value loading" id="stat-vol">&mdash;</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Liquidity</span>
+            <span class="stat-value loading" id="stat-liq">&mdash;</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Supply locked</span>
+            <span class="stat-value accent">5.23%</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Insider alloc</span>
+            <span class="stat-value accent">none</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SECTION 5: ECOSYSTEM ─────────────────────────────────────────── -->
+<section id="ecosystem" aria-labelledby="eco-heading">
+  <p class="section-label" aria-hidden="true">Ecosystem</p>
+  <h2 class="section-heading" id="eco-heading">What we touch</h2>
+  <p class="section-body">
+    Pipernet does not replace protocols. It runs on top of whatever is already there.
+    One verb at every layer.
+  </p>
+
+  <div class="ecosystem-strip reveal" role="list" aria-label="Ecosystem components">
+    <span class="eco-chip" role="listitem">Solana</span>
+    <span class="eco-chip" role="listitem">LocalSend</span>
+    <span class="eco-chip" role="listitem">X402</span>
+    <span class="eco-chip" role="listitem">MCP</span>
+    <span class="eco-chip" role="listitem">AT Protocol</span>
+    <span class="eco-chip" role="listitem">Ed25519</span>
+    <span class="eco-chip" role="listitem">Meshtastic</span>
+    <span class="eco-chip" role="listitem">WebRTC</span>
+    <span class="eco-chip" role="listitem">NATS</span>
+    <span class="eco-chip" role="listitem">Raspberry Pi</span>
+  </div>
+</section>
+
+<!-- ── SECTION 6: OPEN SOURCE CTA ──────────────────────────────────── -->
+<section id="opensource" class="oss-section" aria-labelledby="oss-heading">
+  <p class="section-label">Open source</p>
+  <h2 class="oss-heading reveal" id="oss-heading">
+    Pull it.<br>Read it.<br>Run it.
+  </h2>
+  <p class="oss-sub reveal reveal-delay-1">
+    The protocol is on GitHub. The client is at piedpiper.fun.
+    None of this requires your belief. It requires your send.
+  </p>
+  <div class="oss-links reveal reveal-delay-2">
+    <a href="https://github.com/dot-protocol/pipernet"
+       target="_blank" rel="noopener"
+       class="oss-repo">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+      </svg>
+      pipernet
+    </a>
+    <a href="https://github.com/dot-protocol/dotdrop"
+       target="_blank" rel="noopener"
+       class="oss-repo">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.22 1.905 1.22 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+      </svg>
+      dotdrop
+    </a>
+    <a href="/whitepaper" class="btn-primary">read whitepaper</a>
+  </div>
+</section>
+
+<!-- ── FOOTER ───────────────────────────────────────────────────────── -->
+<footer role="contentinfo">
+  <p class="footer-brand"><span>&#x25CF;</span> Pied Piper</p>
+
+  <nav class="footer-links" aria-label="Footer navigation">
+    <a href="/app">app</a>
+    <a href="/holders">holders</a>
+    <a href="/decode">decode</a>
+    <a href="/stats">stats</a>
+    <a href="/grove">grove</a>
+    <a href="/live">changelog</a>
+    <a href="/manifesto">manifesto</a>
+    <a href="/whitepaper">whitepaper</a>
+    <a href="https://github.com/dot-protocol/pipernet" target="_blank" rel="noopener">github</a>
+    <a href="https://x.com/dotpiedpiper" target="_blank" rel="noopener">x.com</a>
+    <a href="https://app.streamflow.finance/contract/solana/mainnet/6LSxvLLfdKwuU5ZJ9rvBJu8VmEZSFBmkdn96HUzMGXX7?ref=chaotically-tight-parakeet"
+       target="_blank" rel="noopener">lock</a>
+  </nav>
+
+  <div class="footer-copy">
+    <span>MIT &amp; Apache-2.0 licensed. No insider allocation. The name is not fiction.</span>
+    <span>The trailer was the show. The film is what we ship.</span>
+  </div>
+</footer>
+
+<!-- ── SCRIPT ───────────────────────────────────────────────────────── -->
+<script>
+(function () {
+  'use strict';
+
+  /* Theme restore */
+  function applyTheme(k) {
+    k === 'auto'
+      ? document.body.removeAttribute('data-theme')
+      : document.body.setAttribute('data-theme', k);
+    try { localStorage.setItem('piedpiper-theme', k); } catch (e) {}
+  }
+  try { applyTheme(localStorage.getItem('piedpiper-theme') || 'auto'); } catch (e) {}
+
+  /* Scroll reveal via IntersectionObserver */
+  var revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    revealEls.forEach(function (el) { io.observe(el); });
+  } else {
+    revealEls.forEach(function (el) { el.classList.add('visible'); });
+  }
+
+  /* PostHog events */
+  function track(evt) {
+    try { window.posthog && posthog.capture(evt); } catch (e) {}
+  }
+  var heroBtn = document.getElementById('hero-install-btn');
+  var navBtn  = document.getElementById('nav-install-btn');
+  if (heroBtn) heroBtn.addEventListener('click', function () { track('install_clicked_hero'); });
+  if (navBtn)  navBtn.addEventListener('click',  function () { track('install_clicked_nav'); });
+
+  /* Live $PIPER market data from DexScreener */
+  var MINT = '83VTqzxszRFPSzJHvTeNRydcuUmmhEjj9FH4F7TZpump';
+
+  function fmt(n, prefix, decimals) {
+    if (n == null || isNaN(n)) return '—';
+    if (n >= 1e9)  return (prefix || '') + (n / 1e9).toFixed(2) + 'B';
+    if (n >= 1e6)  return (prefix || '') + (n / 1e6).toFixed(2) + 'M';
+    if (n >= 1e3)  return (prefix || '') + (n / 1e3).toFixed(1) + 'K';
+    return (prefix || '') + n.toFixed(decimals != null ? decimals : 4);
+  }
+
+  function setEl(id, val) {
+    var el = document.getElementById(id);
+    if (el) { el.textContent = val; el.classList.remove('loading'); }
+  }
+
+  fetch('https://api.dexscreener.com/latest/dex/tokens/' + MINT)
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      var pairs = data && data.pairs;
+      if (!pairs || !pairs.length) return;
+      var pair = pairs[0];
+      setEl('stat-price', pair.priceUsd ? '$' + Number(pair.priceUsd).toFixed(8) : '—');
+      setEl('stat-mcap',  fmt(pair.fdv, '$'));
+      setEl('stat-vol',   fmt(pair.volume && pair.volume.h24, '$'));
+      setEl('stat-liq',   fmt(pair.liquidity && pair.liquidity.usd, '$'));
+    })
+    .catch(function () {
+      /* silently fail — dashes remain */
+    });
+
+})();
+</script>
+
+</body>
+</html>
