@@ -1,6 +1,13 @@
 {
   "events": [
     {
+      "ts": "2026-05-03T07:09:24Z",
+      "type": "feature",
+      "title": "new home — one page, waitlist, referral",
+      "url": "https://piedpiper.fun",
+      "body": "Swapped the home. One page, plain English: 'I let people send things to each other without a company in the middle.' Waitlist instead of a download that wasn't ready. Every signup gets an invite link and a dashboard. The trailer was the show. The film is what we ship."
+    },
+    {
       "ts": "2026-05-03T05:11:00Z",
       "type": "release",
       "title": "dotdrop v0.1.0 — Android APK shipped",
