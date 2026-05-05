@@ -1,6 +1,18 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/c/:path*",
+      "destination": "https://qr-chat-kohl.vercel.app/:path*",
+      "permanent": false
+    },
+    {
+      "source": "/c",
+      "destination": "https://qr-chat-kohl.vercel.app/",
+      "permanent": false
+    }
+  ],
   "functions": {
     "api/compress.py": {
       "runtime": "@vercel/python@4.3.1",
@@ -28,6 +40,22 @@
         { "key": "Access-Control-Allow-Origin", "value": "*" },
         { "key": "Content-Type", "value": "application/json; charset=utf-8" },
         { "key": "Cache-Control", "value": "public, max-age=60" }
+      ]
+    },
+    {
+      "source": "/send-preview/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Service-Worker-Allowed", "value": "/send-preview/" }
+      ]
+    },
+    {
+      "source": "/send-preview/service-worker.js",
+      "headers": [
+        { "key": "Service-Worker-Allowed", "value": "/send-preview/" },
+        { "key": "Cache-Control", "value": "no-cache" }
       ]
     }
   ]
