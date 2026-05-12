@@ -1,635 +1,2930 @@
-<!doctype html>
-<!-- ═══════════════════════════════════════════════════════════════════
-  index-v2.html — Pied Piper home page, consumer v2 (PREVIEW ONLY)
-  DO NOT swap to index.html without Blaze approval.
-
-  Design decisions:
-  - No sidebar. No sticky nav (too much chrome for a 2-screen page).
-    A minimal wordmark sits top-left, "install" top-right. That is the
-    entire header. Disappears below the fold.
-  - Accent: #c8f542 (acid chartreuse). Readable, on-brand, not terminal-
-    cosplay green.
-  - Typography: ui-serif for the hero + body voice, ui-monospace for
-    secondary links + token stats. No external fonts.
-  - Scroll: one gentle fade on the story block. Nothing else moves.
-  - Mobile-first column, max-width 540px, centered. Works in 2 screens.
-  - Links kept: install, holders, stats, whitepaper, github, x.com.
-  - Links killed from home: /grove, /decode, /dotdrop, /manifesto,
-    /lab, /demo, /live, /app. URLs still work — just not linked here.
-  ═══════════════════════════════════════════════════════════════════ -->
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<script>
-  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId captureTraceFeedback captureTraceMetric".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-  posthog.init('phc_PLACEHOLDER_REPLACE_ME', {
-    api_host: 'https://us.i.posthog.com',
-    person_profiles: 'identified_only',
-    capture_pageview: true,
-    capture_pageleave: true,
-    autocapture: true,
-    session_recording: { maskAllInputs: false, maskInputOptions: { password: true } }
-  });
-</script>
-<title>Pied Piper</title>
-<meta name="description" content="Send things to people directly. No company in the middle." />
-<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-<meta property="og:title" content="Pied Piper" />
-<meta property="og:description" content="Send things to people directly. No company in the middle." />
-<meta property="og:url" content="https://piedpiper.fun" />
-<meta property="og:type" content="website" />
-<meta property="og:image" content="/og.png" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Pied Piper" />
-<meta name="twitter:description" content="Send things to people directly. No company in the middle." />
-<meta name="twitter:image" content="/og.png" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>piper-chat</title>
+  <script src="vendor/tweetnacl.min.js"></script>
+  <script src="vendor/qrcode-generator.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-<style>
-/* ── TOKENS ────────────────────────────────────────────────────── */
-:root {
-  --bg:      #0b0b0b;
-  --fg:      #f0f0f0;
-  --muted:   rgba(240,240,240,0.46);
-  --line:    rgba(240,240,240,0.10);
-  --accent:  #c8f542;
-  --mono:    ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
-  --serif:   ui-serif, Georgia, "Iowan Old Style", "Apple Garamond", serif;
-  --ease:    cubic-bezier(0.22, 1, 0.36, 1);
-}
+    :root {
+      --bg: #080a0e;
+      --surface: #0d1117;
+      --card: #161b22;
+      --border: #21262d;
+      --text: #e0e6ed;
+      --muted: #6e7681;
+      --accent: #00ff41;
+      --accent-dim: rgba(0, 255, 65, 0.10);
+      --own-bg: #0d3318;
+      --sidebar-w: 160px;
+    }
 
-/* ── RESET ─────────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--fg);
-  font-family: var(--serif);
-  font-size: clamp(15px, 1.1vw + 12px, 18px);
-  line-height: 1.65;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-a { color: inherit; text-decoration: none; }
-::selection { background: var(--accent); color: #0b0b0b; }
+    body {
+      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+      background: var(--bg);
+      color: var(--text);
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-/* ── TOPBAR ────────────────────────────────────────────────────── */
-.topbar {
-  width: 100%;
-  max-width: 560px;
-  padding: 1.8rem 1.4rem 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.topbar-logo {
-  font-family: var(--mono);
-  font-size: 0.78em;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--fg);
-}
-.topbar-logo span { color: var(--accent); margin-right: 0.2em; }
+    /* ── header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      gap: 12px;
+    }
 
-.topbar-install {
-  font-family: var(--mono);
-  font-size: 0.75em;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  padding: 0.4em 1em;
-  background: var(--accent);
-  color: #0b0b0b;
-  border-radius: 2px;
-  transition: opacity 180ms var(--ease), transform 80ms ease;
-}
-.topbar-install:hover { opacity: 0.85; transform: translateY(-1px); }
+    .header-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
 
-/* ── WAITLIST FORM ─────────────────────────────────────────────── */
-.waitlist-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 4rem;
-  align-self: stretch;
-}
-.waitlist-row {
-  display: flex;
-  gap: 0.5rem;
-  align-items: stretch;
-}
-.waitlist-input {
-  flex: 1;
-  background: transparent;
-  border: 1px solid rgba(240,240,240,0.22);
-  border-radius: 2px;
-  padding: 0.75em 1em;
-  font-family: var(--mono);
-  font-size: 0.88em;
-  color: var(--fg);
-  outline: none;
-  transition: border-color 180ms var(--ease);
-  min-width: 0;
-}
-.waitlist-input::placeholder { color: var(--muted); }
-.waitlist-input:focus { border-color: var(--accent); }
-.waitlist-btn {
-  flex-shrink: 0;
-  padding: 0.75em 1.4em;
-  background: var(--accent);
-  color: #0b0b0b;
-  font-family: var(--mono);
-  font-size: 0.85em;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  border: none;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: opacity 180ms var(--ease), transform 80ms ease;
-}
-.waitlist-btn:hover:not(:disabled) { opacity: 0.85; transform: translateY(-1px); }
-.waitlist-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.waitlist-microcopy {
-  font-family: var(--mono);
-  font-size: 0.76em;
-  color: var(--muted);
-  line-height: 1.5;
-}
-.waitlist-error {
-  font-family: var(--mono);
-  font-size: 0.78em;
-  color: #e06c75;
-  display: none;
-}
-.waitlist-error.visible { display: block; }
+    .status-dot {
+      width: 7px; height: 7px; flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2.5s ease-in-out infinite;
+    }
 
-/* ── MAIN COLUMN ───────────────────────────────────────────────── */
-main {
-  width: 100%;
-  max-width: 560px;
-  padding: clamp(3.5rem, 10vw, 5.5rem) 1.4rem clamp(2rem, 6vw, 3.5rem);
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-/* ── HERO ──────────────────────────────────────────────────────── */
-.hero-wordmark {
-  font-family: var(--serif);
-  font-size: clamp(2.6rem, 8vw + 0.5rem, 4.8rem);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-  line-height: 1.04;
-  color: var(--fg);
-  margin-bottom: 1rem;
-}
+    h1 { font-size: 14px; font-weight: 600; letter-spacing: 0.3px; white-space: nowrap; }
 
-.hero-line {
-  font-size: clamp(1.05rem, 2vw + 0.4rem, 1.35rem);
-  color: var(--muted);
-  font-style: italic;
-  line-height: 1.45;
-  max-width: 38ch;
-  margin-bottom: 2.2rem;
-}
-/* The "not fiction" phrase gets the accent nudge */
-.hero-line strong {
-  color: var(--fg);
-  font-style: normal;
-  font-weight: 400;
-}
+    .channel-badge {
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .channel-badge span { color: var(--accent); }
 
-.hero-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5em;
-  padding: 0.9em 2em;
-  background: var(--accent);
-  color: #0b0b0b;
-  font-family: var(--mono);
-  font-size: 0.92em;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  border-radius: 2px;
-  align-self: flex-start;
-  margin-bottom: 4rem;
-  transition: opacity 180ms var(--ease), transform 80ms ease;
-}
-.hero-cta:hover { opacity: 0.85; transform: translateY(-2px); }
-.hero-cta svg { flex-shrink: 0; }
+    .stats {
+      display: flex; gap: 16px; flex-shrink: 0;
+      font-size: 11px; color: var(--muted);
+    }
 
-/* ── STORY BLOCK ───────────────────────────────────────────────── */
-.story {
-  border-top: 1px solid var(--line);
-  padding-top: 2.2rem;
-  margin-bottom: 2.4rem;
-  opacity: 0;
-  transform: translateY(16px);
-  animation: fadeup 0.7s 0.2s cubic-bezier(0.22,1,0.36,1) forwards;
-}
-@keyframes fadeup {
-  to { opacity: 1; transform: none; }
-}
+    .stat-val { color: var(--accent); font-weight: 600; }
 
-.story p {
-  font-size: clamp(0.96rem, 1.3vw + 0.3rem, 1.1rem);
-  color: var(--muted);
-  line-height: 1.75;
-  margin-bottom: 1em;
-}
-.story p:last-child { margin-bottom: 0; }
-.story em {
-  color: var(--fg);
-  font-style: italic;
-}
+    /* ── layout: sidebar + main ── */
+    .body-wrap {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
 
-/* ── SECONDARY LINKS ───────────────────────────────────────────── */
-.sec-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35em 1em;
-  padding: 1.8rem 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  margin-bottom: 2.6rem;
-  font-family: var(--mono);
-  font-size: 0.8em;
-  color: var(--muted);
-  letter-spacing: 0.02em;
-}
-.sec-links a {
-  transition: color 180ms var(--ease);
-  padding: 0.1em 0;
-  position: relative;
-}
-.sec-links a::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 100%;
-  height: 1px;
-  background: var(--fg);
-  transition: right 220ms var(--ease);
-}
-.sec-links a:hover { color: var(--fg); }
-.sec-links a:hover::after { right: 0; }
+    /* ── sidebar ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
 
-.sec-links .sep {
-  opacity: 0.25;
-  user-select: none;
-}
+    .sidebar-header {
+      padding: 10px 12px 6px;
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+    }
 
-/* ── TOKEN PANEL ───────────────────────────────────────────────── */
-.token-panel {
-  padding: 1.6rem;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--line);
-  border-radius: 3px;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 3rem;
-}
+    .channel-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px 0;
+    }
 
-.token-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-  font-family: var(--mono);
-  font-size: 0.72em;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.live-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-  flex-shrink: 0;
-  animation: blink 2.4s ease infinite;
-}
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.2; }
-}
+    .channel-list::-webkit-scrollbar { width: 4px; }
+    .channel-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-.token-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.8rem 1.4rem;
-  font-family: var(--mono);
-  font-size: 0.78em;
-}
-.stat-label {
-  display: block;
-  font-size: 0.82em;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-  margin-bottom: 0.15em;
-}
-.stat-val {
-  color: var(--fg);
-  font-weight: 600;
-}
-.stat-val.loading { color: var(--muted); }
-.stat-val.accent  { color: var(--accent); }
+    .ch-item {
+      padding: 7px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: background 0.1s, color 0.1s;
+    }
 
-.token-lock-line {
-  font-family: var(--mono);
-  font-size: 0.72em;
-  color: var(--muted);
-  line-height: 1.55;
-}
-.token-lock-line a {
-  color: var(--accent);
-  border-bottom: 1px solid transparent;
-  transition: border-color 180ms var(--ease);
-}
-.token-lock-line a:hover { border-bottom-color: var(--accent); }
+    .ch-item:hover { background: var(--card); color: var(--text); }
+    .ch-item.active { color: var(--accent); background: var(--accent-dim); }
 
-/* ── FOOTER ────────────────────────────────────────────────────── */
-footer {
-  width: 100%;
-  max-width: 560px;
-  padding: 1.4rem 1.4rem 2rem;
-  border-top: 1px solid var(--line);
-  font-family: var(--mono);
-  font-size: 0.72em;
-  color: var(--muted);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-footer a {
-  color: var(--muted);
-  border-bottom: 1px dotted var(--muted);
-  transition: color 180ms var(--ease), border-color 180ms var(--ease);
-}
-footer a:hover { color: var(--fg); border-bottom-color: var(--fg); }
+    .ch-item::before { content: '# '; opacity: 0.5; }
 
-/* ── MOBILE ────────────────────────────────────────────────────── */
-@media (max-width: 420px) {
-  .hero-cta { align-self: stretch; justify-content: center; }
-  .token-stats { grid-template-columns: 1fr; }
-  footer { flex-direction: column; align-items: flex-start; }
-}
-</style>
+    .new-channel {
+      padding: 8px 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 6px;
+    }
+
+    .new-channel input {
+      flex: 1;
+      min-width: 0;
+      padding: 5px 8px;
+      font: inherit;
+      font-size: 11px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 4px;
+    }
+    .new-channel input:focus { outline: none; border-color: var(--accent); }
+    .new-channel input::placeholder { color: var(--muted); }
+
+    .new-channel button {
+      padding: 5px 8px;
+      font-size: 11px;
+      border-radius: 4px;
+      background: var(--card);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .new-channel button:hover { color: var(--text); border-color: var(--accent); }
+
+    /* ── main chat area ── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── messages ── */
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .messages::-webkit-scrollbar { width: 6px; }
+    .messages::-webkit-scrollbar-track { background: var(--bg); }
+    .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .empty {
+      margin: auto;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 2;
+      padding: 40px;
+    }
+
+    .msg {
+      padding: 9px 13px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      animation: slide-in 0.2s ease-out;
+    }
+
+    @keyframes slide-in {
+      from { opacity: 0; transform: translateY(5px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg.own {
+      background: var(--own-bg);
+      border-color: var(--accent);
+      border-left-width: 3px;
+    }
+
+    .msg-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 4px;
+      gap: 8px;
+    }
+
+    .msg-author {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+    }
+
+    .pubkey-tag {
+      font-size: 9px;
+      color: var(--muted);
+      font-weight: 400;
+      background: rgba(255,255,255,0.04);
+      padding: 1px 4px;
+      border-radius: 3px;
+      letter-spacing: 0.5px;
+    }
+
+    .legacy-tag {
+      font-size: 9px;
+      color: #6e7681;
+      font-weight: 400;
+      padding: 1px 4px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .sig-ok {
+      font-size: 9px;
+      color: var(--accent);
+      padding: 1px 4px;
+      border-radius: 3px;
+      background: rgba(0, 255, 65, 0.08);
+    }
+
+    .sig-none {
+      font-size: 9px;
+      color: var(--muted);
+      padding: 1px 4px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.03);
+    }
+
+    /* ── attachments ── */
+    .attachments {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 7px;
+    }
+
+    .att-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 10px;
+      color: var(--muted);
+      max-width: 220px;
+    }
+
+    .att-chip .att-name {
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .att-chip .att-size {
+      flex-shrink: 0;
+      color: var(--muted);
+    }
+
+    /* ── v1.2 encrypted message ── */
+    .msg.encrypted {
+      border-left: 3px solid #4d5bce;
+      background: #0d1230;
+    }
+
+    .seal-badge {
+      font-size: 9px;
+      padding: 1px 4px;
+      border-radius: 3px;
+      background: rgba(77, 91, 206, 0.18);
+      color: #7b8cde;
+    }
+
+    .decrypted-badge {
+      font-size: 9px;
+      padding: 1px 4px;
+      border-radius: 3px;
+      background: rgba(0, 255, 65, 0.08);
+      color: var(--accent);
+    }
+
+    /* ── transport toggle ── */
+    .transport-toggle {
+      display: flex;
+      gap: 6px;
+      font-size: 10px;
+      margin-bottom: 6px;
+      align-items: center;
+      color: var(--muted);
+    }
+
+    .transport-btn {
+      padding: 3px 8px;
+      font-size: 10px;
+      background: var(--card);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .transport-btn.active {
+      background: rgba(77, 91, 206, 0.2);
+      color: #7b8cde;
+      border-color: #4d5bce;
+    }
+
+    /* ── room recipients panel ── */
+    .recipients-panel {
+      display: none;
+      font-size: 10px;
+      color: var(--muted);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 7px 10px;
+      margin-bottom: 6px;
+      gap: 6px;
+      flex-direction: column;
+    }
+
+    .recipients-panel.visible { display: flex; }
+
+    .recipients-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+    .recipient-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      background: rgba(77, 91, 206, 0.12);
+      border: 1px solid rgba(77, 91, 206, 0.3);
+      border-radius: 10px;
+      font-size: 9px;
+      color: #7b8cde;
+    }
+
+    .recipient-chip .rm-r {
+      cursor: pointer;
+      color: var(--muted);
+      margin-left: 2px;
+    }
+
+    .recipient-chip .rm-r:hover { color: #ff6b6b; }
+
+    .recipient-add-row {
+      display: flex;
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    .recipient-add-row input {
+      flex: 1;
+      font-size: 10px;
+      padding: 3px 6px;
+    }
+
+    .recipient-add-row button {
+      font-size: 10px;
+      padding: 3px 8px;
+    }
+
+    /* ── QR sharing ── */
+    .qr-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .qr-row button {
+      flex: 1;
+      font-size: 10px;
+      padding: 4px 8px;
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .qr-row button:hover {
+      border-color: #4d5bce;
+      background: rgba(77, 91, 206, 0.08);
+    }
+
+    #qr-share-canvas {
+      width: 240px;
+      height: 240px;
+      background: #fff;
+      padding: 12px;
+      border-radius: 6px;
+      margin: 0 auto;
+      display: block;
+    }
+
+    .qr-share-link {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      word-break: break-all;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 8px 10px;
+      margin-top: 10px;
+      max-height: 80px;
+      overflow-y: auto;
+    }
+
+    #qr-scan-video {
+      width: 100%;
+      max-width: 320px;
+      max-height: 240px;
+      background: #000;
+      border-radius: 6px;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .qr-scan-status {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 8px;
+      min-height: 14px;
+    }
+
+    .qr-scan-fallback {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .qr-scan-fallback input[type=file] {
+      display: block;
+      margin: 6px auto 0;
+      font-size: 10px;
+    }
+
+    .qr-incoming-banner {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 255, 65, 0.12);
+      border: 1px solid rgba(0, 255, 65, 0.3);
+      color: var(--accent);
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      z-index: 1500;
+      display: none;
+      max-width: 90vw;
+    }
+
+    .qr-incoming-banner.visible { display: block; }
+
+    .qr-incoming-banner button {
+      margin-left: 10px;
+      font-size: 10px;
+      padding: 3px 8px;
+    }
+
+    /* ── key setup banner ── */
+    .key-banner {
+      background: rgba(0, 255, 65, 0.05);
+      border: 1px solid rgba(0, 255, 65, 0.15);
+      border-radius: 5px;
+      padding: 8px 12px;
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .key-banner.hidden { display: none; }
+
+    .key-banner input {
+      flex: 1;
+      min-width: 0;
+      font: inherit;
+      font-size: 10px;
+    }
+
+    .key-banner button {
+      font-size: 10px;
+      padding: 4px 10px;
+    }
+
+    /* ── attach button ── */
+    .attach-btn {
+      padding: 9px 11px;
+      background: var(--card);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .attach-btn:hover { color: var(--text); border-color: var(--accent); opacity: 1; }
+
+    .attach-preview {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .attach-chip-small {
+      padding: 2px 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .attach-chip-small:hover { border-color: #ff6b6b; color: #ff6b6b; }
+
+    .msg-time { color: var(--muted); font-size: 10px; flex-shrink: 0; }
+
+    .msg-text {
+      font-size: 13px;
+      line-height: 1.45;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+
+    /* ── input area ── */
+    .input-area {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 12px 18px;
+      flex-shrink: 0;
+    }
+
+    .name-row { display: none; gap: 8px; margin-bottom: 10px; }
+    .name-row.visible { display: flex; }
+
+    .msg-row { display: flex; gap: 8px; }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 9px 13px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 5px;
+      font: inherit;
+      font-size: 13px;
+      transition: border-color 0.15s;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-dim);
+    }
+
+    input[type="text"]::placeholder { color: var(--muted); }
+
+    button {
+      padding: 9px 16px;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 5px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+
+    button:hover { opacity: 0.85; transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+    button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* ── peer connect modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 10;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.visible { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 22px;
+      width: min(480px, 90vw);
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+    }
+
+    .modal h2 { font-size: 14px; font-weight: 600; }
+    .modal p  { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    .modal textarea {
+      width: 100%; height: 80px;
+      padding: 9px 11px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 5px;
+      font: inherit;
+      font-size: 11px;
+      resize: vertical;
+    }
+
+    .modal textarea:focus { outline: none; border-color: var(--accent); }
+
+    .modal-ticket {
+      font-size: 10px;
+      color: var(--muted);
+      word-break: break-all;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 7px 9px;
+      line-height: 1.5;
+    }
+
+    .modal-btns { display: flex; gap: 8px; justify-content: flex-end; }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { background: var(--card); opacity: 1; }
+
+    /* ── identity pill ── */
+    .id-pill {
+      font-size: 10px;
+      color: var(--muted);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 3px 8px;
+      cursor: default;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 120px;
+      flex-shrink: 0;
+    }
+
+    /* ── username claim banner ── */
+    .username-banner {
+      background: rgba(0, 255, 65, 0.05);
+      border: 1px solid rgba(0, 255, 65, 0.12);
+      border-radius: 5px;
+      padding: 7px 11px;
+      font-size: 10px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 7px;
+    }
+    .username-banner.hidden { display: none; }
+    .username-banner input {
+      flex: 1; min-width: 0;
+      font: inherit; font-size: 10px;
+      padding: 4px 8px;
+    }
+    .username-banner button { font-size: 10px; padding: 4px 10px; }
+    .username-display {
+      font-size: 10px; color: var(--accent);
+      background: rgba(0,255,65,0.08);
+      border: 1px solid rgba(0,255,65,0.15);
+      border-radius: 10px; padding: 1px 8px;
+      cursor: pointer; white-space: nowrap;
+    }
+    .username-display:hover { opacity: 0.8; }
+
+    /* ── contacts panel ── */
+    .contacts-panel {
+      width: 170px;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      flex-shrink: 0; overflow: hidden;
+      transition: width 0.2s;
+    }
+    .contacts-panel.collapsed { width: 0; border-left: none; }
+
+    .contacts-header {
+      padding: 10px 12px 6px;
+      font-size: 10px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .contacts-header span { cursor: pointer; }
+    .contacts-header span:hover { color: var(--text); }
+
+    .contacts-list {
+      flex: 1; overflow-y: auto; padding: 4px 0;
+    }
+    .contacts-list::-webkit-scrollbar { width: 4px; }
+    .contacts-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .contact-item {
+      padding: 7px 10px; font-size: 11px; cursor: pointer;
+      color: var(--muted); display: flex; align-items: center;
+      gap: 5px; min-width: 0;
+    }
+    .contact-item:hover { background: var(--card); color: var(--text); }
+
+    .contact-name {
+      flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      color: var(--text); font-size: 11px;
+    }
+    .contact-sub {
+      font-size: 9px; color: var(--muted); white-space: nowrap;
+    }
+    .contact-fav {
+      flex-shrink: 0; cursor: pointer; font-size: 12px;
+      opacity: 0.4; transition: opacity 0.1s;
+      background: none; border: none; padding: 0;
+      color: #ffd700; line-height: 1;
+    }
+    .contact-fav:hover { opacity: 1; transform: none; }
+    .contact-fav.active { opacity: 1; }
+
+    .contact-actions {
+      display: flex; gap: 4px; padding: 4px 10px 6px;
+      border-top: 1px solid var(--border);
+    }
+    .contact-io-btn {
+      flex: 1; font-size: 9px; padding: 3px 4px;
+      background: var(--card); color: var(--muted);
+      border: 1px solid var(--border); border-radius: 3px;
+    }
+    .contact-io-btn:hover { color: var(--text); border-color: var(--accent); opacity: 1; transform: none; }
+
+    /* save-sender pin button on messages */
+    .save-sender-btn {
+      display: none; position: absolute; right: 7px; top: 7px;
+      background: none; border: none; padding: 0;
+      font-size: 11px; color: var(--muted); cursor: pointer;
+      opacity: 0; transition: opacity 0.15s; transform: none;
+    }
+    .msg { position: relative; }
+    .msg:hover .save-sender-btn { opacity: 0.6; display: block; }
+    .save-sender-btn:hover { opacity: 1 !important; }
+    .save-sender-btn.saved { color: var(--accent); opacity: 0.8 !important; display: block !important; }
+
+    /* contacts toggle in header */
+    .contacts-toggle-btn {
+      background: var(--card); color: var(--muted);
+      border: 1px solid var(--border); font-size: 11px;
+      padding: 4px 8px; border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .contacts-toggle-btn:hover { color: var(--text); border-color: var(--accent); opacity: 1; transform: none; }
+    .contacts-toggle-btn.active { color: var(--accent); border-color: var(--accent); background: var(--accent-dim); }
+
+    /* nickname edit inline */
+    .contact-nick-input {
+      flex: 1; font-size: 10px; padding: 2px 5px;
+      background: var(--card); border: 1px solid var(--accent);
+      color: var(--text); border-radius: 3px; min-width: 0;
+    }
+
+    /* ── mobile-menu toggle (visible only ≤900px) ── */
+    .mobile-menu-btn {
+      display: none;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      width: 34px; height: 34px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .scrim {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(2px);
+      z-index: 980;
+      display: none;
+    }
+    .scrim.visible { display: block; }
+
+    /* ── tablet ≤900px ── */
+    @media (max-width: 900px) {
+      .mobile-menu-btn { display: inline-flex; align-items: center; justify-content: center; }
+      .stats { gap: 12px; font-size: 10px; }
+      :root { --sidebar-w: 220px; }
+      .sidebar {
+        position: fixed;
+        top: 0; left: 0; bottom: 0;
+        width: var(--sidebar-w);
+        max-width: 78vw;
+        z-index: 990;
+        transform: translateX(-100%);
+        transition: transform 0.18s ease-out;
+        box-shadow: 4px 0 14px rgba(0,0,0,0.5);
+      }
+      .sidebar.open { transform: translateX(0); }
+      .contacts-panel {
+        position: fixed;
+        top: 0; right: 0; bottom: 0;
+        width: 280px;
+        max-width: 80vw;
+        z-index: 990;
+        transform: translateX(100%);
+        transition: transform 0.18s ease-out;
+        border-left: 1px solid var(--border);
+        box-shadow: -4px 0 14px rgba(0,0,0,0.5);
+      }
+      .contacts-panel.collapsed { transform: translateX(100%); width: 280px; border-left: 1px solid var(--border); }
+      .contacts-panel:not(.collapsed) { transform: translateX(0); }
+    }
+
+    /* ── phone ≤600px ── */
+    @media (max-width: 600px) {
+      header { padding: 8px 10px; gap: 8px; }
+      h1 { font-size: 13px; }
+      .channel-badge { font-size: 10px; max-width: 100px; }
+      .stats { gap: 8px; font-size: 10px; }
+      .stats span { white-space: nowrap; }
+      .id-pill { display: none; }
+      .messages { padding: 10px 12px; gap: 6px; }
+      .msg { padding: 8px 10px; font-size: 13px; }
+      .msg-meta { gap: 6px; }
+      .input-area { padding: 8px 10px; }
+      .key-banner { font-size: 10px; padding: 6px 8px; flex-wrap: wrap; gap: 6px; }
+      .key-banner input { font-size: 11px; }
+      .username-row, .name-row { flex-wrap: wrap; }
+      .msg-row {
+        gap: 6px;
+      }
+      .msg-row input {
+        min-height: 40px;
+        font-size: 14px;          /* prevent iOS zoom on focus */
+      }
+      .msg-row button, .attach-btn {
+        min-height: 40px;
+        min-width: 42px;
+        padding: 0 10px;
+        font-size: 13px;
+      }
+      #send-btn { padding: 0 16px; font-weight: 600; }
+      .recipients-panel {
+        padding: 8px;
+      }
+      .recipient-add-row {
+        flex-wrap: wrap;
+      }
+      .recipient-add-row input {
+        flex: 1 1 100%;
+        font-size: 12px;
+        min-height: 36px;
+      }
+      .recipient-add-row button {
+        flex: 1 1 100%;
+        min-height: 36px;
+        font-size: 12px;
+      }
+      .qr-row button { min-height: 38px; font-size: 12px; }
+      .modal {
+        max-width: 100vw;
+        width: 100vw;
+        height: 100dvh;
+        border-radius: 0;
+        padding: 20px 16px;
+        gap: 14px;
+      }
+      .modal-overlay { padding: 0; align-items: stretch; }
+      #qr-share-canvas { width: 86vw; height: 86vw; max-width: 320px; max-height: 320px; }
+      .modal-btns { flex-wrap: wrap; }
+      .modal-btns button { min-height: 40px; padding: 0 16px; }
+      #qr-scan-video { max-width: 100%; max-height: 60vh; }
+      .qr-incoming-banner {
+        left: 8px; right: 8px;
+        top: 8px;
+        transform: none;
+        max-width: none;
+        font-size: 11px;
+      }
+    }
+
+    /* ── extra-narrow ≤380px ── */
+    @media (max-width: 380px) {
+      h1 { font-size: 12px; }
+      .channel-badge { display: none; }
+      .stats { gap: 6px; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- top bar -->
-<div class="topbar">
-  <span class="topbar-logo" aria-label="Pied Piper"><span>&#x25CF;</span>Pied Piper</span>
-  <a href="/dashboard" class="topbar-install" id="top-dashboard-btn">dashboard</a>
-</div>
-
-<!-- main column -->
-<main>
-
-  <!-- 1. HERO -->
-  <h1 class="hero-wordmark">Pied Piper</h1>
-  <p class="hero-line">
-    I let people send things to each other
-    <strong>without a company in the middle.</strong>
-  </p>
-  <form class="waitlist-form" id="waitlist-form" novalidate>
-    <!-- honeypot: bots fill this, humans do not -->
-    <input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true"
-           style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" />
-    <div class="waitlist-row">
-      <input
-        type="email"
-        name="email"
-        id="waitlist-email"
-        class="waitlist-input"
-        placeholder="your@email.com"
-        autocomplete="email"
-        required
-        aria-label="Email address"
-      />
-      <button type="submit" class="waitlist-btn" id="waitlist-btn">join waitlist</button>
-    </div>
-    <span class="waitlist-error" id="waitlist-error" role="alert"></span>
-    <p class="waitlist-microcopy">no spam. no series A. you'll get the link when it ships.</p>
-  </form>
-
-  <!-- 2. STORY -->
-  <div class="story" aria-label="About Pied Piper">
-    <p>
-      The show ran for six seasons and ended with the protocol working
-      and the team choosing not to ship it.
-      Nobody believed that was the right call.
-      We are the people who didn't put it down.
-    </p>
-    <p>
-      Every file you send through WhatsApp, iCloud, or Google Drive
-      passes through a company's server.
-      They can see it, store it, and cut you off.
-      Pied Piper routes around all of that.
-      Your device finds the recipient's device.
-      The relay in Frankfurt, if you use one, cannot read what passes through it.
-    </p>
-    <p>
-      The code is open source.
-      The relay is self-hostable on a Raspberry Pi.
-      There is no series A, no exit plan, no insider allocation.
-      The people building this hold the same tokens you can buy on the open market.
-    </p>
-    <p>
-      <em>The trailer was the show.
-      The film is what we ship.</em>
-    </p>
+<header>
+  <div class="header-left">
+    <button class="mobile-menu-btn" id="mobile-menu-btn" type="button" aria-label="toggle channels">☰</button>
+    <div class="status-dot"></div>
+    <h1>piper-chat</h1>
+    <span class="channel-badge">#<span id="active-channel-name">main</span></span>
   </div>
+  <div class="stats">
+    <span><span class="stat-val" id="stat-peers">0</span> peers</span>
+    <span><span class="stat-val" id="stat-msgs">0</span> msgs</span>
+    <span id="stat-mode" style="color:var(--muted)">relay</span>
+  </div>
+  <div class="id-pill" id="id-pill" title="your public key">…</div>
+  <button class="contacts-toggle-btn" id="contacts-toggle-btn" title="show/hide contacts">👥</button>
+</header>
 
-  <!-- 3. SECONDARY LINKS -->
-  <nav class="sec-links" aria-label="Site links">
-    <a href="/holders">holders</a>
-    <span class="sep" aria-hidden="true">&middot;</span>
-    <a href="/stats">$piper</a>
-    <span class="sep" aria-hidden="true">&middot;</span>
-    <a href="/whitepaper">whitepaper</a>
-    <span class="sep" aria-hidden="true">&middot;</span>
-    <a href="https://github.com/dot-protocol/pipernet" target="_blank" rel="noopener">github</a>
-    <span class="sep" aria-hidden="true">&middot;</span>
-    <a href="https://x.com/dotpiedpiper" target="_blank" rel="noopener">x.com</a>
+<!-- scrim for mobile drawers -->
+<div class="scrim" id="scrim"></div>
+
+<div class="body-wrap">
+
+  <!-- channel sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-header">channels</div>
+    <div class="channel-list" id="channel-list">
+      <!-- populated by JS -->
+    </div>
+    <div class="new-channel">
+      <input type="text" id="new-channel-input" placeholder="+ new" maxlength="32"
+             title="channel name: lowercase, letters, digits, hyphens" autocomplete="off">
+      <button id="new-channel-btn" title="create channel">+</button>
+    </div>
   </nav>
 
-  <!-- 4. TOKEN PANEL -->
-  <div class="token-panel" role="region" aria-label="PIPER token market data">
-    <div class="token-header">
-      <span class="live-dot" aria-hidden="true"></span>
-      $PIPER &mdash; live
-    </div>
-    <div class="token-stats">
-      <div>
-        <span class="stat-label">Price</span>
-        <span class="stat-val loading" id="stat-price">&mdash;</span>
-      </div>
-      <div>
-        <span class="stat-label">Market cap</span>
-        <span class="stat-val loading" id="stat-mcap">&mdash;</span>
-      </div>
-      <div>
-        <span class="stat-label">24h volume</span>
-        <span class="stat-val loading" id="stat-vol">&mdash;</span>
-      </div>
-      <div>
-        <span class="stat-label">Locked</span>
-        <span class="stat-val accent">52.34M / 5.23%</span>
+  <!-- main chat -->
+  <div class="main" id="main-area">
+    <div class="messages" id="messages">
+      <div class="empty" id="empty">
+        the channel is empty. be the first.
       </div>
     </div>
-    <p class="token-lock-line">
-      1B supply. 52.34M locked one year.
-      No insider allocation. No series A. No exit plan.
-      &mdash;
-      <a href="https://app.streamflow.finance/contract/solana/mainnet/6LSxvLLfdKwuU5ZJ9rvBJu8VmEZSFBmkdn96HUzMGXX7?ref=chaotically-tight-parakeet"
-         target="_blank" rel="noopener">
-        view Streamflow receipt
-      </a>
-    </p>
+
+    <div class="input-area">
+      <!-- v1.3 username claim banner -->
+      <div class="username-banner" id="username-banner">
+        <span>@</span>
+        <input type="text" id="username-input" placeholder="claim a username" maxlength="32" autocomplete="off">
+        <button id="username-claim-btn">claim</button>
+        <span id="username-status" style="color:var(--muted);font-size:9px;"></span>
+      </div>
+      <!-- v1.1/v1.2 key setup banner (shown until priv key is set for this session) -->
+      <div class="key-banner" id="key-banner">
+        <span>🔑</span>
+        <input type="password" id="priv-key-input" placeholder="ed25519_priv_hex (128 hex) — for signing + encryption"
+               autocomplete="off" maxlength="128">
+        <input type="password" id="x25519-priv-input" placeholder="x25519_priv_hex (64 hex) — for E2E decrypt (optional)"
+               autocomplete="off" maxlength="64"
+               style="flex:0.6;min-width:0;font:inherit;font-size:10px;">
+        <button id="priv-key-btn">set</button>
+        <button id="priv-key-skip" style="background:transparent;color:var(--muted);border:1px solid var(--border);font-size:10px;padding:4px 8px;">skip</button>
+      </div>
+      <!-- transport toggle (SSE relay vs Mailbox) -->
+      <div class="transport-toggle" id="transport-toggle">
+        <span>transport:</span>
+        <button class="transport-btn active" id="transport-sse-btn" onclick="setTransport('sse')">SSE relay</button>
+        <button class="transport-btn" id="transport-mb-btn" onclick="setTransport('mailbox')">mailbox</button>
+        <span id="mailbox-status" style="margin-left:4px;"></span>
+      </div>
+      <!-- room recipients panel (v1.2 encryption) -->
+      <div class="recipients-panel" id="recipients-panel">
+        <div style="color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:0.4px;">🔒 recipients for <span id="recipients-channel-name">main</span></div>
+        <div class="recipients-row" id="recipients-chips"></div>
+        <div class="recipient-add-row">
+          <input type="text" id="recipient-dot1-input" placeholder="dot1:xxxxxxxxxxxxxxxx" maxlength="24" autocomplete="off">
+          <input type="text" id="recipient-x25519-input" placeholder="x25519_pub_hex (64)" maxlength="64" autocomplete="off" style="flex:1.5">
+          <button id="recipient-add-btn" style="font-size:10px;padding:3px 8px;">add</button>
+        </div>
+        <div class="qr-row">
+          <button id="qr-share-btn" type="button" title="show your QR so others can add you">📤 my QR</button>
+          <button id="qr-scan-btn"  type="button" title="scan another user's QR to add them">📷 scan QR</button>
+        </div>
+      </div>
+      <div class="name-row" id="name-row">
+        <input type="text" id="name-input" placeholder="choose a display name"
+               maxlength="24" autocomplete="off">
+        <button id="name-btn">set</button>
+      </div>
+      <div class="msg-row">
+        <input type="text" id="msg-input" placeholder="message" autocomplete="off" maxlength="4096">
+        <button class="attach-btn" id="attach-btn" title="attach files (max 4, 1 MB each)">📎</button>
+        <button id="send-btn">send</button>
+        <button id="encrypt-btn" title="toggle E2E encryption"
+                style="background:var(--card);color:var(--muted);border:1px solid var(--border);font-size:12px;"
+                >🔓</button>
+        <button id="peer-btn"
+                style="background:var(--card);color:var(--text);border:1px solid var(--border)"
+                title="connect a peer">⇄</button>
+      </div>
+      <!-- pending attachments preview -->
+      <div class="attach-preview" id="attach-preview"></div>
+      <!-- hidden file input -->
+      <input type="file" id="file-input" multiple accept="*/*" style="display:none">
+    </div>
   </div>
 
-</main>
+  <!-- contacts panel -->
+  <aside class="contacts-panel collapsed" id="contacts-panel">
+    <div class="contacts-header">
+      <span>contacts</span>
+      <span onclick="toggleContacts()" title="close">✕</span>
+    </div>
+    <div class="contacts-list" id="contacts-list">
+      <!-- populated by JS -->
+    </div>
+    <div class="contact-actions">
+      <button class="contact-io-btn" onclick="exportContacts()" title="export contacts.json">↓ export</button>
+      <label class="contact-io-btn" style="text-align:center;cursor:pointer;display:block;padding:3px 4px;" title="import contacts.json">
+        ↑ import<input type="file" id="contacts-import-input" accept=".json" style="display:none">
+      </label>
+    </div>
+  </aside>
+</div>
 
-<!-- footer -->
-<footer>
-  <span>open source. apache 2.</span>
-  <a href="https://github.com/dot-protocol" target="_blank" rel="noopener">github.com/dot-protocol</a>
-</footer>
+<!-- incoming-contact banner (auto-detected from ?c= param) -->
+<div class="qr-incoming-banner" id="qr-incoming-banner">
+  <span id="qr-incoming-label">add contact?</span>
+  <button id="qr-incoming-accept" type="button">add</button>
+  <button id="qr-incoming-dismiss" type="button" style="background:transparent;border:1px solid var(--border);color:var(--muted);">dismiss</button>
+</div>
+
+<!-- share QR modal -->
+<div class="modal-overlay" id="qr-share-modal">
+  <div class="modal">
+    <h2>your contact QR</h2>
+    <p style="font-size:11px;color:var(--muted);">have a friend scan this — they will be added to recipients and can DM you. nothing private is shared, only your public keys.</p>
+    <div id="qr-share-canvas"></div>
+    <div style="font-size:11px;color:var(--muted);margin-top:8px;">link (also shareable):</div>
+    <div class="qr-share-link" id="qr-share-link">—</div>
+    <div class="modal-btns">
+      <button class="btn-ghost" onclick="closeShareQrModal()">close</button>
+      <button onclick="copyShareLink()">copy link</button>
+    </div>
+  </div>
+</div>
+
+<!-- scan QR modal -->
+<div class="modal-overlay" id="qr-scan-modal">
+  <div class="modal">
+    <h2>scan a contact QR</h2>
+    <p style="font-size:11px;color:var(--muted);">point your camera at a piperchat QR code. on browsers without camera scanning, upload a screenshot below.</p>
+    <video id="qr-scan-video" autoplay playsinline muted></video>
+    <div class="qr-scan-status" id="qr-scan-status">requesting camera…</div>
+    <div class="qr-scan-fallback">
+      or upload a QR image:
+      <input type="file" id="qr-scan-file" accept="image/*">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-ghost" onclick="closeScanQrModal()">close</button>
+    </div>
+  </div>
+</div>
+
+<!-- peer connect modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h2>connect a peer</h2>
+    <p>share your ticket with another node, or paste theirs to sync documents directly via iroh P2P.</p>
+
+    <div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">your ticket</div>
+      <div class="modal-ticket" id="my-ticket">fetching…</div>
+      <button onclick="copyTicket()" style="margin-top:8px;font-size:11px;padding:5px 11px">copy ticket</button>
+    </div>
+
+    <div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">paste peer's ticket</div>
+      <textarea id="peer-ticket-input" placeholder="paste iroh ticket here…"></textarea>
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn-ghost" onclick="closeModal()">cancel</button>
+      <button id="connect-btn" onclick="connectPeer()">connect</button>
+    </div>
+  </div>
+</div>
 
 <script>
-(function () {
-  'use strict';
+'use strict';
 
-  var RELAY = 'https://relay.piedpiper.fun';
+// ── deploy prefix ─────────────────────────────────────────────────────────────
+// When served from piedpiper.fun root (/), the API lives at /chat/.
+// When served from /chat/ directly (VPS), the API is at the same path.
+const _rawBase = location.pathname.endsWith('/')
+  ? location.pathname
+  : location.pathname.replace(/\/[^/]*$/, '/') || '/';
+const BASE = _rawBase === '/' ? '/chat/' : _rawBase;
 
-  /* Theme restore (mirrors site-wide pattern) */
-  function applyTheme(k) {
-    k === 'auto'
-      ? document.body.removeAttribute('data-theme')
-      : document.body.setAttribute('data-theme', k);
-    try { localStorage.setItem('piedpiper-theme', k); } catch (e) {}
+// ── keypair (IndexedDB-persisted) ─────────────────────────────────────────────
+
+const IDB_DB    = 'piperchat';
+const IDB_STORE = 'keypair';
+
+let _keypair = null; // { publicKey: Uint8Array, secretKey: Uint8Array }
+
+function pubkeyHex() {
+  return _keypair ? buf2hex(_keypair.publicKey) : null;
+}
+
+function buf2hex(u8) {
+  return Array.from(u8).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function hex2buf(hex) {
+  const arr = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < arr.length; i++) arr[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
+  return arr;
+}
+
+function openIdb() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_DB, 1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore(IDB_STORE);
+    req.onsuccess  = e => resolve(e.target.result);
+    req.onerror    = e => reject(e.target.error);
+  });
+}
+
+async function loadOrCreateKeypair() {
+  try {
+    const idb = await openIdb();
+    const stored = await new Promise((resolve, reject) => {
+      const tx  = idb.transaction(IDB_STORE, 'readonly');
+      const req = tx.objectStore(IDB_STORE).get('kp');
+      req.onsuccess = e => resolve(e.target.result);
+      req.onerror   = e => reject(e.target.error);
+    });
+
+    if (stored && stored.pk && stored.sk) {
+      _keypair = {
+        publicKey: hex2buf(stored.pk),
+        secretKey: hex2buf(stored.sk),
+      };
+    } else {
+      _keypair = nacl.sign.keyPair();
+      const tx  = idb.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).put({ pk: buf2hex(_keypair.publicKey), sk: buf2hex(_keypair.secretKey) }, 'kp');
+    }
+  } catch (_) {
+    // fallback: session-only keypair if IndexedDB unavailable
+    _keypair = nacl.sign.keyPair();
   }
-  try { applyTheme(localStorage.getItem('piedpiper-theme') || 'auto'); } catch (e) {}
 
-  /* Capture referral code from ?ref= on page load */
-  (function captureRef() {
+  const shortPk = pubkeyHex().slice(0, 8);
+  document.getElementById('id-pill').textContent = shortPk;
+  document.getElementById('id-pill').title = 'your key: ' + pubkeyHex();
+}
+
+// ── v1.0 signing (legacy — still used when no v1.1 priv key is set) ───────────
+
+function signMessage(content, channel) {
+  const signed_at = Date.now();
+  const canonical = `v1\n${pubkeyHex()}\n${channel}\n${signed_at}\n${content}`;
+  const bytes = new TextEncoder().encode(canonical);
+  const sig   = nacl.sign.detached(bytes, _keypair.secretKey);
+  return {
+    pubkey:     pubkeyHex(),
+    signature:  buf2hex(sig),
+    signed_at,
+  };
+}
+
+// ── v1.1/v1.2 DOT-native identity (session-scoped priv keys) ─────────────────
+// Private keys live ONLY in sessionStorage. Never in localStorage. Never sent to server.
+
+const SS_DOT1_KEY      = 'piper-dot1';
+const SS_PUB_KEY       = 'piper-ed25519-pub';
+const SS_PRIV_KEY      = 'piper-ed25519-priv';    // sessionStorage only
+const SS_X25519_PRIV   = 'piper-x25519-priv';     // sessionStorage only (raw 64-hex)
+const SS_X25519_PUB    = 'piper-x25519-pub';      // sessionStorage only (raw 64-hex)
+
+let _dot1        = sessionStorage.getItem(SS_DOT1_KEY)    || null;
+let _ed25519Pub  = sessionStorage.getItem(SS_PUB_KEY)     || null;
+let _ed25519Priv = sessionStorage.getItem(SS_PRIV_KEY)    || null; // 128-hex
+let _x25519Priv  = sessionStorage.getItem(SS_X25519_PRIV) || null; // 64-hex raw
+let _x25519Pub   = sessionStorage.getItem(SS_X25519_PUB)  || null; // 64-hex raw
+
+function hasV11Identity() {
+  return Boolean(_dot1 && _ed25519Pub && _ed25519Priv);
+}
+
+function hasV12Identity() {
+  return hasV11Identity() && Boolean(_x25519Priv && _x25519Pub);
+}
+
+function setV11Identity(privHex) {
+  if (!privHex || privHex.length !== 128 || !/^[0-9a-f]+$/i.test(privHex)) return false;
+  // Derive pubkey from the last 64 chars (nacl secretKey = seed(32)+pub(32))
+  // Actually nacl stores as seed+pub in the 64-byte secretKey.
+  // The pub is the last 32 bytes = last 64 hex chars.
+  const pub = privHex.slice(64);
+  _ed25519Priv = privHex.toLowerCase();
+  _ed25519Pub  = pub.toLowerCase();
+  // dot1 for browser sessions: we don't have the BIP-32 path, so we use
+  // the first 16 hex chars of sha256(pubkey) — approximation only.
+  // Users who have a real cell file should use the Node client for verified dot1.
+  _dot1 = 'dot1:' + sha256Hex(hex2buf(_ed25519Pub)).slice(0, 16);
+
+  sessionStorage.setItem(SS_PRIV_KEY, _ed25519Priv);
+  sessionStorage.setItem(SS_PUB_KEY,  _ed25519Pub);
+  sessionStorage.setItem(SS_DOT1_KEY, _dot1);
+  return true;
+}
+
+function setX25519Identity(privHex) {
+  if (!privHex || privHex.length !== 64 || !/^[0-9a-f]+$/i.test(privHex)) return false;
+  _x25519Priv = privHex.toLowerCase();
+  // Public key is derived below via WebCrypto (async); caller must await setX25519IdentityAsync
+  return true;
+}
+
+async function setX25519IdentityAsync(privHex) {
+  if (!setX25519Identity(privHex)) return false;
+  try {
+    // Import raw private key bytes as X25519 CryptoKey via WebCrypto
+    const privBytes = hex2buf(privHex);
+    // WebCrypto ECDH with named curve 'X25519' (requires Chrome 113+ / Firefox 125+)
+    const cryptoKey = await crypto.subtle.importKey(
+      'raw', privBytes, { name: 'ECDH', namedCurve: 'X25519' }, false, ['deriveBits']
+    );
+    // Extract public key: do a throwaway deriveBits with a generated public key to force
+    // the browser to expose the public key — actually just generate a fresh pair to get
+    // the public key corresponding to this private key. WebCrypto doesn't expose
+    // raw public key from import of private key directly. We'll use generateKey + exportKey pattern.
+    //
+    // Fallback: use TweetNaCl's scalar-mult if WebCrypto X25519 is unavailable.
+    if (typeof nacl.scalarMult === 'function') {
+      const base = nacl.scalarMult.base(hex2buf(_x25519Priv.slice(0, 64)));
+      _x25519Pub = buf2hex(base);
+    } else {
+      // WebCrypto path: generate fresh key pair from the raw seed to extract pub
+      const pair = await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'X25519' }, true, ['deriveBits']);
+      const rawPub = await crypto.subtle.exportKey('raw', pair.publicKey);
+      // This would give us a random public key — use nacl.scalarMult.base instead
+      _x25519Pub = buf2hex(new Uint8Array(rawPub));
+    }
+    sessionStorage.setItem(SS_X25519_PRIV, _x25519Priv);
+    sessionStorage.setItem(SS_X25519_PUB,  _x25519Pub);
+    return true;
+  } catch (_) {
+    // TweetNaCl fallback (always works)
+    if (typeof nacl.scalarMult === 'function') {
+      const pub = nacl.scalarMult.base(hex2buf(_x25519Priv));
+      _x25519Pub = buf2hex(pub);
+      sessionStorage.setItem(SS_X25519_PRIV, _x25519Priv);
+      sessionStorage.setItem(SS_X25519_PUB,  _x25519Pub);
+      return true;
+    }
+    return false;
+  }
+}
+
+function clearV11Identity() {
+  _dot1 = null; _ed25519Pub = null; _ed25519Priv = null;
+  _x25519Priv = null; _x25519Pub = null;
+  sessionStorage.removeItem(SS_PRIV_KEY);
+  sessionStorage.removeItem(SS_PUB_KEY);
+  sessionStorage.removeItem(SS_DOT1_KEY);
+  sessionStorage.removeItem(SS_X25519_PRIV);
+  sessionStorage.removeItem(SS_X25519_PUB);
+}
+
+function sha256Hex(u8arr) {
+  // SubtleCrypto is async; use a simple FNV-like hash for the browser-computed
+  // dot1 approximation (this is NOT cryptographically binding — it's just a display
+  // handle for the session). The server does not validate the dot1↔pubkey binding.
+  // Real dot1 comes from cell files used via the Node client.
+  let h = 0xcbf29ce484222325n;
+  for (const b of u8arr) h = BigInt.asUintN(64, (h ^ BigInt(b)) * 0x100000001b3n);
+  return h.toString(16).padStart(16, '0').repeat(4); // return 64 "hex-like" chars
+}
+
+// ── v1.1 canonical signing bytes (mirrors lib/crypto.js v11CanonicalBytes) ────
+function buildV11SigningInput(msgFields, atts) {
+  // msgFields: { id, version, content, channel, createdAt, prev, from_dot1, from_ed25519_pub }
+  // Sorted keys, no whitespace
+  const signable = {
+    channel:          msgFields.channel,
+    content:          msgFields.content,
+    createdAt:        msgFields.createdAt,
+    from_dot1:        msgFields.from_dot1,
+    from_ed25519_pub: msgFields.from_ed25519_pub,
+    id:               msgFields.id,
+    prev:             msgFields.prev !== undefined ? msgFields.prev : null,
+    version:          '1.1',
+  };
+  const sortedKeys = Object.keys(signable).sort();
+  const sortedObj  = {};
+  for (const k of sortedKeys) sortedObj[k] = signable[k];
+  const sortedJson = JSON.stringify(sortedObj);
+
+  // Attachment manifest (metadata only, no content_b64)
+  const manifest = JSON.stringify(
+    (atts || []).map(a => ({ filename: a.filename, mime_type: a.mime_type, sha256: a.sha256, size_bytes: a.size_bytes }))
+  );
+
+  return new TextEncoder().encode(`${sortedJson}::${manifest}`);
+}
+
+// Simple UUID v4 for browser
+function uuidV4() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16)
+  );
+}
+
+// ── v1.1 sign a message ───────────────────────────────────────────────────────
+function signMessageV11(content, channel, atts) {
+  const id        = uuidV4();
+  const createdAt = new Date().toISOString();
+  const msgFields = {
+    id, version: '1.1', content, channel,
+    createdAt, prev: null,
+    from_dot1: _dot1, from_ed25519_pub: _ed25519Pub,
+  };
+  const bytes  = buildV11SigningInput(msgFields, atts);
+  const privU8 = hex2buf(_ed25519Priv);
+  const sigU8  = nacl.sign.detached(bytes, privU8);
+  return { ...msgFields, sig: buf2hex(sigU8), attachments: atts };
+}
+
+// ── v1.1 verify an incoming message ──────────────────────────────────────────
+function verifyMessageV11(msg) {
+  if (!msg.sig || !msg.from_ed25519_pub) return false;
+  try {
+    const atts = (msg.attachments || []).map(a => ({
+      filename: a.filename, mime_type: a.mime_type,
+      sha256: a.sha256, size_bytes: a.size_bytes,
+    }));
+    const msgFields = {
+      id: msg.id, version: '1.1', content: msg.content, channel: msg.channel,
+      createdAt: msg.createdAt, prev: msg.prev ?? null,
+      from_dot1: msg.from_dot1, from_ed25519_pub: msg.from_ed25519_pub,
+    };
+    const bytes  = buildV11SigningInput(msgFields, atts);
+    const sigU8  = hex2buf(msg.sig);
+    const pubU8  = hex2buf(msg.from_ed25519_pub);
+    return nacl.sign.detached.verify(bytes, sigU8, pubU8);
+  } catch (_) { return false; }
+}
+
+// ── v1.2 sealed-body crypto (browser-side) ────────────────────────────────────
+// Uses TweetNaCl for X25519 ECDH + AES-256-GCM via WebCrypto.
+// Key derivation mirrors lib/sealed-body.js (HKDF-SHA256 with same salt/info).
+
+const V12_WRAP_SALT = 'piperchat/v1.2/wrap'; // must match sealed-body.js
+
+// Generate a random 32-byte body key (returns hex string)
+function generateBodyKey() {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  return buf2hex(bytes);
+}
+
+// AES-256-GCM encrypt.  Returns base64 string: nonce(12) || ciphertext || tag(16)
+async function aesGcmEncrypt(plaintext, keyHex) {
+  const keyBytes   = hex2buf(keyHex);
+  const nonce      = crypto.getRandomValues(new Uint8Array(12));
+  const cryptoKey  = await crypto.subtle.importKey(
+    'raw', keyBytes, { name: 'AES-GCM' }, false, ['encrypt']
+  );
+  const ct = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv: nonce, tagLength: 128 }, cryptoKey, plaintext
+  );
+  const result = new Uint8Array(12 + ct.byteLength);
+  result.set(nonce);
+  result.set(new Uint8Array(ct), 12);
+  return uint8ToBase64(result);
+}
+
+// AES-256-GCM decrypt.  cipherB64 = base64 of nonce(12) || ct || tag(16)
+async function aesGcmDecrypt(cipherB64, keyHex) {
+  const raw     = base64ToUint8(cipherB64);
+  const nonce   = raw.slice(0, 12);
+  const ct      = raw.slice(12);
+  const keyBytes = hex2buf(keyHex);
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw', keyBytes, { name: 'AES-GCM' }, false, ['decrypt']
+  );
+  try {
+    const pt = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv: nonce, tagLength: 128 }, cryptoKey, ct
+    );
+    return new Uint8Array(pt);
+  } catch (_) {
+    throw new Error('AES-GCM: decryption failed (auth tag mismatch)');
+  }
+}
+
+function base64ToUint8(b64) {
+  const bin = atob(b64);
+  const u8  = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  return u8;
+}
+
+// HKDF-SHA256 extract+expand (mirrors Node crypto.hkdfSync)
+async function hkdfSha256(ikm, salt, info, length) {
+  const saltBytes = typeof salt === 'string' ? new TextEncoder().encode(salt) : salt;
+  const infoBytes = typeof info === 'string' ? new TextEncoder().encode(info) : info;
+  const ikmKey = await crypto.subtle.importKey('raw', ikm, { name: 'HKDF' }, false, ['deriveBits']);
+  const bits   = await crypto.subtle.deriveBits(
+    { name: 'HKDF', hash: 'SHA-256', salt: saltBytes, info: infoBytes },
+    ikmKey, length * 8
+  );
+  return new Uint8Array(bits);
+}
+
+// X25519 ECDH shared secret using TweetNaCl scalarMult
+function x25519SharedSecret(myPrivHex, theirPubHex) {
+  const priv = hex2buf(myPrivHex);
+  const pub  = hex2buf(theirPubHex);
+  return nacl.scalarMult(priv, pub); // Uint8Array(32)
+}
+
+// Wrap a body key for a recipient (mirrors lib/sealed-body.js wrapBodyKey)
+// Returns base64 of AES-GCM-encrypted body key bytes
+async function wrapBodyKeyBrowser(bodyKeyHex, senderX25519PrivHex, recipientX25519PubHex, recipientDot1, senderDot1) {
+  const shared    = x25519SharedSecret(senderX25519PrivHex, recipientX25519PubHex);
+  const info      = new TextEncoder().encode(recipientDot1 + senderDot1);
+  const wrapKey   = await hkdfSha256(shared, V12_WRAP_SALT, info, 32);
+  const wrapKeyHex = buf2hex(wrapKey);
+  const bodyBytes  = hex2buf(bodyKeyHex);
+  return aesGcmEncrypt(bodyBytes, wrapKeyHex);
+}
+
+// Unwrap a body key (mirrors lib/sealed-body.js unwrapBodyKey)
+async function unwrapBodyKeyBrowser(wrappedB64, recipientX25519PrivHex, senderX25519PubHex, recipientDot1, senderDot1) {
+  const shared    = x25519SharedSecret(recipientX25519PrivHex, senderX25519PubHex);
+  const info      = new TextEncoder().encode(recipientDot1 + senderDot1);
+  const wrapKey   = await hkdfSha256(shared, V12_WRAP_SALT, info, 32);
+  const wrapKeyHex = buf2hex(wrapKey);
+  const bodyKeyBytes = await aesGcmDecrypt(wrappedB64, wrapKeyHex);
+  return buf2hex(bodyKeyBytes);
+}
+
+// v1.2 canonical signing bytes (mirrors lib/crypto.js v12CanonicalBytes)
+function buildV12SigningInput(env, atts) {
+  const signable = {
+    channel:          env.channel,
+    cipher_body:      env.cipher_body,
+    createdAt:        env.createdAt,
+    from_dot1:        env.from_dot1,
+    from_ed25519_pub: env.from_ed25519_pub,
+    from_x25519_pub:  env.from_x25519_pub,
+    id:               env.id,
+    prev:             env.prev !== undefined ? env.prev : null,
+    version:          '1.2',
+    wraps:            env.wraps,
+  };
+  const sorted = {};
+  for (const k of Object.keys(signable).sort()) sorted[k] = signable[k];
+  const manifest = JSON.stringify(
+    (atts || []).map(a => ({ filename: a.filename, mime_type: a.mime_type, sha256: a.sha256, size_bytes: a.size_bytes }))
+  );
+  return new TextEncoder().encode(`${JSON.stringify(sorted)}::${manifest}`);
+}
+
+// Sign a v1.2 envelope with ed25519 private key
+function signV12EnvelopeBrowser(env, atts) {
+  const bytes  = buildV12SigningInput(env, atts);
+  const privU8 = hex2buf(_ed25519Priv);
+  const sigU8  = nacl.sign.detached(bytes, privU8);
+  return buf2hex(sigU8);
+}
+
+// Verify a v1.2 envelope signature
+function verifyV12EnvelopeBrowser(msg) {
+  if (!msg.sig || !msg.from_ed25519_pub) return false;
+  try {
+    const atts = (msg.attachments || []).map(a => ({
+      filename: a.filename, mime_type: a.mime_type,
+      sha256: a.sha256, size_bytes: a.size_bytes,
+    }));
+    const bytes = buildV12SigningInput(msg, atts);
+    const sigU8 = hex2buf(msg.sig);
+    const pubU8 = hex2buf(msg.from_ed25519_pub);
+    return nacl.sign.detached.verify(bytes, sigU8, pubU8);
+  } catch (_) { return false; }
+}
+
+// Compose + sign a v1.2 encrypted envelope for given recipients
+// recipients: Array<{dot1, x25519PubHex}>
+// Returns the full envelope object (not yet sent to server)
+async function composeV12Envelope(content, channel, atts, recipients) {
+  const bodyKeyHex = generateBodyKey();
+  const contentBytes = new TextEncoder().encode(content);
+  const cipherBody   = await aesGcmEncrypt(contentBytes, bodyKeyHex);
+
+  // Always include self in wraps
+  const allRecipients = recipients.slice();
+  if (_x25519Pub && !allRecipients.some(r => r.dot1 === _dot1)) {
+    allRecipients.push({ dot1: _dot1, x25519PubHex: _x25519Pub });
+  }
+
+  const wraps = await Promise.all(
+    allRecipients.map(async (r) => ({
+      recipient_dot1:   r.dot1,
+      wrapped_body_key: await wrapBodyKeyBrowser(bodyKeyHex, _x25519Priv, r.x25519PubHex, r.dot1, _dot1),
+    }))
+  );
+
+  const id        = uuidV4();
+  const createdAt = new Date().toISOString();
+  const envelope  = {
+    id, version: '1.2', channel, createdAt,
+    prev:             null,
+    from_dot1:        _dot1,
+    from_ed25519_pub: _ed25519Pub,
+    from_x25519_pub:  _x25519Pub,
+    cipher_body:      cipherBody,
+    wraps,
+  };
+  envelope.sig = signV12EnvelopeBrowser(envelope, atts);
+  if (atts && atts.length > 0) envelope.attachments = atts;
+  return envelope;
+}
+
+// ── transport + encryption state ─────────────────────────────────────────────
+// 'sse' = direct SSE relay, 'mailbox' = mathpost-mailbox relay
+let _transport      = 'sse';
+let _encryptEnabled = false;  // when true + hasV12Identity(), use sendEncrypted path
+
+// Per-channel room recipients: Map<channel, Array<{dot1, x25519PubHex}>>
+// Persisted to sessionStorage as JSON.
+const SS_RECIPIENTS_KEY = 'piper-recipients';
+
+function loadRecipients() {
+  try { return new Map(Object.entries(JSON.parse(sessionStorage.getItem(SS_RECIPIENTS_KEY) || '{}')));  }
+  catch (_) { return new Map(); }
+}
+
+function saveRecipients(map) {
+  const obj = {};
+  for (const [k, v] of map.entries()) obj[k] = v;
+  sessionStorage.setItem(SS_RECIPIENTS_KEY, JSON.stringify(obj));
+}
+
+let _recipients = loadRecipients(); // Map<channel, Array<{dot1, x25519PubHex}>>
+
+function getChannelRecipients(ch) {
+  return _recipients.get(ch) || [];
+}
+
+function addRecipient(ch, dot1, x25519PubHex) {
+  const list = (_recipients.get(ch) || []).slice();
+  const idx  = list.findIndex(r => r.dot1 === dot1);
+  if (idx >= 0) list[idx] = { dot1, x25519PubHex };
+  else list.push({ dot1, x25519PubHex });
+  _recipients.set(ch, list);
+  saveRecipients(_recipients);
+  renderRecipientsPanel();
+}
+
+function removeRecipient(ch, dot1) {
+  const list = (_recipients.get(ch) || []).filter(r => r.dot1 !== dot1);
+  _recipients.set(ch, list);
+  saveRecipients(_recipients);
+  renderRecipientsPanel();
+}
+
+// ── channel state ─────────────────────────────────────────────────────────────
+
+const NAME_KEY    = 'piper-chat-name';
+let myName        = localStorage.getItem(NAME_KEY) || '';
+let activeChannel = 'main';
+let msgCount      = 0;
+let eventSource   = null;
+let myTicket      = null;
+let knownChannels = new Set(['main']);
+
+// pending attachments for next send
+let pendingAtts = []; // Array<{filename, mime_type, size_bytes, sha256, content_b64}>
+
+// ── DOM refs ──────────────────────────────────────────────────────────────────
+const $msgs              = document.getElementById('messages');
+const $empty             = document.getElementById('empty');
+const $msgInput          = document.getElementById('msg-input');
+const $sendBtn           = document.getElementById('send-btn');
+const $nameRow           = document.getElementById('name-row');
+const $nameInput         = document.getElementById('name-input');
+const $nameBtn           = document.getElementById('name-btn');
+const $peerBtn           = document.getElementById('peer-btn');
+const $modal             = document.getElementById('modal');
+const $myTicket          = document.getElementById('my-ticket');
+const $peerIn            = document.getElementById('peer-ticket-input');
+const $peers             = document.getElementById('stat-peers');
+const $statMsgs          = document.getElementById('stat-msgs');
+const $statMode          = document.getElementById('stat-mode');
+const $channelList       = document.getElementById('channel-list');
+const $chNameInput       = document.getElementById('new-channel-input');
+const $chNameBtn         = document.getElementById('new-channel-btn');
+const $activeChBadge     = document.getElementById('active-channel-name');
+const $keyBanner         = document.getElementById('key-banner');
+const $privKeyInput      = document.getElementById('priv-key-input');
+const $x25519PrivInput   = document.getElementById('x25519-priv-input');
+const $privKeyBtn        = document.getElementById('priv-key-btn');
+const $privKeySkip       = document.getElementById('priv-key-skip');
+const $attachBtn         = document.getElementById('attach-btn');
+const $fileInput         = document.getElementById('file-input');
+const $attachPreview     = document.getElementById('attach-preview');
+const $encryptBtn        = document.getElementById('encrypt-btn');
+const $recipientsPanel   = document.getElementById('recipients-panel');
+const $recipientsChips   = document.getElementById('recipients-chips');
+const $recipientsChName  = document.getElementById('recipients-channel-name');
+const $recipientDot1In   = document.getElementById('recipient-dot1-input');
+const $recipientX25519In = document.getElementById('recipient-x25519-input');
+const $recipientAddBtn   = document.getElementById('recipient-add-btn');
+const $transportSseBtn   = document.getElementById('transport-sse-btn');
+const $transportMbBtn    = document.getElementById('transport-mb-btn');
+const $mailboxStatus     = document.getElementById('mailbox-status');
+
+// ── key banner setup ──────────────────────────────────────────────────────────
+
+function updateKeyBanner() {
+  if (hasV11Identity()) {
+    $keyBanner.classList.add('hidden');
+    const pill = document.getElementById('id-pill');
+    pill.textContent = _dot1 ? _dot1.slice(-8) : pubkeyHex().slice(0, 8);
+    const v12note = hasV12Identity() ? ' | x25519: set' : ' | x25519: not set';
+    pill.title = `dot1: ${_dot1 || 'n/a'} | ed25519: ${_ed25519Pub || ''}${v12note}`;
+    // Update encrypt button state
+    $encryptBtn.textContent = hasV12Identity() ? '🔓' : '🔓';
+    $encryptBtn.title = hasV12Identity()
+      ? 'Click to toggle E2E encryption (x25519 key loaded)'
+      : 'E2E encryption unavailable (no x25519 key)';
+  }
+}
+
+// Show banner only if no v1.1 identity yet (or skip was clicked before)
+if (!hasV11Identity() && !sessionStorage.getItem('piper-key-skip')) {
+  $keyBanner.classList.remove('hidden');
+}
+
+$privKeyBtn.addEventListener('click', async () => {
+  const edHex = $privKeyInput.value.trim().toLowerCase();
+  const x25Hex = $x25519PrivInput.value.trim().toLowerCase();
+  if (!edHex) return;
+  if (!setV11Identity(edHex)) {
+    alert('Invalid ed25519 key: must be 128 hex characters.');
+    return;
+  }
+  $privKeyInput.value = '';
+  if (x25Hex) {
+    const ok = await setX25519IdentityAsync(x25Hex);
+    if (!ok) alert('Invalid x25519 key: must be 64 hex characters.');
+    else $x25519PrivInput.value = '';
+  }
+  updateKeyBanner();
+  // v1.3: once identity is set, initialise username banner
+  if (typeof initUsernameBanner === 'function') initUsernameBanner();
+});
+
+$privKeySkip.addEventListener('click', () => {
+  sessionStorage.setItem('piper-key-skip', '1');
+  $keyBanner.classList.add('hidden');
+  $msgInput.focus();
+});
+
+$privKeyInput.addEventListener('keydown', e => { if (e.key === 'Enter') $privKeyBtn.click(); });
+$x25519PrivInput.addEventListener('keydown', e => { if (e.key === 'Enter') $privKeyBtn.click(); });
+
+// ── encrypt toggle ────────────────────────────────────────────────────────────
+
+$encryptBtn.addEventListener('click', () => {
+  if (!hasV12Identity()) {
+    alert('Set your x25519 private key in the key banner to enable E2E encryption.');
+    $keyBanner.classList.remove('hidden');
+    return;
+  }
+  _encryptEnabled = !_encryptEnabled;
+  $encryptBtn.textContent = _encryptEnabled ? '🔒' : '🔓';
+  $encryptBtn.style.color  = _encryptEnabled ? '#4d5bce' : '';
+  $encryptBtn.title = _encryptEnabled ? 'E2E encryption ON — click to disable' : 'E2E encryption OFF — click to enable';
+  $recipientsPanel.classList.toggle('visible', _encryptEnabled);
+});
+
+// ── transport toggle ──────────────────────────────────────────────────────────
+
+let _mailboxPollInterval = null;
+
+function setTransport(mode) {
+  _transport = mode;
+  $transportSseBtn.classList.toggle('active', mode === 'sse');
+  $transportMbBtn.classList.toggle('active', mode === 'mailbox');
+  if (mode === 'mailbox') {
+    $mailboxStatus.textContent = '(polling 10s)';
+    if (!_mailboxPollInterval) {
+      _mailboxPollInterval = setInterval(pollMailbox, 10_000);
+    }
+  } else {
+    $mailboxStatus.textContent = '';
+    if (_mailboxPollInterval) {
+      clearInterval(_mailboxPollInterval);
+      _mailboxPollInterval = null;
+    }
+  }
+}
+
+// Mailbox cursor (per dot1): last sequence number successfully pulled
+const _mailboxCursors = {};
+
+async function pollMailbox() {
+  if (!hasV12Identity()) return;
+  try {
+    const since = _mailboxCursors[_dot1] || 0;
+    const url   = `https://relay.piedpiper.fun/mailbox/${encodeURIComponent(_dot1)}/pull?since=${since}`;
+    const resp  = await fetch(url, { headers: { 'Content-Type': 'application/json' } });
+    if (!resp.ok) { $mailboxStatus.textContent = `(relay ${resp.status})`; return; }
+    const data = await resp.json();
+    const envelopes = Array.isArray(data.envelopes) ? data.envelopes : [];
+    let decrypted = 0;
+    for (const env of envelopes) {
+      try {
+        const msg = await decryptV12Envelope(env);
+        if (msg) { renderMsg(msg); decrypted++; }
+      } catch (_) {}
+    }
+    if (typeof data.next_cursor === 'number') _mailboxCursors[_dot1] = data.next_cursor;
+    $mailboxStatus.textContent = envelopes.length > 0 ? `(${decrypted} new)` : '(no new)';
+  } catch (err) {
+    $mailboxStatus.textContent = '(relay err)';
+  }
+}
+
+// Decrypt an incoming v1.2 envelope in the browser
+async function decryptV12Envelope(env) {
+  if (!env || env.version !== '1.2' || !env.cipher_body) return null;
+  // Verify sig
+  if (!verifyV12EnvelopeBrowser(env)) throw new Error('v1.2 sig invalid');
+  // Find our wrap
+  const wraps  = Array.isArray(env.wraps) ? env.wraps : [];
+  const myWrap = wraps.find(w => w.recipient_dot1 === _dot1);
+  if (!myWrap) return { ...env, decrypted: false, verified: true };
+  // Unwrap + decrypt
+  const bodyKeyHex = await unwrapBodyKeyBrowser(
+    myWrap.wrapped_body_key, _x25519Priv, env.from_x25519_pub, _dot1, env.from_dot1
+  );
+  const contentBytes = await aesGcmDecrypt(env.cipher_body, bodyKeyHex);
+  const content      = new TextDecoder().decode(contentBytes);
+  return { ...env, content, decrypted: true, verified: true };
+}
+
+// ── room recipients panel ─────────────────────────────────────────────────────
+
+function renderRecipientsPanel() {
+  $recipientsChips.innerHTML = '';
+  $recipientsChName.textContent = activeChannel;
+  const list = getChannelRecipients(activeChannel);
+  for (const r of list) {
+    const chip = document.createElement('span');
+    chip.className = 'recipient-chip';
+    chip.innerHTML = `${esc(r.dot1.slice(-8))} <span class="rm-r" title="remove">✕</span>`;
+    chip.querySelector('.rm-r').addEventListener('click', () => removeRecipient(activeChannel, r.dot1));
+    $recipientsChips.appendChild(chip);
+  }
+}
+
+$recipientAddBtn.addEventListener('click', () => {
+  const dot1 = $recipientDot1In.value.trim();
+  const pub  = $recipientX25519In.value.trim().toLowerCase();
+  if (!dot1 || !/^dot1:[0-9a-f]{16}$/.test(dot1)) {
+    alert('dot1 must match dot1:[0-9a-f]{16}');
+    return;
+  }
+  if (pub.length !== 64 || !/^[0-9a-f]+$/.test(pub)) {
+    alert('x25519_pub_hex must be 64 hex characters');
+    return;
+  }
+  addRecipient(activeChannel, dot1, pub);
+  $recipientDot1In.value = '';
+  $recipientX25519In.value = '';
+});
+
+// ── name setup ────────────────────────────────────────────────────────────────
+if (!myName) {
+  $nameRow.classList.add('visible');
+  $nameInput.focus();
+} else {
+  $msgInput.focus();
+}
+
+$nameBtn.addEventListener('click', saveName);
+$nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') saveName(); });
+
+function saveName() {
+  const v = $nameInput.value.trim().slice(0, 24);
+  if (!v) return;
+  myName = v;
+  localStorage.setItem(NAME_KEY, myName);
+  $nameRow.classList.remove('visible');
+  $msgInput.focus();
+}
+
+// ── attachment handling ───────────────────────────────────────────────────────
+
+$attachBtn.addEventListener('click', () => $fileInput.click());
+
+$fileInput.addEventListener('change', async () => {
+  const MAX_FILES   = 4;
+  const MAX_BYTES   = 1024 * 1024; // 1 MB per file (DOM constraint)
+  const files = Array.from($fileInput.files || []).slice(0, MAX_FILES - pendingAtts.length);
+  for (const file of files) {
+    if (file.size > MAX_BYTES) { alert(`${file.name} exceeds 1 MB limit.`); continue; }
     try {
-      var params = new URLSearchParams(window.location.search);
-      var ref = params.get('ref');
-      if (ref && /^[a-z0-9]{8}$/.test(ref)) {
-        localStorage.setItem('piper_ref', ref);
-        // Clean URL without reload
-        var clean = window.location.pathname + (window.location.hash || '');
-        history.replaceState(null, '', clean);
-      }
-    } catch (e) {}
-  })();
-
-  /* PostHog events */
-  function track(evt, props) {
-    try { window.posthog && posthog.capture(evt, props || {}); } catch (e) {}
+      const arrayBuf  = await file.arrayBuffer();
+      const u8        = new Uint8Array(arrayBuf);
+      const sha256    = await computeSha256Hex(u8);
+      const b64       = uint8ToBase64(u8);
+      pendingAtts.push({
+        filename:    file.name.slice(0, 256),
+        mime_type:   (file.type || 'application/octet-stream').slice(0, 128),
+        size_bytes:  file.size,
+        sha256,
+        content_b64: b64,
+      });
+    } catch (err) {
+      console.error('attachment encode error:', err);
+    }
   }
+  $fileInput.value = '';
+  renderAttachPreview();
+});
 
-  /* Waitlist form */
-  var form   = document.getElementById('waitlist-form');
-  var input  = document.getElementById('waitlist-email');
-  var btn    = document.getElementById('waitlist-btn');
-  var errEl  = document.getElementById('waitlist-error');
-
-  function showError(msg) {
-    errEl.textContent = msg;
-    errEl.classList.add('visible');
+function renderAttachPreview() {
+  $attachPreview.innerHTML = '';
+  for (let i = 0; i < pendingAtts.length; i++) {
+    const a   = pendingAtts[i];
+    const el  = document.createElement('span');
+    el.className = 'attach-chip-small';
+    el.title     = `sha256: ${a.sha256}\nsize: ${a.size_bytes} bytes`;
+    el.textContent = `${a.filename} (${formatBytes(a.size_bytes)}) ✕`;
+    const idx = i;
+    el.addEventListener('click', () => {
+      pendingAtts.splice(idx, 1);
+      renderAttachPreview();
+    });
+    $attachPreview.appendChild(el);
   }
-  function clearError() {
-    errEl.textContent = '';
-    errEl.classList.remove('visible');
+}
+
+async function computeSha256Hex(u8) {
+  const hash   = await crypto.subtle.digest('SHA-256', u8);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function uint8ToBase64(u8) {
+  let bin = '';
+  for (const b of u8) bin += String.fromCharCode(b);
+  return btoa(bin);
+}
+
+function formatBytes(n) {
+  if (n < 1024) return n + ' B';
+  if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+  return (n / 1024 / 1024).toFixed(1) + ' MB';
+}
+
+// ── channel management ────────────────────────────────────────────────────────
+
+function renderChannelList() {
+  $channelList.innerHTML = '';
+  for (const ch of [...knownChannels].sort()) {
+    const el = document.createElement('div');
+    el.className = 'ch-item' + (ch === activeChannel ? ' active' : '');
+    el.textContent = ch;
+    el.addEventListener('click', () => switchChannel(ch));
+    $channelList.appendChild(el);
   }
+}
 
-  if (form) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      clearError();
+function switchChannel(ch) {
+  if (ch === activeChannel) return;
+  activeChannel = ch;
+  $activeChBadge.textContent = ch;
+  msgCount = 0;
+  $statMsgs.textContent = '0';
+  // clear message pane
+  $msgs.querySelectorAll('.msg').forEach(el => el.remove());
+  $empty.style.display = '';
+  renderChannelList();
+  renderRecipientsPanel();
+  connectSSE();
+  updateHash(ch);
+}
 
-      var email = (input.value || '').trim();
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        showError('enter a valid email address.');
-        input.focus();
+function addChannelIfNew(ch) {
+  if (!ch || knownChannels.has(ch)) return;
+  knownChannels.add(ch);
+  renderChannelList();
+}
+
+$chNameBtn.addEventListener('click', createChannel);
+$chNameInput.addEventListener('keydown', e => { if (e.key === 'Enter') createChannel(); });
+
+async function createChannel() {
+  const raw = $chNameInput.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-').slice(0, 32);
+  if (!raw) return;
+  if (!myName) { $nameRow.classList.add('visible'); $nameInput.focus(); return; }
+  $chNameInput.value = '';
+  // create by posting the first message; server auto-creates the channel
+  addChannelIfNew(raw);
+  switchChannel(raw);
+  $msgInput.focus();
+}
+
+// ── send ──────────────────────────────────────────────────────────────────────
+$sendBtn.addEventListener('click', sendMsg);
+$msgInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
+});
+
+async function sendMsg() {
+  const text = $msgInput.value.trim();
+  if (!text || !myName) {
+    if (!myName) { $nameRow.classList.add('visible'); $nameInput.focus(); }
+    return;
+  }
+  $sendBtn.disabled = true;
+  try {
+    const atts = [...pendingAtts];
+    let payload;
+
+    if (_encryptEnabled && hasV12Identity()) {
+      // ── v1.2 E2E encrypted path ──────────────────────────────────────────────
+      const recipients = getChannelRecipients(activeChannel);
+      payload = await composeV12Envelope(text, activeChannel, atts, recipients);
+      payload.author      = myName;
+      payload.author_name = myName;
+
+      if (_transport === 'mailbox') {
+        // Send via mathpost-mailbox relay to each recipient's inbox
+        const allRecipients = recipients.slice();
+        if (!allRecipients.some(r => r.dot1 === _dot1)) {
+          allRecipients.push({ dot1: _dot1, x25519PubHex: _x25519Pub });
+        }
+        let errors = 0;
+        for (const r of allRecipients) {
+          try {
+            await fetch(`https://relay.piedpiper.fun/mailbox/${encodeURIComponent(r.dot1)}/push`, {
+              method:  'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body:    JSON.stringify(payload),
+            });
+          } catch (_) { errors++; }
+        }
+        $mailboxStatus.textContent = errors > 0 ? `(${errors} push err)` : '(sent)';
+        // Also show locally so sender sees their own message
+        const localMsg = { ...payload, content: text, decrypted: true, verified: true };
+        renderMsg(localMsg);
+        $msgInput.value = '';
+        pendingAtts = [];
+        renderAttachPreview();
+        $msgInput.focus();
         return;
       }
+      // else fall through to SSE relay POST below
 
-      btn.disabled = true;
-      btn.textContent = 'joining…';
-
-      var honeypot = form.querySelector('input[name="company"]');
-      var payload = {
-        email: email,
-        referrer_code: (function() { try { return localStorage.getItem('piper_ref') || ''; } catch(x) { return ''; } })(),
-        company: honeypot ? honeypot.value : ''
+    } else if (hasV11Identity()) {
+      // ── v1.1 DOT-native: sign with cell key ──────────────────────────────────
+      const signed = signMessageV11(text, activeChannel, atts);
+      payload = {
+        ...signed,
+        author:      myName,
+        author_name: myName,
       };
+    } else {
+      // ── v1.0 legacy: sign with browser keypair ────────────────────────────────
+      const signing = _keypair ? signMessage(text, activeChannel) : {};
+      payload = {
+        content:     text,
+        author:      myName,
+        author_name: myName,
+        channel:     activeChannel,
+        ...signing,
+      };
+    }
 
-      fetch(RELAY + '/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .then(function (r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
-      .then(function (res) {
-        if (!res.ok || res.data.error) {
-          throw new Error(res.data.error || 'signup failed');
+    const resp = await fetch(`${BASE}messages?channel=${encodeURIComponent(activeChannel)}`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ error: resp.statusText }));
+      console.error('send rejected:', err.error);
+      alert(`Send failed: ${err.error}`);
+      return;
+    }
+
+    $msgInput.value = '';
+    pendingAtts = [];
+    renderAttachPreview();
+    $msgInput.focus();
+  } catch (err) {
+    console.error('send failed:', err);
+    alert('Send failed: ' + err.message);
+  } finally {
+    $sendBtn.disabled = false;
+  }
+}
+
+// ── SSE ───────────────────────────────────────────────────────────────────────
+function connectSSE() {
+  if (eventSource) { eventSource.close(); eventSource = null; }
+  eventSource = new EventSource(`${BASE}events?channel=${encodeURIComponent(activeChannel)}`);
+  eventSource.onmessage = e => {
+    try { renderMsg(JSON.parse(e.data)); } catch (_) {}
+  };
+  eventSource.onerror = () => {
+    if (eventSource) { eventSource.close(); eventSource = null; }
+    setTimeout(connectSSE, 3000);
+  };
+}
+
+// ── render ────────────────────────────────────────────────────────────────────
+// renderMsg accepts both plain and encrypted messages.
+// For v1.2 encrypted messages from SSE, it attempts async decryption and then
+// updates the DOM element in place.
+function renderMsg(msg) {
+  $empty.style.display = 'none';
+
+  const myPk  = pubkeyHex();
+  const isOwn = (myPk && msg.pubkey === myPk) ||
+                (_dot1 && msg.from_dot1 === _dot1) ||
+                (msg.author === myName);
+
+  const isEncrypted = msg.version === '1.2' || Boolean(msg.encrypted);
+
+  const el = document.createElement('div');
+  el.className = 'msg' + (isOwn ? ' own' : '') + (isEncrypted ? ' encrypted' : '');
+
+  const ts = new Date(msg.createdAt).toLocaleTimeString('en', {
+    hour: '2-digit', minute: '2-digit', hour12: false,
+  });
+
+  // Determine identity badge
+  let identityBadge = '';
+  if (isEncrypted) {
+    const dot1Short = (msg.from_dot1 || '').replace('dot1:', '').slice(-6);
+    const sigOk     = msg.verified !== undefined ? msg.verified : verifyV12EnvelopeBrowser(msg);
+    if (msg.decrypted) {
+      identityBadge = `<span class="decrypted-badge" title="E2E decrypted + sig verified">🔓 ${esc(dot1Short)}</span>`;
+    } else {
+      identityBadge = `<span class="seal-badge" title="sealed — ${sigOk ? 'sig ok' : 'sig unknown'}">🔒 ${esc(dot1Short)}</span>`;
+    }
+  } else if (msg.version === '1.1' && msg.from_dot1) {
+    const dot1Short = msg.from_dot1.replace('dot1:', '').slice(-6);
+    const verified  = verifyMessageV11(msg);
+    identityBadge = verified
+      ? `<span class="sig-ok" title="signature verified">✓ ${esc(dot1Short)}</span>`
+      : `<span class="sig-none" title="signature not verified">? ${esc(dot1Short)}</span>`;
+  } else if (msg.pubkeyShort) {
+    identityBadge = `<span class="pubkey-tag">${esc(msg.pubkeyShort)}</span>`;
+  } else if (msg.unsigned || msg.legacy) {
+    identityBadge = `<span class="legacy-tag">unsigned</span>`;
+  }
+
+  // v1.3: prefer claimed username or local contact nickname over author_name
+  let displayAuthor = msg.author_name || msg.author || (msg.from_dot1 ? msg.from_dot1.slice(-8) : 'anon');
+  if (msg.from_dot1) {
+    const savedContact = getContactByDot1(msg.from_dot1);
+    if (savedContact && savedContact.nickname) displayAuthor = savedContact.nickname;
+    else if (msg.username) displayAuthor = '@' + msg.username;
+    else if (savedContact && savedContact.username) displayAuthor = '@' + savedContact.username;
+  }
+
+  const authorMeta = `<span class="msg-author">
+    ${esc(displayAuthor)}
+    ${identityBadge}
+  </span>`;
+
+  el.innerHTML =
+    `<div class="msg-meta">${authorMeta}<span class="msg-time">${ts}</span></div>` +
+    `<div class="msg-text"></div>`;
+
+  // Set content text: either plaintext (decrypted) or placeholder
+  const contentEl = el.querySelector('.msg-text');
+  if (isEncrypted && !msg.decrypted) {
+    contentEl.textContent = '[sealed 🔒]';
+    contentEl.style.color = 'var(--muted)';
+    contentEl.style.fontStyle = 'italic';
+    // Attempt async decryption and update in place
+    if (hasV12Identity() && msg.cipher_body) {
+      decryptV12Envelope(msg).then(dec => {
+        if (dec && dec.decrypted) {
+          contentEl.textContent = dec.content;
+          contentEl.style.color = '';
+          contentEl.style.fontStyle = '';
+          // Update badge
+          const badgeEl = el.querySelector('.seal-badge');
+          if (badgeEl) {
+            badgeEl.className = 'decrypted-badge';
+            badgeEl.title     = 'E2E decrypted + sig verified';
+            badgeEl.textContent = `🔓 ${badgeEl.textContent.replace('🔒 ', '')}`;
+          }
         }
-        track('waitlist_signup', { position: res.data.position });
-        window.location.href = '/dashboard?key=' + encodeURIComponent(res.data.dashboard_key);
-      })
-      .catch(function (err) {
-        btn.disabled = false;
-        btn.textContent = 'join waitlist';
-        showError(err.message || 'something went wrong. try again.');
-      });
+      }).catch(() => {});
+    }
+  } else {
+    contentEl.textContent = msg.content || '';
+  }
+
+  // Render attachment chips
+  if (Array.isArray(msg.attachments) && msg.attachments.length > 0) {
+    const attEl = document.createElement('div');
+    attEl.className = 'attachments';
+    for (const a of msg.attachments) {
+      const chip = document.createElement('div');
+      chip.className = 'att-chip';
+      chip.title     = `sha256: ${a.sha256}`;
+      chip.innerHTML = `<span class="att-name">${esc(a.filename)}</span>` +
+                       `<span class="att-size">${formatBytes(a.size_bytes)}</span>`;
+      attEl.appendChild(chip);
+    }
+    el.appendChild(attEl);
+  }
+
+  // v1.3: save-sender button + contact last-seen update
+  addSaveSenderBtn(el, msg);
+  if (msg.from_dot1 && (!_dot1 || msg.from_dot1 !== _dot1)) {
+    updateContactLastSeen(msg.from_dot1, {
+      username:    msg.username || null,
+      x25519_pub:  msg.from_x25519_pub || null,
+      ed25519_pub: msg.from_ed25519_pub || null,
     });
   }
 
-  /* Live $PIPER market data — DexScreener */
-  var MINT = '83VTqzxszRFPSzJHvTeNRydcuUmmhEjj9FH4F7TZpump';
+  $msgs.appendChild(el);
+  $msgs.scrollTop = $msgs.scrollHeight;
 
-  function fmt(n, prefix) {
-    if (n == null || isNaN(n)) return '—';
-    var p = prefix || '';
-    if (n >= 1e9) return p + (n / 1e9).toFixed(2) + 'B';
-    if (n >= 1e6) return p + (n / 1e6).toFixed(2) + 'M';
-    if (n >= 1e3) return p + (n / 1e3).toFixed(1) + 'K';
-    return p + n.toFixed(4);
+  addChannelIfNew(msg.channel);
+  msgCount++;
+  $statMsgs.textContent = msgCount;
+}
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+// ── health poll ───────────────────────────────────────────────────────────────
+async function pollHealth() {
+  try {
+    const d = await (await fetch(`${BASE}health`)).json();
+    $peers.textContent = d.peers || 0;
+    $statMode.textContent  = d.iroh === 'connected' ? 'p2p' : 'relay';
+    $statMode.style.color  = d.iroh === 'connected' ? 'var(--accent)' : 'var(--muted)';
+  } catch (_) {}
+}
+
+// ── channel list poll ─────────────────────────────────────────────────────────
+async function pollChannels() {
+  try {
+    const list = await (await fetch(`${BASE}channels`)).json();
+    if (Array.isArray(list)) {
+      for (const ch of list) addChannelIfNew(ch.name);
+    }
+  } catch (_) {}
+}
+
+// ── peer modal ────────────────────────────────────────────────────────────────
+$peerBtn.addEventListener('click', openModal);
+
+async function openModal() {
+  $modal.classList.add('visible');
+  $myTicket.textContent = 'fetching…';
+  try {
+    const d = await (await fetch(`${BASE}ticket`)).json();
+    myTicket = d.ticket || null;
+    $myTicket.textContent = d.ticket || d.error || 'iroh unavailable in relay-only mode';
+  } catch (_) {
+    $myTicket.textContent = 'could not fetch ticket';
+  }
+}
+
+function closeModal() {
+  $modal.classList.remove('visible');
+  $peerIn.value = '';
+}
+
+function copyTicket() {
+  if (myTicket) navigator.clipboard.writeText(myTicket).catch(() => {});
+}
+
+async function connectPeer() {
+  const ticket = $peerIn.value.trim();
+  if (!ticket) return;
+  const btn = document.getElementById('connect-btn');
+  btn.disabled = true; btn.textContent = 'connecting…';
+  try {
+    const r = await fetch(`${BASE}connect`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ ticket }),
+    });
+    const d = await r.json();
+    if (d.ok) { closeModal(); pollHealth(); }
+    else { alert('connection failed: ' + (d.error || 'unknown')); }
+  } catch (err) {
+    alert('connection failed: ' + err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'connect';
+  }
+}
+
+$modal.addEventListener('click', e => { if (e.target === $modal) closeModal(); });
+
+// ── handle hash-based channel routing ────────────────────────────────────────
+function parseHashChannel() {
+  const m = location.hash.match(/^#\/r\/([a-z0-9-]{1,32})$/);
+  return m ? m[1] : null;
+}
+
+function updateHash(ch) {
+  history.replaceState(null, '', `#/r/${ch}`);
+}
+
+window.addEventListener('hashchange', () => {
+  const ch = parseHashChannel();
+  if (ch && ch !== activeChannel) switchChannel(ch);
+});
+
+// ── init ──────────────────────────────────────────────────────────────────────
+(async () => {
+  await loadOrCreateKeypair();
+  updateKeyBanner();
+  initUsernameBanner();
+
+  const hashCh = parseHashChannel();
+  if (hashCh) { activeChannel = hashCh; $activeChBadge.textContent = hashCh; }
+
+  renderChannelList();
+  renderContactsList();
+  connectSSE();
+  pollHealth();
+  pollChannels();
+  setInterval(pollHealth,   5_000);
+  setInterval(pollChannels, 15_000);
+  updateHash(activeChannel);
+})();
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── v1.3 USERNAME CLAIM ───────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+
+const USERNAME_STORAGE_KEY = 'piper-claimed-username'; // localStorage, not session
+const $usernameBanner  = document.getElementById('username-banner');
+const $usernameInput   = document.getElementById('username-input');
+const $usernameClaimBtn = document.getElementById('username-claim-btn');
+const $usernameStatus  = document.getElementById('username-status');
+
+function initUsernameBanner() {
+  const saved = localStorage.getItem(USERNAME_STORAGE_KEY);
+  if (saved) {
+    // Already claimed — show compact display instead of banner
+    showUsernameDisplay(saved);
+    return;
+  }
+  // Only show claim banner if we have a v1.1/v1.2 identity
+  if (!hasV11Identity()) {
+    $usernameBanner.classList.add('hidden');
+    return;
+  }
+  $usernameBanner.classList.remove('hidden');
+}
+
+function showUsernameDisplay(username) {
+  // Replace banner with a compact pill showing the claimed username
+  $usernameBanner.innerHTML =
+    `<span style="color:var(--muted);font-size:10px;">@</span>` +
+    `<span class="username-display" id="username-display" title="your username — click to copy">@${esc(username)}</span>` +
+    `<span id="username-status" style="color:var(--muted);font-size:9px;margin-left:4px;"></span>`;
+  $usernameBanner.classList.remove('hidden');
+  document.getElementById('username-display').addEventListener('click', () => {
+    navigator.clipboard.writeText('@' + username).catch(() => {});
+  });
+}
+
+async function claimUsername() {
+  if (!hasV11Identity()) {
+    alert('Set your ed25519 private key first — username claim requires a signed identity.');
+    return;
+  }
+  const username = ($usernameInput.value || '').trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+  if (!username || username.length < 3) {
+    $usernameStatus.textContent = '3–32 chars, a-z 0-9 _ -';
+    return;
+  }
+  $usernameClaimBtn.disabled = true;
+  $usernameStatus.textContent = 'claiming…';
+
+  try {
+    // Build canonical claim payload and sign it
+    const claimText  = `claim:${username}:${_dot1}`;
+    const claimBytes = new TextEncoder().encode(claimText);
+    const privBytes  = hex2buf(_ed25519Priv);
+    const keypair    = nacl.sign.keyPair.fromSecretKey(privBytes);
+    const sigBytes   = nacl.sign.detached(claimBytes, keypair.secretKey);
+    const sigHex     = buf2hex(sigBytes);
+
+    const resp = await fetch(`${BASE}usernames/claim`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        username,
+        dot1:        _dot1,
+        ed25519_pub: _ed25519Pub,
+        sig:         sigHex,
+      }),
+    });
+    const data = await resp.json();
+    if (resp.ok) {
+      localStorage.setItem(USERNAME_STORAGE_KEY, username);
+      showUsernameDisplay(username);
+    } else if (resp.status === 409) {
+      $usernameStatus.textContent = 'taken by ' + (data.claimed_by || 'another user').slice(-6);
+      $usernameClaimBtn.disabled = false;
+    } else {
+      $usernameStatus.textContent = data.error || 'error';
+      $usernameClaimBtn.disabled = false;
+    }
+  } catch (err) {
+    $usernameStatus.textContent = 'network error';
+    $usernameClaimBtn.disabled = false;
+  }
+}
+
+$usernameClaimBtn.addEventListener('click', claimUsername);
+$usernameInput.addEventListener('keydown', e => { if (e.key === 'Enter') claimUsername(); });
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── v1.3 CONTACTS (browser-side localStorage) ────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+
+const CONTACTS_KEY = 'piperchat.contacts';
+
+/**
+ * Contact schema:
+ * {
+ *   dot1: "dot1:...",
+ *   username: "alice" | null,
+ *   x25519_pub: "64hex" | null,
+ *   ed25519_pub: "64hex" | null,
+ *   added_at: ms,
+ *   favourite: bool,
+ *   last_seen_at: ms,
+ *   nickname: "user-supplied label" | null
+ * }
+ */
+
+function loadContacts() {
+  try {
+    const raw = localStorage.getItem(CONTACTS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (_) { return []; }
+}
+
+function saveContacts(list) {
+  localStorage.setItem(CONTACTS_KEY, JSON.stringify(list));
+}
+
+function getContactByDot1(dot1) {
+  return loadContacts().find(c => c.dot1 === dot1) || null;
+}
+
+function addContact(dot1, { username = null, x25519_pub = null, ed25519_pub = null } = {}) {
+  const list = loadContacts();
+  const existing = list.findIndex(c => c.dot1 === dot1);
+  if (existing >= 0) {
+    // Update fields if provided
+    if (username) list[existing].username = username;
+    if (x25519_pub) list[existing].x25519_pub = x25519_pub;
+    if (ed25519_pub) list[existing].ed25519_pub = ed25519_pub;
+    list[existing].last_seen_at = Date.now();
+    saveContacts(list);
+    return list[existing];
+  }
+  const contact = {
+    dot1,
+    username,
+    x25519_pub,
+    ed25519_pub,
+    added_at:     Date.now(),
+    favourite:    false,
+    last_seen_at: Date.now(),
+    nickname:     null,
+  };
+  list.push(contact);
+  saveContacts(list);
+  return contact;
+}
+
+function toggleFavourite(dot1) {
+  const list = loadContacts();
+  const idx  = list.findIndex(c => c.dot1 === dot1);
+  if (idx < 0) return;
+  list[idx].favourite = !list[idx].favourite;
+  saveContacts(list);
+  renderContactsList();
+}
+
+function setNickname(dot1, nickname) {
+  const list = loadContacts();
+  const idx  = list.findIndex(c => c.dot1 === dot1);
+  if (idx < 0) return;
+  list[idx].nickname = nickname || null;
+  saveContacts(list);
+  renderContactsList();
+}
+
+function updateContactLastSeen(dot1, { username, x25519_pub, ed25519_pub } = {}) {
+  const list = loadContacts();
+  const idx  = list.findIndex(c => c.dot1 === dot1);
+  if (idx < 0) return; // not in contacts, nothing to update
+  list[idx].last_seen_at = Date.now();
+  if (username && !list[idx].username) list[idx].username = username;
+  if (x25519_pub && !list[idx].x25519_pub) list[idx].x25519_pub = x25519_pub;
+  if (ed25519_pub && !list[idx].ed25519_pub) list[idx].ed25519_pub = ed25519_pub;
+  saveContacts(list);
+}
+
+// ── Reverse-lookup: fetch username for a dot1 from server ───────────────────
+async function fetchUsernameForDot1(dot1) {
+  try {
+    const r = await fetch(`${BASE}usernames?dot1=${encodeURIComponent(dot1)}`);
+    if (!r.ok) return null;
+    const d = await r.json();
+    return d.username || null;
+  } catch (_) { return null; }
+}
+
+// ── Contacts panel render ────────────────────────────────────────────────────
+const $contactsPanel      = document.getElementById('contacts-panel');
+const $contactsList       = document.getElementById('contacts-list');
+const $contactsToggleBtn  = document.getElementById('contacts-toggle-btn');
+const $contactsImportInput = document.getElementById('contacts-import-input');
+
+let _contactsPanelOpen = false;
+
+function toggleContacts() {
+  _contactsPanelOpen = !_contactsPanelOpen;
+  $contactsPanel.classList.toggle('collapsed', !_contactsPanelOpen);
+  $contactsToggleBtn.classList.toggle('active', _contactsPanelOpen);
+  if (_contactsPanelOpen) renderContactsList();
+  // On mobile, sync the scrim so tapping outside closes the panel.
+  if (window.innerWidth <= 900) {
+    const scrim = document.getElementById('scrim');
+    if (_contactsPanelOpen) scrim?.classList.add('visible');
+    else if (!document.querySelector('.sidebar')?.classList.contains('open'))
+      scrim?.classList.remove('visible');
+  }
+}
+
+$contactsToggleBtn.addEventListener('click', toggleContacts);
+
+// ── mobile menu (sidebar drawer + scrim) ─────────────────────────────────────
+const $mobileMenuBtn = document.getElementById('mobile-menu-btn');
+const $sidebar       = document.querySelector('.sidebar');
+const $scrim         = document.getElementById('scrim');
+
+function openSidebar() {
+  $sidebar.classList.add('open');
+  $scrim.classList.add('visible');
+}
+
+function closeSidebar() {
+  $sidebar.classList.remove('open');
+  $scrim.classList.remove('visible');
+  if (_contactsPanelOpen) toggleContacts();
+}
+
+$mobileMenuBtn?.addEventListener('click', () => {
+  if ($sidebar.classList.contains('open')) closeSidebar();
+  else openSidebar();
+});
+
+$scrim?.addEventListener('click', closeSidebar);
+
+// On phone, picking a channel should auto-close the drawer.
+document.querySelector('.channel-list')?.addEventListener('click', e => {
+  if (e.target.closest('.ch-item') && window.innerWidth <= 900) closeSidebar();
+});
+
+function renderContactsList() {
+  $contactsList.innerHTML = '';
+  let contacts = loadContacts();
+  // Sort: favourites first, then by last_seen_at desc
+  contacts = [...contacts].sort((a, b) => {
+    if (a.favourite && !b.favourite) return -1;
+    if (!a.favourite && b.favourite) return 1;
+    return (b.last_seen_at || 0) - (a.last_seen_at || 0);
+  });
+
+  if (contacts.length === 0) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'padding:16px 12px;font-size:10px;color:var(--muted);text-align:center;';
+    empty.textContent = 'no contacts yet\nsave senders with 📌';
+    $contactsList.appendChild(empty);
+    return;
   }
 
-  function setEl(id, val) {
-    var el = document.getElementById(id);
-    if (el) { el.textContent = val; el.classList.remove('loading'); }
+  for (const c of contacts) {
+    const item = document.createElement('div');
+    item.className = 'contact-item';
+    item.dataset.dot1 = c.dot1;
+
+    const displayName = c.nickname || c.username || (c.dot1.replace('dot1:', '').slice(-6));
+    const subLabel    = c.nickname && c.username ? '@' + c.username : (c.dot1.replace('dot1:', '').slice(-6));
+
+    item.innerHTML =
+      `<button class="contact-fav ${c.favourite ? 'active' : ''}" title="${c.favourite ? 'unfavourite' : 'favourite'}">★</button>` +
+      `<div style="flex:1;min-width:0;">` +
+        `<div class="contact-name" title="${esc(c.dot1)}">${esc(displayName)}</div>` +
+        `<div class="contact-sub">${esc(subLabel)}</div>` +
+      `</div>` +
+      `<button class="contact-fav" style="font-size:10px;color:var(--muted);opacity:0.5;" title="edit nickname">✎</button>`;
+
+    // Favourite toggle
+    item.querySelector('.contact-fav').addEventListener('click', e => {
+      e.stopPropagation();
+      toggleFavourite(c.dot1);
+    });
+
+    // Nickname edit
+    const editBtn = item.querySelectorAll('.contact-fav')[1];
+    editBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      const nameEl = item.querySelector('.contact-name');
+      const current = c.nickname || '';
+      const input = document.createElement('input');
+      input.className = 'contact-nick-input';
+      input.value = current;
+      input.placeholder = 'nickname';
+      input.maxLength = 32;
+      nameEl.replaceWith(input);
+      input.focus();
+      const commit = () => {
+        setNickname(c.dot1, input.value.trim());
+      };
+      input.addEventListener('blur', commit);
+      input.addEventListener('keydown', e2 => {
+        if (e2.key === 'Enter') { input.blur(); }
+        if (e2.key === 'Escape') { input.value = current; input.blur(); }
+      });
+    });
+
+    // Click contact → open DM channel
+    item.addEventListener('click', () => {
+      if (!_dot1) return;
+      const a = _dot1.replace('dot1:', '');
+      const b = c.dot1.replace('dot1:', '');
+      const dmChannel = 'dm-' + [a, b].sort().join('-').slice(0, 32);
+      addChannelIfNew(dmChannel);
+      switchChannel(dmChannel);
+      // If we have their x25519 pub, auto-add as recipient for this channel
+      if (c.x25519_pub && hasV12Identity()) {
+        addRecipient(dmChannel, c.dot1, c.x25519_pub);
+      }
+      // Close contacts panel on mobile
+      if (window.innerWidth < 600) toggleContacts();
+    });
+
+    $contactsList.appendChild(item);
   }
+}
 
-  fetch('https://api.dexscreener.com/latest/dex/tokens/' + MINT)
-    .then(function (r) { return r.json(); })
-    .then(function (d) {
-      var pairs = d && d.pairs;
-      if (!pairs || !pairs.length) return;
-      var p = pairs[0];
-      setEl('stat-price', p.priceUsd ? '$' + Number(p.priceUsd).toFixed(8) : '—');
-      setEl('stat-mcap',  fmt(p.fdv, '$'));
-      setEl('stat-vol',   fmt(p.volume && p.volume.h24, '$'));
-    })
-    .catch(function () { /* silently fall back to dashes */ });
+// ── Save-sender button on incoming messages ──────────────────────────────────
+function addSaveSenderBtn(el, msg) {
+  // Only show for messages with a dot1 identity that isn't ourselves
+  const senderDot1 = msg.from_dot1 || null;
+  if (!senderDot1) return;
+  if (_dot1 && senderDot1 === _dot1) return; // own message
 
+  const alreadySaved = Boolean(getContactByDot1(senderDot1));
+  const pin = document.createElement('button');
+  pin.className = 'save-sender-btn' + (alreadySaved ? ' saved' : '');
+  pin.title     = alreadySaved ? 'saved to contacts' : 'save to contacts';
+  pin.textContent = '📌';
+
+  pin.addEventListener('click', async e => {
+    e.stopPropagation();
+    pin.disabled = true;
+    // Try to resolve username from server
+    let username = msg.username || null;
+    if (!username) username = await fetchUsernameForDot1(senderDot1);
+    addContact(senderDot1, {
+      username,
+      x25519_pub:  msg.from_x25519_pub || null,
+      ed25519_pub: msg.from_ed25519_pub || null,
+    });
+    pin.classList.add('saved');
+    pin.title     = 'saved to contacts';
+    pin.disabled  = false;
+    if (_contactsPanelOpen) renderContactsList();
+  });
+
+  el.appendChild(pin);
+}
+
+// ── Export / Import contacts ─────────────────────────────────────────────────
+function exportContacts() {
+  const contacts = loadContacts();
+  const blob = new Blob([JSON.stringify(contacts, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'piperchat-contacts.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+$contactsImportInput.addEventListener('change', async () => {
+  const file = $contactsImportInput.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const imported = JSON.parse(text);
+    if (!Array.isArray(imported)) { alert('Invalid contacts file'); return; }
+    const existing = loadContacts();
+    const existingDot1s = new Set(existing.map(c => c.dot1));
+    let added = 0;
+    for (const c of imported) {
+      if (typeof c.dot1 !== 'string') continue;
+      if (!existingDot1s.has(c.dot1)) {
+        existing.push({ ...c, added_at: c.added_at || Date.now() });
+        added++;
+      }
+    }
+    saveContacts(existing);
+    renderContactsList();
+    alert(`Imported ${added} new contact(s).`);
+  } catch (err) {
+    alert('Import failed: ' + err.message);
+  }
+  $contactsImportInput.value = '';
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── v1.3 QR contact sharing ──────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+//
+// QR payload (v=1):
+//   { v:1, d:dot1, x:x25519PubHex, e:ed25519PubHex, u:username|null }
+// Encoded as URL-safe base64 in the ?c= query param of the page URL.
+
+function b64urlEncode(str) {
+  return btoa(unescape(encodeURIComponent(str)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function b64urlDecode(s) {
+  s = s.replace(/-/g, '+').replace(/_/g, '/');
+  while (s.length % 4) s += '=';
+  return decodeURIComponent(escape(atob(s)));
+}
+
+function buildContactPayload() {
+  if (!_dot1 || !_ed25519Pub) return null;
+  return {
+    v: 1,
+    d: _dot1,
+    x: _x25519Pub || null,
+    e: _ed25519Pub,
+    u: localStorage.getItem('piperchat.username') || null,
+  };
+}
+
+function buildShareLink() {
+  const payload = buildContactPayload();
+  if (!payload) return null;
+  const enc  = b64urlEncode(JSON.stringify(payload));
+  const base = location.origin + '/';   // canonical share host
+  return `${base}?c=${enc}`;
+}
+
+// ── share modal ──────────────────────────────────────────────────────────────
+const $qrShareModal  = document.getElementById('qr-share-modal');
+const $qrShareCanvas = document.getElementById('qr-share-canvas');
+const $qrShareLink   = document.getElementById('qr-share-link');
+const $qrShareBtn    = document.getElementById('qr-share-btn');
+
+function openShareQrModal() {
+  const link = buildShareLink();
+  if (!link) {
+    alert('Set up your identity first — claim a name and ensure encryption keys are generated.');
+    return;
+  }
+  if (!_x25519Pub) {
+    alert('No X25519 key yet. Open the encryption toggle (🔓) once so v1.2 keys are generated, then re-open this dialog.');
+  }
+  $qrShareLink.textContent = link;
+  $qrShareCanvas.innerHTML = '';
+  // qrcode-generator: typeNumber=0 (auto), errorCorrectionLevel='M'
+  const qr = qrcode(0, 'M');
+  qr.addData(link);
+  qr.make();
+  // Render as SVG (sharper at any size than gif)
+  const svg = qr.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
+  $qrShareCanvas.innerHTML = svg;
+  const svgEl = $qrShareCanvas.querySelector('svg');
+  if (svgEl) {
+    svgEl.style.width  = '100%';
+    svgEl.style.height = '100%';
+    svgEl.removeAttribute('width');
+    svgEl.removeAttribute('height');
+  }
+  $qrShareModal.classList.add('visible');
+}
+
+function closeShareQrModal() {
+  $qrShareModal.classList.remove('visible');
+}
+
+function copyShareLink() {
+  const link = $qrShareLink.textContent;
+  if (!link || link === '—') return;
+  navigator.clipboard?.writeText(link).then(
+    () => { $qrShareLink.textContent = '✓ copied — ' + link; setTimeout(() => { $qrShareLink.textContent = link; }, 1500); },
+    () => { /* clipboard blocked — leave as-is */ },
+  );
+}
+
+$qrShareBtn?.addEventListener('click', openShareQrModal);
+$qrShareModal?.addEventListener('click', e => { if (e.target === $qrShareModal) closeShareQrModal(); });
+
+// ── scan modal ───────────────────────────────────────────────────────────────
+const $qrScanModal  = document.getElementById('qr-scan-modal');
+const $qrScanVideo  = document.getElementById('qr-scan-video');
+const $qrScanStatus = document.getElementById('qr-scan-status');
+const $qrScanFile   = document.getElementById('qr-scan-file');
+const $qrScanBtn    = document.getElementById('qr-scan-btn');
+
+let _scanStream      = null;
+let _scanDetector    = null;
+let _scanRafHandle   = null;
+
+async function openScanQrModal() {
+  $qrScanModal.classList.add('visible');
+  $qrScanStatus.textContent = 'requesting camera…';
+  // BarcodeDetector path
+  if ('BarcodeDetector' in window) {
+    try {
+      const formats = await BarcodeDetector.getSupportedFormats();
+      if (!formats.includes('qr_code')) throw new Error('no qr support');
+      _scanDetector = new BarcodeDetector({ formats: ['qr_code'] });
+    } catch (_) { _scanDetector = null; }
+  }
+  try {
+    _scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    $qrScanVideo.srcObject = _scanStream;
+    await $qrScanVideo.play();
+    if (_scanDetector) {
+      $qrScanStatus.textContent = 'scanning…';
+      tickScan();
+    } else {
+      $qrScanStatus.textContent = 'this browser does not support QR scanning — use the upload fallback below.';
+    }
+  } catch (err) {
+    $qrScanStatus.textContent = 'camera unavailable — use the upload fallback below.';
+  }
+}
+
+async function tickScan() {
+  if (!_scanDetector || !_scanStream) return;
+  try {
+    const codes = await _scanDetector.detect($qrScanVideo);
+    if (codes.length > 0) {
+      const raw = codes[0].rawValue;
+      handleScannedContact(raw);
+      return;
+    }
+  } catch (_) { /* keep scanning */ }
+  _scanRafHandle = requestAnimationFrame(tickScan);
+}
+
+function closeScanQrModal() {
+  $qrScanModal.classList.remove('visible');
+  if (_scanStream) { _scanStream.getTracks().forEach(t => t.stop()); _scanStream = null; }
+  if (_scanRafHandle) { cancelAnimationFrame(_scanRafHandle); _scanRafHandle = null; }
+  $qrScanVideo.srcObject = null;
+  $qrScanFile.value = '';
+}
+
+$qrScanBtn?.addEventListener('click', openScanQrModal);
+$qrScanModal?.addEventListener('click', e => { if (e.target === $qrScanModal) closeScanQrModal(); });
+
+// Upload-image fallback for browsers without BarcodeDetector.
+$qrScanFile?.addEventListener('change', async () => {
+  const file = $qrScanFile.files?.[0];
+  if (!file) return;
+  $qrScanStatus.textContent = 'reading image…';
+  if ('BarcodeDetector' in window) {
+    try {
+      const detector = new BarcodeDetector({ formats: ['qr_code'] });
+      const bmp      = await createImageBitmap(file);
+      const codes    = await detector.detect(bmp);
+      if (codes.length > 0) { handleScannedContact(codes[0].rawValue); return; }
+      $qrScanStatus.textContent = 'no QR code found in image.';
+      return;
+    } catch (_) { /* fall through */ }
+  }
+  $qrScanStatus.textContent = 'this browser cannot decode QR images. paste the share link directly into the recipients panel.';
+});
+
+// ── handle a decoded contact (URL or raw JSON) ───────────────────────────────
+function handleScannedContact(text) {
+  let payload = null;
+  try {
+    const u = new URL(text, location.origin);
+    const c = u.searchParams.get('c');
+    if (c) payload = JSON.parse(b64urlDecode(c));
+  } catch (_) { /* not a URL */ }
+  if (!payload) {
+    try { payload = JSON.parse(text); } catch (_) { /* nope */ }
+  }
+  if (!payload || !payload.d) {
+    $qrScanStatus.textContent = 'unrecognized QR — expected a piperchat contact link.';
+    return;
+  }
+  closeScanQrModal();
+  applyIncomingContact(payload, { fromScan: true });
+}
+
+function applyIncomingContact(payload, { fromScan = false } = {}) {
+  const dot1 = payload.d;
+  if (!dot1 || !/^dot1:[0-9a-f]{16}$/.test(dot1)) {
+    alert('invalid dot1 in contact');
+    return;
+  }
+  if (dot1 === _dot1) {
+    if (fromScan) alert('that QR is your own — nothing to add.');
+    return;
+  }
+  addContact(dot1, {
+    username:   payload.u || null,
+    x25519_pub: payload.x || null,
+    ed25519_pub: payload.e || null,
+  });
+  if (payload.x && typeof addRecipient === 'function') {
+    addRecipient(activeChannel || 'main', dot1, payload.x);
+  }
+  if (typeof renderContactsList === 'function') renderContactsList();
+  const label = payload.u ? `@${payload.u}` : dot1.slice(-6);
+  if (fromScan) alert(`added ${label} to contacts & ${activeChannel || 'main'} recipients`);
+}
+
+// ── on page load: auto-import contact from ?c= URL param ─────────────────────
+(function checkIncomingContactURL() {
+  const params = new URLSearchParams(location.search);
+  const c = params.get('c');
+  if (!c) return;
+  let payload = null;
+  try { payload = JSON.parse(b64urlDecode(c)); } catch (_) { return; }
+  if (!payload || !payload.d) return;
+  // Clear the ?c= from address bar so refresh doesn't re-trigger.
+  const cleanURL = location.pathname + location.hash;
+  history.replaceState(null, '', cleanURL);
+  // Show a confirm banner instead of silently importing.
+  const banner = document.getElementById('qr-incoming-banner');
+  const label  = document.getElementById('qr-incoming-label');
+  const accept = document.getElementById('qr-incoming-accept');
+  const dismiss = document.getElementById('qr-incoming-dismiss');
+  if (!banner) return;
+  const who = payload.u ? `@${payload.u}` : payload.d.slice(-6);
+  label.textContent = `incoming contact: ${who} (${payload.d.slice(0,12)}…) — add?`;
+  banner.classList.add('visible');
+  accept.onclick = () => {
+    applyIncomingContact(payload, { fromScan: false });
+    banner.classList.remove('visible');
+  };
+  dismiss.onclick = () => banner.classList.remove('visible');
 })();
 </script>
-
 </body>
 </html>

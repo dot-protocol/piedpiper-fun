@@ -5,13 +5,14 @@
     {
       "source": "/chat/:path*",
       "destination": "http://69.62.114.97/chat/:path*"
-    },
-    {
-      "source": "/chat",
-      "destination": "http://69.62.114.97/chat/"
     }
   ],
   "redirects": [
+    {
+      "source": "/chat",
+      "destination": "/",
+      "permanent": false
+    },
     {
       "source": "/c/:path*",
       "destination": "https://qr-chat-kohl.vercel.app/:path*",
