@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Pied Piper</title>
+<meta name="description" content="The coin is the meme. The meme funds the build. The product is the point.">
+<meta property="og:title" content="Pied Piper">
+<meta property="og:description" content="The coin is the meme. The meme funds the build. The product is the point.">
+<meta property="og:url" content="https://piedpiper.fun">
+<meta property="og:type" content="website">
+<meta property="og:image" content="/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>
+  :root {
+    --bg: #080a0e;
+    --surface: #0d1117;
+    --card: #161b22;
+    --line: #1b2028;
+    --text: #e0e6ed;
+    --muted: #6e7681;
+    --accent: #00ff41;
+    --accent-dim: rgba(0, 255, 65, 0.08);
+    --warn: #ffb347;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    min-height: 100%;
+    background: var(--bg); color: var(--text);
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+    font-size: 14px; line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 56px 24px 96px; }
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; color: var(--muted); margin-bottom: 56px;
+    letter-spacing: 0.05em;
+  }
+  .topbar a { color: var(--accent); text-decoration: none; }
+  .topbar a:hover { text-decoration: underline; }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+    display: inline-block; margin-right: 6px; animation: pulse 2.5s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  h1 {
+    font-family: ui-serif, Georgia, 'Times New Roman', serif;
+    font-weight: 400; font-size: clamp(48px, 8vw, 84px); line-height: 0.95;
+    letter-spacing: -0.025em; margin-bottom: 16px;
+  }
+  h1 em { font-style: italic; color: var(--accent); }
+  .tag {
+    color: var(--muted); font-size: 13px; margin-bottom: 48px;
+    letter-spacing: 0.02em;
+  }
+
+  .answer {
+    font-size: 19px; line-height: 1.55; margin: 32px 0 40px;
+    color: var(--text);
+  }
+  .answer span { display: block; padding: 6px 0; }
+  .answer .green { color: var(--accent); }
+
+  h2 {
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--muted); margin: 56px 0 12px; font-weight: 500;
+  }
+
+  p { margin: 0 0 16px; max-width: 64ch; color: var(--text); }
+  p.muted { color: var(--muted); }
+
+  .card {
+    border: 1px solid var(--line); padding: 18px 22px; margin: 12px 0;
+    background: var(--card); border-radius: 4px;
+  }
+  .card .k {
+    color: var(--muted); font-size: 10px; letter-spacing: 0.16em;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .card .v { color: var(--text); }
+  .card .v a { color: var(--accent); text-decoration: none; }
+  .card .v a:hover { text-decoration: underline; }
+
+  .pull {
+    font-family: ui-serif, Georgia, serif;
+    font-style: italic; font-size: 20px; line-height: 1.45;
+    border-left: 2px solid var(--accent); padding: 6px 0 6px 20px;
+    margin: 28px 0; color: var(--text);
+  }
+
+  .cta {
+    display: inline-block; padding: 12px 20px; margin: 8px 8px 8px 0;
+    border: 1px solid var(--accent); color: var(--accent);
+    text-decoration: none; border-radius: 3px;
+    font-size: 13px; letter-spacing: 0.06em;
+    transition: background 0.15s, color 0.15s;
+  }
+  .cta:hover { background: var(--accent); color: var(--bg); }
+  .cta.muted { border-color: var(--line); color: var(--muted); }
+  .cta.muted:hover { background: var(--card); color: var(--text); }
+
+  .ctas { margin: 32px 0; }
+
+  .quiet {
+    color: var(--muted); font-size: 12px; margin-top: 64px;
+    padding-top: 24px; border-top: 1px solid var(--line);
+  }
+  .quiet a { color: var(--muted); text-decoration: underline; }
+  .quiet a:hover { color: var(--accent); }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0 32px; }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div><span class="dot"></span>protocol live · 2026</div>
+    <div>
+      <a href="https://x.com/dotpiedpiper">x</a> &nbsp;·&nbsp;
+      <a href="https://github.com/dot-protocol">github</a> &nbsp;·&nbsp;
+      <a href="https://t.me/+piedpiperfun">telegram</a>
+    </div>
+  </div>
+
+  <h1>Pied Piper<em>.</em></h1>
+  <div class="tag">The new internet, built by the meme.</div>
+
+  <p>
+    People keep asking the same two questions. So here it is, plain.
+  </p>
+
+  <h2>Do you have to hold $PIPER?</h2>
+  <p>
+    No. The coin is the meme. The meme funds the build. Holding doesn't guarantee anything. Using the product does.
+  </p>
+
+  <h2>Are you going to pump the chart?</h2>
+  <p>
+    No. The chart is a byproduct. Creator fees on pump.fun pay the devs to build. That's it. If the work is good, the chart takes care of itself. If the work is bad, no chart push will save it.
+  </p>
+
+  <div class="pull">
+    "If you understand what's being built, the question doesn't even arise."
+  </div>
+
+  <h2>So what is being built</h2>
+  <p>
+    A peer-to-peer protocol. Send any file to any person directly. No company in the middle. No upload step. No "your data is now ours."
+  </p>
+  <p>
+    Six seasons of HBO fiction made the name Pied Piper a household word for compression and decentralized internet. We're the real one. We didn't watch the show. We don't need to.
+  </p>
+
+  <h2>What you should do</h2>
+
+  <div class="grid">
+    <div class="card">
+      <div class="k">→ Use it</div>
+      <div class="v"><a href="/app/">Open the app</a> · send a file to someone right now</div>
+    </div>
+    <div class="card">
+      <div class="k">→ Read it</div>
+      <div class="v"><a href="/manifesto/">Read the manifesto</a> · the why, in plain words</div>
+    </div>
+    <div class="card">
+      <div class="k">→ Hold it (optional)</div>
+      <div class="v">$PIPER · <a href="https://pump.fun/coin/AyUfba64zszzNqVQG3Ya4g2mEjVCWJcHqyGN8Ae2pump">on pump.fun</a></div>
+    </div>
+    <div class="card">
+      <div class="k">→ Talk to us</div>
+      <div class="v"><a href="https://t.me/+piedpiperfun">Join Telegram</a> · ask any question · we answer</div>
+    </div>
+  </div>
+
+  <h2>The honest part</h2>
+  <p>
+    We are devs building a protocol. The coin is how the meme moves. The fees keep the lights on. That is the entire economic model. We will not promise gains, push the chart, or coordinate buys. We will ship.
+  </p>
+  <p class="muted">
+    Crypto-native readers: if you want a chart-push project, this isn't it. There are a hundred of those today. Stay if you want the protocol. Leave if you want the pump.
+  </p>
+
+  <div class="ctas">
+    <a class="cta" href="/app/">Open the app</a>
+    <a class="cta muted" href="/manifesto/">Read more</a>
+  </div>
+
+  <div class="quiet">
+    Pied Piper is a real protocol, an open-source codebase, and a $PIPER coin on Solana. The HBO show is a tribute we wear with affection — we did not write it, we are not affiliated with it. Last updated 2026-05-13. <a href="/agents/erlich">The AI accounts are labeled.</a>
+  </div>
+
+</div>
+</body>
+</html>
