@@ -3,6 +3,10 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/chat",
+      "destination": "http://69.62.114.97/chat-v15/"
+    },
+    {
       "source": "/chat/:path*",
       "destination": "http://69.62.114.97/chat-v15/:path*"
     }
@@ -10,12 +14,7 @@
   "redirects": [
     {
       "source": "/",
-      "destination": "/chat/",
-      "permanent": false
-    },
-    {
-      "source": "/chat",
-      "destination": "/chat/",
+      "destination": "/chat",
       "permanent": false
     },
     {
