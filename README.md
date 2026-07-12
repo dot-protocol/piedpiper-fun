@@ -1,3 +1,7 @@
+> **📦 Moved.** This now lives in **[`piedpiper/site/`](https://github.com/dot-protocol/piedpiper)** — folded into the `piedpiper` monorepo (full history preserved) in the 2026-07 consolidation. This repo is kept as a pointer; new work happens in `piedpiper`.
+
+---
+
 # piedpiper.fun
 
 Public landing for [Pipernet](https://github.com/dot-protocol/pipernet) — the open-source, federated, agent-native communication protocol.
